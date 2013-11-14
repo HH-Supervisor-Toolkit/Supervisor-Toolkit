@@ -56,7 +56,7 @@ public class main {
         System.out.println("Begining to load pages");
         try {
             for (int i = 1; i < address.length; i = i + 2) {
-                System.out.println("Constructing web browser " + (i - 1) / 2);
+                System.out.println("Constructing web browser " + (i - 1) / 2 +" in tab: " + address[i-1]);
                 webBrowser[(i - 1) / 2] = new JWebBrowser();
                 System.out.println("Navagating to " + address[i]);
                 webBrowser[(i - 1) / 2].navigate(address[i]);
