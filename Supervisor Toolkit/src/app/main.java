@@ -119,7 +119,7 @@ public class main {
             if (!file.exists()) {
                 System.out.println("Options file not found attemping to create default");
                 if (!file.getParentFile().exists()) {
-                    System.out.println("File path doesn't exist creating it");
+                    System.out.println("SuperToolkit directory not found attempting to create it");
                     file.getParentFile().mkdirs();
                 }
                 file.createNewFile();
