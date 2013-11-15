@@ -37,7 +37,7 @@ import javax.swing.SwingUtilities;
  */
 public class main {
 
-    final static String[] Default = {"[Nightly Log]", "https://docs.google.com/forms/d/172-Elqzog2MgLSMe9WvCHkuxHsJAb5IaFJZKq74KxPw/viewform",
+  final static String[] Default = {"[Nightly Log]", "https://docs.google.com/forms/d/172-Elqzog2MgLSMe9WvCHkuxHsJAb5IaFJZKq74KxPw/viewform",
         "[Equipment Problem Report]", "https://docs.google.com/forms/d/1X8K1XeWBykPRnnxn5TWaLGUcc68Yn3JiejvpSgwiJTc/viewform",
         "[Incident Report]", "https://docs.google.com/forms/d/1Zy4Hd4FxPlpSAOZMigRfUVywnL78-pBm5HP5E69TasE/viewform",
         "[Textbook Request Form]", "https://docs.google.com/forms/d/1wW0GEoEqkOlpTIPP__2kRSWbD1RskTBo4wtBaO738BM/viewform",
@@ -45,7 +45,7 @@ public class main {
         "[Phone Surveys]", "https://prod11gbss8.rose-hulman.edu/BanSS/rhit_hwhl.P_QuestionPage",
         "[Attendance Page]", "http://askrose.org/askrose-login"
         
-    };
+    };    
     static File file;
     static FileReader read;
 
@@ -117,7 +117,7 @@ public class main {
         try {
             file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Options.txt");
             if (!file.exists()) {
-                System.out.println("File is known not to exist creating new one");
+                System.out.println("Options file not found attemping to create default");
                 if (!file.getParentFile().exists()) {
                     System.out.println("File path doesn't exist creating it");
                     file.getParentFile().mkdirs();
