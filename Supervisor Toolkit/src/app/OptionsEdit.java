@@ -24,7 +24,7 @@ public class OptionsEdit extends javax.swing.JPanel {
     public void FillEditPane() {
         try {
             BufferedReader bufRead = new BufferedReader(new FileReader(main.file));
-            System.out.println("Attempting to Fill Options Pane");
+            System.out.println("Attempting to fill options pane");
             String workingLine;
             workingLine = bufRead.readLine();
             EditPane.setText(null);
@@ -32,6 +32,7 @@ public class OptionsEdit extends javax.swing.JPanel {
                 EditPane.setText(EditPane.getText() + workingLine + System.getProperty("line.separator"));
                 workingLine = bufRead.readLine();
             }
+            System.out.println("Options pane sucessfully filled");
         } catch (FileNotFoundException ex) {
             Logger.getLogger(OptionsEdit.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -116,13 +117,11 @@ public class OptionsEdit extends javax.swing.JPanel {
         if (!broken) {
 
             int choice = JOptionPane.showConfirmDialog(null, "Are you sure you want to revert any changes?", "Confirm cancel", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-
             if (choice == JOptionPane.YES_OPTION) {
                 FillEditPane();
             }
         } else {
             int choice = JOptionPane.showConfirmDialog(null, "Are you sure you want cancel. This will close the program?", "Confirm cancel", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-
             if (choice == JOptionPane.YES_OPTION) {
                 System.exit(0);
             }

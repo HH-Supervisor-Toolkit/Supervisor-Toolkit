@@ -37,15 +37,14 @@ import javax.swing.SwingUtilities;
  */
 public class main {
 
-  final static String[] Default = {"[Nightly Log]", "https://docs.google.com/forms/d/172-Elqzog2MgLSMe9WvCHkuxHsJAb5IaFJZKq74KxPw/viewform",
+    final static String[] Default = {"[Nightly Log]", "https://docs.google.com/forms/d/172-Elqzog2MgLSMe9WvCHkuxHsJAb5IaFJZKq74KxPw/viewform",
         "[Equipment Problem Report]", "https://docs.google.com/forms/d/1X8K1XeWBykPRnnxn5TWaLGUcc68Yn3JiejvpSgwiJTc/viewform",
         "[Incident Report]", "https://docs.google.com/forms/d/1Zy4Hd4FxPlpSAOZMigRfUVywnL78-pBm5HP5E69TasE/viewform",
         "[Textbook Request Form]", "https://docs.google.com/forms/d/1wW0GEoEqkOlpTIPP__2kRSWbD1RskTBo4wtBaO738BM/viewform",
         "[Real-Time Agent]", "http://geomantce-cra.rose-hulman.edu/ACEAdmin/Admin/login.asp?entire=yes&returnpage=http://geomantce-cra.rose-hulman.edu:8080/ACEReport/",
         "[Phone Surveys]", "https://prod11gbss8.rose-hulman.edu/BanSS/rhit_hwhl.P_QuestionPage",
         "[Attendance Page]", "http://askrose.org/askrose-login"
-        
-    };    
+    };
     static File file;
     static FileReader read;
 
@@ -56,7 +55,7 @@ public class main {
         System.out.println("Begining to load pages");
         try {
             for (int i = 1; i < address.length; i = i + 2) {
-                System.out.println("Constructing web browser " + (i - 1) / 2 +" in tab: " + address[i-1]);
+                System.out.println("Constructing web browser " + (i - 1) / 2 + " in tab: " + address[i - 1]);
                 webBrowser[(i - 1) / 2] = new JWebBrowser();
                 System.out.println("Navagating to " + address[i]);
                 webBrowser[(i - 1) / 2].navigate(address[i]);
@@ -75,7 +74,7 @@ public class main {
     }
 
     /* Standard main method to try that test as a standalone application. */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         NativeInterface.open();
         UIUtils.setPreferredLookAndFeel();
         SwingUtilities.invokeLater(new Runnable() {
@@ -87,7 +86,16 @@ public class main {
                 frame.setSize(900, 600);
                 frame.setLocationByPlatform(true);
                 try {
-                    String iconPath = "img/icon.png";
+                    String iconPath;
+                    if (args.length > 0) {
+                        if (args[0].equals("don'tfeedthebears")) {
+                            iconPath = "img/bear.png";
+                        } else {
+                            iconPath = "img/icon.png";
+                        }
+                    } else {
+                        iconPath = "img/icon.png";
+                    }
                     InputStream iconStream = main.class.getResourceAsStream(iconPath);
                     BufferedImage icon = ImageIO.read(iconStream);
                     frame.setIconImage(icon);
@@ -115,6 +123,7 @@ public class main {
         ArrayList<String> LineList = new ArrayList();
         String workingLine;
         try {
+            System.out.println("Attempting to read options file");
             file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Options.txt");
             if (!file.exists()) {
                 System.out.println("Options file not found attemping to create default");
@@ -162,6 +171,7 @@ public class main {
     }
 
     public static void RepairOptions() {
+        System.out.println("Options file not formatted correctly. Opening repair window");
         infoBox("Options file is not formatted correctly please repair it manually.", "Bad Startup");
         JDialog diag = new JDialog();
         diag.setTitle("Options Manual Repair");
@@ -171,5 +181,6 @@ public class main {
         diag.setLocationByPlatform(true);
         diag.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         diag.setVisible(true);
+        System.out.println("Options revision submitted");
     }
 }
