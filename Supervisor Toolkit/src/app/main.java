@@ -69,7 +69,7 @@ public class main {
             return createContent(ReadOptions());
         }
         webBrowserPane.addTab("Options", new OptionsEdit(false));
-        webBrowserPane.addMouseListener(new RightClickListener());
+        webBrowserPane.addMouseListener(new RightClickListener(webBrowserPane));
         contentPane.add(webBrowserPane, BorderLayout.CENTER);
         return contentPane;
     }

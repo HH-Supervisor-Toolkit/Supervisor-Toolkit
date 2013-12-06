@@ -4,6 +4,9 @@
  */
 package app;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
@@ -11,10 +14,18 @@ import javax.swing.JPopupMenu;
  *
  * @author haywoosd
  */
-public class RightClickMenu extends JPopupMenu{
-    JMenuItem timerItem;
-    public RightClickMenu(){
-        timerItem = new JMenuItem("Add Timer to Tab");
+public class RightClickMenu extends JPopupMenu {
+
+    JCheckBoxMenuItem timerItem;
+
+    public RightClickMenu() {
+        timerItem = new JCheckBoxMenuItem("Add Timer to Tab");
+        timerItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println(e.getActionCommand());
+            }
+        });
         add(timerItem);
     }
 }
