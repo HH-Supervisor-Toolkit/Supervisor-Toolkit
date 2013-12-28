@@ -4,7 +4,7 @@
  */
 package app;
 
-import java.awt.Point;
+import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JTabbedPane;
@@ -16,6 +16,7 @@ import javax.swing.JTabbedPane;
 public class RightClickListener extends MouseAdapter {
 
     JTabbedPane tabPaneParent;
+    int index;
 
     @Override
     public void mousePressed(MouseEvent e) {
@@ -34,16 +35,22 @@ public class RightClickListener extends MouseAdapter {
     }
 
     private void showMenu(MouseEvent e) {
-        RightClickMenu menu = new RightClickMenu();
-        menu.setInvoker(e.getComponent());
+        tabPaneParent.setSelectedIndex(index);
+        RightClickMenu menu = new RightClickMenu((JWebBrowser) tabPaneParent.getComponent(index));
+        menu.setInvoker((JWebBrowser) tabPaneParent.getComponent(index));
         menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
         menu.setVisible(true);
     }
 
     private boolean isTabReal(MouseEvent e) {
-            
+        index = tabPaneParent.indexAtLocation(e.getX(), e.getY());
+        if (index != -1 && index < tabPaneParent.getTabCount() - 1) {
+            System.out.println("The tab right clicked is: " + tabPaneParent.getTitleAt(index));
             return true;
-        
+        } else {
+            return false;
+        }
+
     }
 
     RightClickListener(JTabbedPane parent) {

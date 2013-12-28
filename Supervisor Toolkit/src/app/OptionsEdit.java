@@ -39,6 +39,16 @@ public class OptionsEdit extends javax.swing.JPanel {
             Logger.getLogger(OptionsEdit.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    public String[] getOptionsText(){
+        return EditPane.getText().split(System.getProperty("line.separator"));
+    }
+    
+    public void setOptionsText(String[] optionsText){
+        EditPane.setText("");
+        for (int i = 0; i < optionsText.length; i++){
+            EditPane.setText(EditPane.getText() + optionsText[i] + System.getProperty("line.separator"));
+        }
+    }
 
     /**
      * Creates new form OptionsEdit
@@ -88,9 +98,9 @@ public class OptionsEdit extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(473, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel1)
-                .addContainerGap(403, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(CancelButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -140,7 +150,7 @@ public class OptionsEdit extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton ApplyButton;
     private javax.swing.JButton CancelButton;
-    private javax.swing.JEditorPane EditPane;
+    javax.swing.JEditorPane EditPane;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables

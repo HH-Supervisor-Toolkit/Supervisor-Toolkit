@@ -47,11 +47,12 @@ public class main {
     };
     static File file;
     static FileReader read;
-
+    public static OptionsEdit optionsEdit;
+    
     public static JComponent createContent(String[] address) {
-        final JWebBrowser[] webBrowser = new JWebBrowser[address.length / 2];
+        JWebBrowser[] webBrowser = new JWebBrowser[address.length / 2];
         JPanel contentPane = new JPanel(new BorderLayout());
-        final JTabbedPane webBrowserPane = new JTabbedPane();
+        JTabbedPane webBrowserPane = new JTabbedPane();
         System.out.println("Begining to load pages");
         try {
             for (int i = 1; i < address.length; i = i + 2) {
@@ -60,6 +61,7 @@ public class main {
                 System.out.println("Navagating to " + address[i]);
                 webBrowser[(i - 1) / 2].navigate(address[i]);
                 webBrowser[(i - 1) / 2].setBarsVisible(false);
+                webBrowser[(i - 1) / 2].setName("Web Browser " + (i - 1) / 2);
             }
             for (int i = 0; i < address.length - 1; i += 2) {
                 webBrowserPane.addTab(address[i].substring(1, address[i].length() - 1), webBrowser[i / 2]);
@@ -68,8 +70,10 @@ public class main {
             RepairOptions();
             return createContent(ReadOptions());
         }
-        webBrowserPane.addTab("Options", new OptionsEdit(false));
+        optionsEdit = new OptionsEdit(false);
+        webBrowserPane.addTab("Options", optionsEdit);
         webBrowserPane.addMouseListener(new RightClickListener(webBrowserPane));
+        webBrowserPane.setName("Tabbed Pane");
         contentPane.add(webBrowserPane, BorderLayout.CENTER);
         return contentPane;
     }
