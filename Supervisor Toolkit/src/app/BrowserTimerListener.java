@@ -25,13 +25,18 @@ public class BrowserTimerListener implements WebBrowserListener {
     int timerDuration;
     long lastRefreshTime;
     JWebBrowser webBrowser;
+    TimerCounterThread timerThread;
 
     public BrowserTimerListener(int minutes, JWebBrowser webBrowser2) {
         timerDuration = minutes;
         webBrowser = webBrowser2;
         lastRefreshTime = Calendar.getInstance().getTimeInMillis();
-        Thread timerThread = new TimerCounterThread();
+        timerThread = new TimerCounterThread();
         timerThread.start();
+    }
+    
+    public void terminate(){
+        timerThread.terminate();
     }
 
     @Override
@@ -78,6 +83,7 @@ public class BrowserTimerListener implements WebBrowserListener {
     private class TimerCounterThread extends Thread {
 
         long lastNoticeTime;
+        boolean terminated = false;
 
         TimerCounterThread() {
             lastNoticeTime = Calendar.getInstance().getTimeInMillis();
@@ -87,7 +93,7 @@ public class BrowserTimerListener implements WebBrowserListener {
         public void run() {
             long timeDifference;
             long timeNoticeDifference;
-            while (true) {
+            while (!terminated) {
                 timeDifference = Calendar.getInstance().getTimeInMillis() - lastRefreshTime;
                 timeNoticeDifference = Calendar.getInstance().getTimeInMillis() - lastNoticeTime;
                 if (timeDifference > timerDuration * 40000 && timeNoticeDifference > timerDuration * 10000) {
@@ -102,6 +108,9 @@ public class BrowserTimerListener implements WebBrowserListener {
                 }
             }
         }
+        public void terminate(){
+            terminated = true;
+        }
     }
 
     private class TimerMessageThread extends Thread {
@@ -113,7 +122,7 @@ public class BrowserTimerListener implements WebBrowserListener {
         }
 
         public void run() {
-            JOptionPane.showMessageDialog(webBrowser, "Your timer is at " + timeDifference / (60000) + " of " + timerDuration + " minutes", "Timer Notification", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(webBrowser, "Your timer is at " + (double) timeDifference / (60000) + " of " + timerDuration + " minutes", "Timer Notification", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 }

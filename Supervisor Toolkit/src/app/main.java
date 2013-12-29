@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -48,7 +49,7 @@ public class main {
     static File file;
     static FileReader read;
     public static OptionsEdit optionsEdit;
-    
+
     public static JComponent createContent(String[] address) {
         JWebBrowser[] webBrowser = new JWebBrowser[address.length / 2];
         JPanel contentPane = new JPanel(new BorderLayout());
@@ -56,15 +57,13 @@ public class main {
         System.out.println("Begining to load pages");
         try {
             for (int i = 1; i < address.length; i = i + 2) {
-                System.out.println("Constructing web browser " + (i - 1) / 2 + " in tab: " + address[i - 1]);
                 webBrowser[(i - 1) / 2] = new JWebBrowser();
+                addTabWithOptions(webBrowserPane, webBrowser[(i - 1) / 2], address[i - 1]);
                 System.out.println("Navagating to " + address[i]);
                 webBrowser[(i - 1) / 2].navigate(address[i]);
                 webBrowser[(i - 1) / 2].setBarsVisible(false);
-                webBrowser[(i - 1) / 2].setName("Web Browser " + (i - 1) / 2);
             }
             for (int i = 0; i < address.length - 1; i += 2) {
-                webBrowserPane.addTab(address[i].substring(1, address[i].length() - 1), webBrowser[i / 2]);
             }
         } catch (StringIndexOutOfBoundsException ex1) {
             RepairOptions();
@@ -187,5 +186,20 @@ public class main {
         diag.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         diag.setVisible(true);
         System.out.println("Options revision submitted");
+    }
+
+    public static void addTabWithOptions(JTabbedPane webBrowserPane, JWebBrowser webBrowser, String title) {
+        String[] parsedOptions;
+        int tabTitleEndPos;
+        tabTitleEndPos = title.lastIndexOf("]");
+        System.out.println("Constructing web browser in tab: " + title.substring(1, tabTitleEndPos));
+        parsedOptions = title.substring(tabTitleEndPos + 1).trim().split("-", -1);
+        webBrowserPane.add(title.substring(1, tabTitleEndPos), webBrowser);
+        for (int i = 0; i < parsedOptions.length; i++){
+            if (parsedOptions[i].contains("t:")){
+                System.out.println("Adding a timer to " + webBrowser.getPageTitle() + " from options for " + parsedOptions[i].substring(2).trim() + " minute(s)");
+                webBrowser.addWebBrowserListener(new BrowserTimerListener(Integer.parseInt(parsedOptions[i].substring(2).trim()), webBrowser));
+            }
+        }
     }
 }

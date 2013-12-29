@@ -5,6 +5,7 @@
 package app;
 
 import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
+import chrriis.dj.nativeswing.swtimpl.components.WebBrowserListener;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,21 +24,30 @@ public class RightClickMenu extends JPopupMenu {
     JCheckBoxMenuItem timerItem;
     JMenuItem refreshItem;
     JWebBrowser webBrowser;
+    boolean hasTimer = false;
+    BrowserTimerListener timerListener;
 
     public RightClickMenu(final JWebBrowser webBrowser2) {
         webBrowser = webBrowser2;
         timerItem = new JCheckBoxMenuItem("Add Timer to Tab");
-        if (webBrowser.getWebBrowserListeners().length != 0) {
-            timerItem.setState(true);
+        for (WebBrowserListener wbl : webBrowser.getWebBrowserListeners()) {
+            if (wbl instanceof BrowserTimerListener) {
+                hasTimer = true;
+                timerListener = (BrowserTimerListener) wbl;
+            }
+        }
+        if (hasTimer) {
+            timerItem.setSelected(true);
         } else {
-            timerItem.setState(false);
+            timerItem.setSelected(false);
         }
         timerItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (webBrowser.getWebBrowserListeners().length != 0) {
+                if (hasTimer) {
                     ModifyTimerOptions(true, 0);
-                    webBrowser.removeWebBrowserListener(webBrowser.getWebBrowserListeners()[0]);
+                    webBrowser.removeWebBrowserListener(timerListener);
+                    timerListener.terminate();
                     System.out.println("A timer has been removed from " + webBrowser.getPageTitle());
                 } else {
                     int minutes = GetTimerMinutes(webBrowser);
@@ -80,13 +90,12 @@ public class RightClickMenu extends JPopupMenu {
                 break;
             }
         }
-        System.out.println("Modifying timer options for tab " + index);
         String[] optionsText = main.optionsEdit.getOptionsText();
         if (removing) {
             System.out.println("Removing timer option switch from tab " + index);
             optionsText[index * 2] = optionsText[index * 2].replaceAll("-t[^-]*", "");
         } else {
-            System.out.println("Adding timer option switch to tab" + index);
+            System.out.println("Adding timer option switch to tab " + index);
             optionsText[index * 2] = optionsText[index * 2].trim() + " -t:" + minutes;
         }
         main.optionsEdit.setOptionsText(optionsText);
