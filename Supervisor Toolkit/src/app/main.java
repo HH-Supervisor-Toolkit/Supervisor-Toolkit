@@ -61,8 +61,6 @@ public class main {
                 webBrowser[(i - 1) / 2].navigate(address[i]);
                 webBrowser[(i - 1) / 2].setBarsVisible(false);
             }
-            for (int i = 0; i < address.length - 1; i += 2) {
-            }
         } catch (StringIndexOutOfBoundsException ex1) {
             RepairOptions();
             return createContent(ReadOptions());
