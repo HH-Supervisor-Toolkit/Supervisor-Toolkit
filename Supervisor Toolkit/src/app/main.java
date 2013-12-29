@@ -53,7 +53,6 @@ public class main {
         JWebBrowser[] webBrowser = new JWebBrowser[address.length / 2];
         JPanel contentPane = new JPanel(new BorderLayout());
         JTabbedPane webBrowserPane = new JTabbedPane();
-        System.out.println("Begining to load pages");
         try {
             for (int i = 1; i < address.length; i = i + 2) {
                 webBrowser[(i - 1) / 2] = new JWebBrowser();
@@ -194,8 +193,8 @@ public class main {
         System.out.println("Constructing web browser in tab: " + title.substring(1, tabTitleEndPos));
         parsedOptions = title.substring(tabTitleEndPos + 1).trim().split("-", -1);
         webBrowserPane.add(title.substring(1, tabTitleEndPos), webBrowser);
-        for (int i = 0; i < parsedOptions.length; i++){
-            if (parsedOptions[i].contains("t:")){
+        for (int i = 0; i < parsedOptions.length; i++) {
+            if (parsedOptions[i].contains("t:")) {
                 System.out.println("Adding a timer to " + webBrowser.getPageTitle() + " from options for " + parsedOptions[i].substring(2).trim() + " minute(s)");
                 webBrowser.addWebBrowserListener(new BrowserTimerListener(Integer.parseInt(parsedOptions[i].substring(2).trim()), webBrowser));
             }
