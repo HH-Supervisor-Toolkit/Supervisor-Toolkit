@@ -67,7 +67,7 @@ public class main {
         }
         optionsEdit = new OptionsEdit(false);
         webBrowserPane.addTab("Options", optionsEdit);
-        webBrowserPane.addMouseListener(new RightClickListener(webBrowserPane));
+        webBrowserPane.addMouseListener(new TabbedPaneMouseListener(webBrowserPane));
         webBrowserPane.setName("Tabbed Pane");
         contentPane.add(webBrowserPane, BorderLayout.CENTER);
         return contentPane;

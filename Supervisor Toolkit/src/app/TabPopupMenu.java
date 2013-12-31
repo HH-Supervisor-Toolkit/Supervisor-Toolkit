@@ -6,7 +6,6 @@ package app;
 
 import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserListener;
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JCheckBoxMenuItem;
@@ -19,7 +18,7 @@ import javax.swing.JTabbedPane;
  *
  * @author haywoosd
  */
-public class RightClickMenu extends JPopupMenu {
+public class TabPopupMenu extends JPopupMenu {
 
     JCheckBoxMenuItem timerItem;
     JMenuItem refreshItem;
@@ -27,7 +26,7 @@ public class RightClickMenu extends JPopupMenu {
     boolean hasTimer = false;
     BrowserTimerListener timerListener;
 
-    public RightClickMenu(final JWebBrowser webBrowser2) {
+    public TabPopupMenu(final JWebBrowser webBrowser2) {
         webBrowser = webBrowser2;
         timerItem = new JCheckBoxMenuItem("Add Timer to Tab");
         for (WebBrowserListener wbl : webBrowser.getWebBrowserListeners()) {
@@ -82,10 +81,10 @@ public class RightClickMenu extends JPopupMenu {
 
     private void ModifyTimerOptions(boolean removing, int minutes) {
         int index = 0;
-        Component[] components = ((JTabbedPane) webBrowser.getParent()).getComponents();
-        int componentCount = components.length;
+        JTabbedPane tabbedPane = (JTabbedPane) webBrowser.getParent();
+        int componentCount = tabbedPane.getTabCount();
         for (int i = 0; i < componentCount; i++) {
-            if (components[i].equals(webBrowser)) {
+            if (tabbedPane.getComponentAt(i).equals(webBrowser)) {
                 index = i;
                 break;
             }

@@ -13,7 +13,7 @@ import javax.swing.JTabbedPane;
  *
  * @author haywoosd
  */
-public class RightClickListener extends MouseAdapter {
+public class TabbedPaneMouseListener extends MouseAdapter {
 
     JTabbedPane tabPaneParent;
     int index;
@@ -36,7 +36,7 @@ public class RightClickListener extends MouseAdapter {
 
     private void showMenu(MouseEvent e) {
         tabPaneParent.setSelectedIndex(index);
-        RightClickMenu menu = new RightClickMenu((JWebBrowser) tabPaneParent.getComponent(index));
+        TabPopupMenu menu = new TabPopupMenu((JWebBrowser) tabPaneParent.getComponent(index));
         menu.setInvoker((JWebBrowser) tabPaneParent.getComponent(index));
         menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
         menu.setVisible(true);
@@ -53,7 +53,7 @@ public class RightClickListener extends MouseAdapter {
 
     }
 
-    RightClickListener(JTabbedPane parent) {
+    TabbedPaneMouseListener(JTabbedPane parent) {
         tabPaneParent = parent;
     }
 }
