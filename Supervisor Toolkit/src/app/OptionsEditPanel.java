@@ -17,43 +17,43 @@ import javax.swing.SwingUtilities;
  *
  * @author Sloan
  */
-public class OptionsEdit extends javax.swing.JPanel {
+public class OptionsEditPanel extends javax.swing.JPanel {
 
     boolean broken;
 
-    public void FillEditPane() {
+    private void FillEditPane() {
         try {
             BufferedReader bufRead = new BufferedReader(new FileReader(main.file));
             System.out.println("Attempting to fill options pane");
             String workingLine;
             workingLine = bufRead.readLine();
-            EditPane.setText(null);
+            optionsEditorArea.setText(null);
             while (workingLine != null) {
-                EditPane.setText(EditPane.getText() + workingLine + System.getProperty("line.separator"));
+                optionsEditorArea.setText(optionsEditorArea.getText() + workingLine + System.getProperty("line.separator"));
                 workingLine = bufRead.readLine();
             }
             System.out.println("Options pane sucessfully filled");
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(OptionsEdit.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(OptionsEditPanel.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(OptionsEdit.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(OptionsEditPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     public String[] getOptionsText(){
-        return EditPane.getText().split(System.getProperty("line.separator"));
+        return optionsEditorArea.getText().split(System.getProperty("line.separator"));
     }
     
     public void setOptionsText(String[] optionsText){
-        EditPane.setText("");
+        optionsEditorArea.setText("");
         for (int i = 0; i < optionsText.length; i++){
-            EditPane.setText(EditPane.getText() + optionsText[i] + System.getProperty("line.separator"));
+            optionsEditorArea.setText(optionsEditorArea.getText() + optionsText[i] + System.getProperty("line.separator"));
         }
     }
 
     /**
      * Creates new form OptionsEdit
      */
-    public OptionsEdit(boolean broken2) {
+    public OptionsEditPanel(boolean broken2) {
         initComponents();
         broken = broken2;
         FillEditPane();
@@ -68,45 +68,48 @@ public class OptionsEdit extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        EditPane = new javax.swing.JEditorPane();
-        ApplyButton = new javax.swing.JButton();
-        CancelButton = new javax.swing.JButton();
+        applyButton = new javax.swing.JButton();
+        cancelButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        optionsEditorArea = new javax.swing.JTextArea();
 
-        jScrollPane1.setViewportView(EditPane);
-
-        ApplyButton.setText("Apply");
-        ApplyButton.addActionListener(new java.awt.event.ActionListener() {
+        applyButton.setText("Apply");
+        applyButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ApplyButtonActionPerformed(evt);
+                applyButtonActionPerformed(evt);
             }
         });
 
-        CancelButton.setText("Cancel");
-        CancelButton.addActionListener(new java.awt.event.ActionListener() {
+        cancelButton.setText("Cancel");
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CancelButtonActionPerformed(evt);
+                cancelButtonActionPerformed(evt);
             }
         });
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         jLabel1.setText("Pages to Load");
 
+        optionsEditorArea.setColumns(20);
+        optionsEditorArea.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        optionsEditorArea.setRows(5);
+        jScrollPane2.setViewportView(optionsEditorArea);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(404, Short.MAX_VALUE)
                 .addComponent(jLabel1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(405, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(CancelButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(ApplyButton, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cancelButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(applyButton, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addComponent(jScrollPane2))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -114,16 +117,16 @@ public class OptionsEdit extends javax.swing.JPanel {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(ApplyButton)
+                        .addComponent(applyButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(CancelButton)
-                        .addGap(0, 215, Short.MAX_VALUE))))
+                        .addComponent(cancelButton)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 557, Short.MAX_VALUE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void CancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CancelButtonActionPerformed
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         if (!broken) {
 
             int choice = JOptionPane.showConfirmDialog(null, "Are you sure you want to revert any changes?", "Confirm cancel", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -136,22 +139,22 @@ public class OptionsEdit extends javax.swing.JPanel {
                 System.exit(0);
             }
         }
-    }//GEN-LAST:event_CancelButtonActionPerformed
+    }//GEN-LAST:event_cancelButtonActionPerformed
 
-    private void ApplyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ApplyButtonActionPerformed
+    private void applyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyButtonActionPerformed
         int choice = JOptionPane.showConfirmDialog(null, "Are you sure you want save these changes?", "Confirm apply", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (choice == JOptionPane.YES_OPTION) {
-            main.writeOptions(main.file, EditPane.getText().split(System.getProperty("line.separator")));
+            main.writeOptions(main.file, optionsEditorArea.getText().split(System.getProperty("line.separator")));
             if (broken) {
                 SwingUtilities.getRoot(this).setVisible(false);
             }
         }
-    }//GEN-LAST:event_ApplyButtonActionPerformed
+    }//GEN-LAST:event_applyButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton ApplyButton;
-    private javax.swing.JButton CancelButton;
-    javax.swing.JEditorPane EditPane;
+    private javax.swing.JButton applyButton;
+    private javax.swing.JButton cancelButton;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTextArea optionsEditorArea;
     // End of variables declaration//GEN-END:variables
 }

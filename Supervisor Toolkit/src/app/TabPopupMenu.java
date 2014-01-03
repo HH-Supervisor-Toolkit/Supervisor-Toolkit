@@ -50,6 +50,9 @@ public class TabPopupMenu extends JPopupMenu {
                     System.out.println("A timer has been removed from " + webBrowser.getPageTitle());
                 } else {
                     int minutes = GetTimerMinutes(webBrowser);
+                    if (minutes == -1) {
+                        return;
+                    }
                     System.out.println("A " + minutes + " minute timer has been added to " + webBrowser.getPageTitle());
                     ModifyTimerOptions(false, minutes);
                     webBrowser.addWebBrowserListener(new BrowserTimerListener(minutes, webBrowser));
@@ -69,9 +72,15 @@ public class TabPopupMenu extends JPopupMenu {
 
     private int GetTimerMinutes(JWebBrowser webBrowser) {
         int minutes;
-        String timerdurationstr = JOptionPane.showInputDialog(webBrowser, "How many minutes should the timer be for?", "Timer Duration", JOptionPane.PLAIN_MESSAGE);
+        String timerDurationStr = JOptionPane.showInputDialog(webBrowser, "How many minutes should the timer be for?", "Timer Duration", JOptionPane.PLAIN_MESSAGE);
+        if (timerDurationStr == null) {
+            return -1;
+        }
         try {
-            minutes = Integer.parseInt(timerdurationstr);
+            minutes = Integer.parseInt(timerDurationStr);
+            if (minutes < 1) {
+                minutes = GetTimerMinutes(webBrowser);
+            }
         } catch (NumberFormatException e) {
             System.out.println("Invalid input for timer minutes. Prompting for new input");
             minutes = GetTimerMinutes(webBrowser);

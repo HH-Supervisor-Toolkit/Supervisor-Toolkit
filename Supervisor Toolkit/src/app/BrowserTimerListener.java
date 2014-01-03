@@ -26,6 +26,7 @@ public class BrowserTimerListener implements WebBrowserListener {
     long lastRefreshTime;
     JWebBrowser webBrowser;
     TimerCounterThread timerThread;
+    boolean terminated = false;
 
     public BrowserTimerListener(int minutes, JWebBrowser webBrowser2) {
         timerDuration = minutes;
@@ -36,7 +37,7 @@ public class BrowserTimerListener implements WebBrowserListener {
     }
     
     public void terminate(){
-        timerThread.terminate();
+        terminated = true;
     }
 
     @Override
@@ -83,7 +84,6 @@ public class BrowserTimerListener implements WebBrowserListener {
     private class TimerCounterThread extends Thread {
 
         long lastNoticeTime;
-        boolean terminated = false;
 
         TimerCounterThread() {
             lastNoticeTime = Calendar.getInstance().getTimeInMillis();
@@ -108,9 +108,6 @@ public class BrowserTimerListener implements WebBrowserListener {
                 }
             }
         }
-        public void terminate(){
-            terminated = true;
-        }
     }
 
     private class TimerMessageThread extends Thread {
@@ -121,6 +118,7 @@ public class BrowserTimerListener implements WebBrowserListener {
             timeDifference = timeDifference2;
         }
 
+        @Override
         public void run() {
             JOptionPane.showMessageDialog(webBrowser, "Your timer is at " + (double) timeDifference / (60000) + " of " + timerDuration + " minutes", "Timer Notification", JOptionPane.INFORMATION_MESSAGE);
         }

@@ -47,11 +47,10 @@ public class main {
     };
     static File file;
     static FileReader read;
-    public static OptionsEdit optionsEdit;
+    public static OptionsEditPanel optionsEdit;
 
     public static JComponent createContent(String[] address) {
         JWebBrowser[] webBrowser = new JWebBrowser[address.length / 2];
-        JPanel contentPane = new JPanel(new BorderLayout());
         JTabbedPane webBrowserPane = new JTabbedPane();
         try {
             for (int i = 1; i < address.length; i = i + 2) {
@@ -65,12 +64,11 @@ public class main {
             RepairOptions();
             return createContent(ReadOptions());
         }
-        optionsEdit = new OptionsEdit(false);
+        optionsEdit = new OptionsEditPanel(false);
         webBrowserPane.addTab("Options", optionsEdit);
         webBrowserPane.addMouseListener(new TabbedPaneMouseListener(webBrowserPane));
         webBrowserPane.setName("Tabbed Pane");
-        contentPane.add(webBrowserPane, BorderLayout.CENTER);
-        return contentPane;
+        return webBrowserPane;
     }
 
     /* Standard main method to try that test as a standalone application. */
@@ -82,7 +80,7 @@ public class main {
             public void run() {
                 JFrame frame = new JFrame("Supervisor Reports");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.getContentPane().add(createContent(ReadOptions()), BorderLayout.CENTER);
+                frame.add(createContent(ReadOptions()), BorderLayout.CENTER);
                 frame.setSize(900, 600);
                 frame.setLocationByPlatform(true);
                 try {
@@ -175,7 +173,7 @@ public class main {
         infoBox("Options file is not formatted correctly please repair it manually.", "Bad Startup");
         JDialog diag = new JDialog();
         diag.setTitle("Options Manual Repair");
-        diag.add(new OptionsEdit(true), BorderLayout.CENTER);
+        diag.add(new OptionsEditPanel(true), BorderLayout.CENTER);
         diag.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
         diag.setSize(900, 600);
         diag.setLocationByPlatform(true);
