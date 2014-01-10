@@ -13,7 +13,7 @@ import javax.swing.JTabbedPane;
  *
  * @author haywoosd
  */
-public class TabbedPaneMouseListener extends MouseAdapter {
+public class TabbedPaneMouseAdapter extends MouseAdapter {
 
     JTabbedPane tabPaneParent;
     int index;
@@ -36,8 +36,8 @@ public class TabbedPaneMouseListener extends MouseAdapter {
 
     private void showMenu(MouseEvent e) {
         tabPaneParent.setSelectedIndex(index);
-        TabPopupMenu menu = new TabPopupMenu((JWebBrowser) tabPaneParent.getComponent(index));
-        menu.setInvoker((JWebBrowser) tabPaneParent.getComponent(index));
+        TabPopupMenu menu = new TabPopupMenu((JWebBrowser) tabPaneParent.getComponentAt(index));
+        menu.setInvoker((JWebBrowser) tabPaneParent.getComponentAt(index));
         menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
         menu.setVisible(true);
     }
@@ -53,7 +53,7 @@ public class TabbedPaneMouseListener extends MouseAdapter {
 
     }
 
-    TabbedPaneMouseListener(JTabbedPane parent) {
+    TabbedPaneMouseAdapter(JTabbedPane parent) {
         tabPaneParent = parent;
     }
 }

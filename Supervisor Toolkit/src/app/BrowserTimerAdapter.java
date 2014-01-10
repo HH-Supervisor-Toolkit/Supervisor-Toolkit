@@ -16,7 +16,7 @@ import javax.swing.JOptionPane;
  *
  * @author haywoosd
  */
-public class BrowserTimerListener extends WebBrowserAdapter {
+public class BrowserTimerAdapter extends WebBrowserAdapter {
 
     int timerDuration;
     long lastRefreshTime;
@@ -24,7 +24,7 @@ public class BrowserTimerListener extends WebBrowserAdapter {
     TimerCounterThread timerThread;
     boolean terminated = false;
 
-    public BrowserTimerListener(int minutes, JWebBrowser webBrowser2) {
+    public BrowserTimerAdapter(int minutes, JWebBrowser webBrowser2) {
         timerDuration = minutes;
         webBrowser = webBrowser2;
         lastRefreshTime = Calendar.getInstance().getTimeInMillis();
@@ -64,7 +64,7 @@ public class BrowserTimerListener extends WebBrowserAdapter {
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(BrowserTimerListener.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(BrowserTimerAdapter.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }

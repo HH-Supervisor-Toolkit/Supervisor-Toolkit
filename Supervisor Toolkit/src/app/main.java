@@ -65,7 +65,7 @@ public class main {
         }
         optionsEdit = new OptionsEditPanel(false);
         webBrowserPane.addTab("Options", optionsEdit);
-        webBrowserPane.addMouseListener(new TabbedPaneMouseListener(webBrowserPane));
+        webBrowserPane.addMouseListener(new TabbedPaneMouseAdapter(webBrowserPane));
         webBrowserPane.setName("Tabbed Pane");
         return webBrowserPane;
     }
@@ -191,7 +191,7 @@ public class main {
         for (int i = 0; i < parsedOptions.length; i++) {
             if (parsedOptions[i].contains("t:")) {
                 System.out.println("Adding a timer to " + webBrowser.getPageTitle() + " from options for " + parsedOptions[i].substring(2).trim() + " minute(s)");
-                webBrowser.addWebBrowserListener(new BrowserTimerListener(Integer.parseInt(parsedOptions[i].substring(2).trim()), webBrowser));
+                webBrowser.addWebBrowserListener(new BrowserTimerAdapter(Integer.parseInt(parsedOptions[i].substring(2).trim()), webBrowser));
             }
         }
     }

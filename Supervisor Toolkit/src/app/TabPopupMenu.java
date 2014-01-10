@@ -24,15 +24,15 @@ public class TabPopupMenu extends JPopupMenu {
     JMenuItem refreshItem;
     JWebBrowser webBrowser;
     boolean hasTimer = false;
-    BrowserTimerListener timerListener;
+    BrowserTimerAdapter timerListener;
 
     public TabPopupMenu(final JWebBrowser webBrowser2) {
         webBrowser = webBrowser2;
         timerItem = new JCheckBoxMenuItem("Add timer");
         for (WebBrowserListener wbl : webBrowser.getWebBrowserListeners()) {
-            if (wbl instanceof BrowserTimerListener) {
+            if (wbl instanceof BrowserTimerAdapter) {
                 hasTimer = true;
-                timerListener = (BrowserTimerListener) wbl;
+                timerListener = (BrowserTimerAdapter) wbl;
             }
         }
         if (hasTimer) {
@@ -55,7 +55,7 @@ public class TabPopupMenu extends JPopupMenu {
                     }
                     System.out.println("A " + minutes + " minute timer has been added to " + webBrowser.getPageTitle());
                     ModifyTimerOptions(false, minutes);
-                    webBrowser.addWebBrowserListener(new BrowserTimerListener(minutes, webBrowser));
+                    webBrowser.addWebBrowserListener(new BrowserTimerAdapter(minutes, webBrowser));
                 }
             }
         });
