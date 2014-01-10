@@ -28,7 +28,7 @@ public class TabPopupMenu extends JPopupMenu {
 
     public TabPopupMenu(final JWebBrowser webBrowser2) {
         webBrowser = webBrowser2;
-        timerItem = new JCheckBoxMenuItem("Add Timer to Tab");
+        timerItem = new JCheckBoxMenuItem("Add timer");
         for (WebBrowserListener wbl : webBrowser.getWebBrowserListeners()) {
             if (wbl instanceof BrowserTimerListener) {
                 hasTimer = true;
@@ -59,7 +59,7 @@ public class TabPopupMenu extends JPopupMenu {
                 }
             }
         });
-        refreshItem = new JMenuItem("Refresh Tab");
+        refreshItem = new JMenuItem("Refresh");
         refreshItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

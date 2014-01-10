@@ -5,6 +5,7 @@
 package app;
 
 import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
+import chrriis.dj.nativeswing.swtimpl.components.WebBrowserAdapter;
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserCommandEvent;
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserEvent;
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserListener;
@@ -20,7 +21,7 @@ import javax.swing.JOptionPane;
  *
  * @author haywoosd
  */
-public class BrowserTimerListener implements WebBrowserListener {
+public class BrowserTimerListener extends WebBrowserAdapter {
 
     int timerDuration;
     long lastRefreshTime;
@@ -35,50 +36,14 @@ public class BrowserTimerListener implements WebBrowserListener {
         timerThread = new TimerCounterThread();
         timerThread.start();
     }
-    
-    public void terminate(){
+
+    public void terminate() {
         terminated = true;
-    }
-
-    @Override
-    public void windowWillOpen(WebBrowserWindowWillOpenEvent wbwwoe) {
-    }
-
-    @Override
-    public void windowOpening(WebBrowserWindowOpeningEvent wbwoe) {
-    }
-
-    @Override
-    public void windowClosing(WebBrowserEvent wbe) {
-    }
-
-    @Override
-    public void locationChanging(WebBrowserNavigationEvent wbne) {
-    }
-
-    @Override
-    public void locationChanged(WebBrowserNavigationEvent wbne) {
-    }
-
-    @Override
-    public void locationChangeCanceled(WebBrowserNavigationEvent wbne) {
-    }
-
-    @Override
-    public void loadingProgressChanged(WebBrowserEvent wbe) {
     }
 
     @Override
     public void titleChanged(WebBrowserEvent wbe) {
         lastRefreshTime = Calendar.getInstance().getTimeInMillis();
-    }
-
-    @Override
-    public void statusChanged(WebBrowserEvent wbe) {
-    }
-
-    @Override
-    public void commandReceived(WebBrowserCommandEvent wbce) {
     }
 
     private class TimerCounterThread extends Thread {
