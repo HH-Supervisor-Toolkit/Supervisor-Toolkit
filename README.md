@@ -1,4 +1,0 @@
-Nightly-Log
-===========
-
-Nightly Log
