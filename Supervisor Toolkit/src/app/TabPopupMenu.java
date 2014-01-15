@@ -5,7 +5,6 @@
 package app;
 
 import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
-import chrriis.dj.nativeswing.swtimpl.components.WebBrowserListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JCheckBoxMenuItem;
@@ -21,21 +20,16 @@ import javax.swing.JTabbedPane;
 public class TabPopupMenu extends JPopupMenu {
 
     JCheckBoxMenuItem timerItem;
+    JCheckBoxMenuItem backupItem;
     JMenuItem refreshItem;
-    JWebBrowser webBrowser;
+    ExtendedWebBrowser webBrowser;
     boolean hasTimer = false;
     BrowserTimerAdapter timerListener;
 
-    public TabPopupMenu(final JWebBrowser webBrowser2) {
+    public TabPopupMenu(ExtendedWebBrowser webBrowser2) {
         webBrowser = webBrowser2;
         timerItem = new JCheckBoxMenuItem("Add timer");
-        for (WebBrowserListener wbl : webBrowser.getWebBrowserListeners()) {
-            if (wbl instanceof BrowserTimerAdapter) {
-                hasTimer = true;
-                timerListener = (BrowserTimerAdapter) wbl;
-            }
-        }
-        if (hasTimer) {
+        if (webBrowser.isTimerEnabled()) {
             timerItem.setSelected(true);
         } else {
             timerItem.setSelected(false);
@@ -43,10 +37,9 @@ public class TabPopupMenu extends JPopupMenu {
         timerItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (hasTimer) {
-                    ModifyTimerOptions(true, 0);
-                    webBrowser.removeWebBrowserListener(timerListener);
-                    timerListener.terminate();
+                if (webBrowser.isTimerEnabled()) {
+                    ModifyOptions(true, "t", null);
+                    webBrowser.removeBrowserTimer();
                     System.out.println("A timer has been removed from " + webBrowser.getPageTitle());
                 } else {
                     int minutes = GetTimerMinutes(webBrowser);
@@ -54,9 +47,17 @@ public class TabPopupMenu extends JPopupMenu {
                         return;
                     }
                     System.out.println("A " + minutes + " minute timer has been added to " + webBrowser.getPageTitle());
-                    ModifyTimerOptions(false, minutes);
-                    webBrowser.addWebBrowserListener(new BrowserTimerAdapter(minutes, webBrowser));
+                    ModifyOptions(false, null, "-t:" + minutes);
+                    timerListener = new BrowserTimerAdapter(minutes, webBrowser);
+                    webBrowser.addBrowserTimer(timerListener);
                 }
+            }
+        });
+        backupItem = new JCheckBoxMenuItem("Enable auto backup");
+        backupItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
             }
         });
         refreshItem = new JMenuItem("Refresh");
@@ -67,6 +68,7 @@ public class TabPopupMenu extends JPopupMenu {
             }
         });
         add(timerItem);
+        add(backupItem);
         add(refreshItem);
     }
 
@@ -88,7 +90,7 @@ public class TabPopupMenu extends JPopupMenu {
         return minutes;
     }
 
-    private void ModifyTimerOptions(boolean removing, int minutes) {
+    private void ModifyOptions(boolean removing, String prefix, String fullOption) {
         int index = 0;
         JTabbedPane tabbedPane = (JTabbedPane) webBrowser.getParent();
         int componentCount = tabbedPane.getTabCount();
@@ -101,10 +103,10 @@ public class TabPopupMenu extends JPopupMenu {
         String[] optionsText = main.optionsEdit.getOptionsText();
         if (removing) {
             System.out.println("Removing timer option switch from tab " + index);
-            optionsText[index * 2] = optionsText[index * 2].replaceAll("-t[^-]*", "");
+            optionsText[index * 2] = optionsText[index * 2].replaceAll("-" + prefix + "[^-]*", "");
         } else {
             System.out.println("Adding timer option switch to tab " + index);
-            optionsText[index * 2] = optionsText[index * 2].trim() + " -t:" + minutes;
+            optionsText[index * 2] = optionsText[index * 2].trim() + " " + fullOption;
         }
         main.optionsEdit.setOptionsText(optionsText);
         main.writeOptions(main.file, optionsText);

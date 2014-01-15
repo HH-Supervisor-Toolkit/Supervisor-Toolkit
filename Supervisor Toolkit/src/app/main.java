@@ -6,7 +6,6 @@ package app;
 
 import chrriis.common.UIUtils;
 import chrriis.dj.nativeswing.swtimpl.NativeInterface;
-import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.event.WindowAdapter;
@@ -49,11 +48,11 @@ public class main {
     public static OptionsEditPanel optionsEdit;
 
     public static JComponent createContent(String[] address) {
-        JWebBrowser[] webBrowser = new JWebBrowser[address.length / 2];
+        ExtendedWebBrowser[] webBrowser = new ExtendedWebBrowser[address.length / 2];
         JTabbedPane webBrowserPane = new JTabbedPane();
         try {
             for (int i = 1; i < address.length; i = i + 2) {
-                webBrowser[(i - 1) / 2] = new JWebBrowser();
+                webBrowser[(i - 1) / 2] = new ExtendedWebBrowser();
                 addTabWithOptions(webBrowserPane, webBrowser[(i - 1) / 2], address[i - 1]);
                 System.out.println("Navagating to " + address[i]);
                 webBrowser[(i - 1) / 2].navigate(address[i]);
@@ -158,8 +157,8 @@ public class main {
         PrintWriter write;
         try {
             write = new PrintWriter(file);
-            for (int i = 0; i < writeContent.length; i++) {
-                write.println(writeContent[i]);
+            for (String writeContent1 : writeContent) {
+                write.println(writeContent1);
             }
             write.close();
         } catch (FileNotFoundException ex) {
@@ -181,17 +180,18 @@ public class main {
         System.out.println("Options revision submitted");
     }
 
-    public static void addTabWithOptions(JTabbedPane webBrowserPane, JWebBrowser webBrowser, String title) {
+    public static void addTabWithOptions(JTabbedPane webBrowserPane, ExtendedWebBrowser webBrowser, String title) {
         String[] parsedOptions;
         int tabTitleEndPos;
         tabTitleEndPos = title.lastIndexOf("]");
         System.out.println("Constructing web browser in tab: " + title.substring(1, tabTitleEndPos));
         parsedOptions = title.substring(tabTitleEndPos + 1).trim().split("-", -1);
         webBrowserPane.add(title.substring(1, tabTitleEndPos), webBrowser);
-        for (int i = 0; i < parsedOptions.length; i++) {
-            if (parsedOptions[i].contains("t:")) {
-                System.out.println("Adding a timer to " + webBrowser.getPageTitle() + " from options for " + parsedOptions[i].substring(2).trim() + " minute(s)");
-                webBrowser.addWebBrowserListener(new BrowserTimerAdapter(Integer.parseInt(parsedOptions[i].substring(2).trim()), webBrowser));
+        for (String parsedOption : parsedOptions) {
+            if (parsedOption.contains("t:")) {
+                System.out.println("Adding a timer to " + webBrowser.getPageTitle() + " from options for " + parsedOption.substring(2).trim() + " minute(s)");
+                BrowserTimerAdapter browserTimer = new BrowserTimerAdapter(Integer.parseInt(parsedOption.substring(2).trim()), webBrowser);
+                webBrowser.addBrowserTimer(browserTimer);
             }
         }
     }

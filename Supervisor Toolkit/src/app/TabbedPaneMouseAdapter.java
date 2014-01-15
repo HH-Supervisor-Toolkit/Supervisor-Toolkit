@@ -36,7 +36,7 @@ public class TabbedPaneMouseAdapter extends MouseAdapter {
 
     private void showMenu(MouseEvent e) {
         tabPaneParent.setSelectedIndex(index);
-        TabPopupMenu menu = new TabPopupMenu((JWebBrowser) tabPaneParent.getComponentAt(index));
+        TabPopupMenu menu = new TabPopupMenu((ExtendedWebBrowser) tabPaneParent.getComponentAt(index));
         menu.setInvoker((JWebBrowser) tabPaneParent.getComponentAt(index));
         menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
         menu.setVisible(true);
