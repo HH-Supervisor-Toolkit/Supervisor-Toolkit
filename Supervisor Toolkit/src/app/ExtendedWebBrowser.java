@@ -36,10 +36,11 @@ public class ExtendedWebBrowser extends JWebBrowser {
     public class AutoBackupThread {
 
         File backupFile;
+        ExtendedWebBrowser webBrowser;
         
-
-        AutoBackupThread() {
+        AutoBackupThread(ExtendedWebBrowser ewb) {
             backupFile = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Log_Backup.txt");
+            webBrowser = ewb;
         }
 
         public void run() {

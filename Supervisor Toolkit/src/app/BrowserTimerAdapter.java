@@ -58,7 +58,8 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
                 timeNoticeDifference = Calendar.getInstance().getTimeInMillis() - lastNoticeTime;
                 if (timeDifference > timerDuration * 40000 && timeNoticeDifference > timerDuration * 10000) {
                     lastNoticeTime = Calendar.getInstance().getTimeInMillis();
-                    new TimerMessageThread(timeDifference).start();
+                    TimerMessageThread thread = new TimerMessageThread(timeDifference);
+                    thread.start();
                     System.out.println("A notice about the timer for " + webBrowser.getPageTitle() + " has been given.");
                 }
                 try {
@@ -80,7 +81,7 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
 
         @Override
         public void run() {
-            JOptionPane.showMessageDialog(webBrowser, "Your timer is at " + (double) timeDifference / (60000) + " of " + timerDuration + " minutes", "Timer Notification", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(webBrowser, "Your timer is at " + (double) timeDifference / (60000) + " of " + timerDuration + " minutes", "Timer Notification", JOptionPane.WARNING_MESSAGE);
         }
     }
 }
