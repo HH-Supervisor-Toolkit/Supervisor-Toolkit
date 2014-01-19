@@ -15,10 +15,26 @@ import java.io.File;
 public class ExtendedWebBrowser extends JWebBrowser {
 
     private boolean hasTimer = false;
-    private BrowserTimerAdapter browserTimer = null;
+    private boolean hasBackup = false;
+    private AutoBackupThread backupThread;
+    private BrowserTimerAdapter browserTimer;
 
     public boolean isTimerEnabled() {
         return hasTimer;
+    }
+    
+    public boolean isBackupEnabled(){
+        return hasBackup;
+    }
+    
+    public void enableBackup(){
+        backupThread = new AutoBackupThread(this);
+        hasBackup = true;
+    }
+    
+    public void disableBackup(){
+        backupThread.terminate();
+        hasBackup = false;
     }
     
     public void addBrowserTimer(BrowserTimerAdapter bta){
@@ -32,22 +48,4 @@ public class ExtendedWebBrowser extends JWebBrowser {
         hasTimer = false;
         browserTimer.terminate();
     }
-
-    public class AutoBackupThread {
-
-        File backupFile;
-        ExtendedWebBrowser webBrowser;
-        
-        AutoBackupThread(ExtendedWebBrowser ewb) {
-            backupFile = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Log_Backup.txt");
-            webBrowser = ewb;
-        }
-
-        public void run() {
-            while (true) {
-                String str = "return document.getElementById('entry_1877084581').value;";
-            }
-        }
-    }
-
 }
