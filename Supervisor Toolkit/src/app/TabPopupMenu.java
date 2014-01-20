@@ -31,35 +31,49 @@ public class TabPopupMenu extends JPopupMenu {
         timerItem = new JCheckBoxMenuItem("Add timer");
         if (webBrowser.isTimerEnabled()) {
             timerItem.setSelected(true);
-        } else {
-            timerItem.setSelected(false);
         }
         timerItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (webBrowser.isTimerEnabled()) {
-                    ModifyOptions(true, "t", null);
+                    ModifyOptions(true, "t:", null);
                     webBrowser.removeBrowserTimer();
-                    System.out.println("A timer has been removed from " + webBrowser.getPageTitle());
+                    System.out.println("A timer has been removed from " + webBrowser.getName());
                 } else {
                     int minutes = GetTimerMinutes(webBrowser);
                     if (minutes == -1) {
                         return;
                     }
-                    System.out.println("A " + minutes + " minute timer has been added to " + webBrowser.getPageTitle());
-                    ModifyOptions(false, null, "-t:" + minutes);
+                    System.out.println("A " + minutes + " minute timer has been added to " + webBrowser.getName());
+                    ModifyOptions(false, null, "t:" + minutes);
                     timerListener = new BrowserTimerAdapter(minutes, webBrowser);
                     webBrowser.addBrowserTimer(timerListener);
                 }
             }
         });
-        backupItem = new JCheckBoxMenuItem("Enable auto backup");
-        backupItem.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        add(timerItem);
+        if (webBrowser.isBackupEnabled() || webBrowser.getResourceLocation().equals(AutoBackupThread.nightlyLogURL)) {
+            backupItem = new JCheckBoxMenuItem("Enable auto backup");
+            if (webBrowser.isBackupEnabled()) {
+                backupItem.setSelected(true);
             }
-        });
+            backupItem.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (webBrowser.isBackupEnabled()) {
+                        ModifyOptions(true, "B", null);
+                        webBrowser.disableBackup();
+                        System.out.println("Auto backup has been disabled for " + webBrowser.getName());
+                    } else {
+                        ModifyOptions(false, null, "B");
+                        webBrowser.enableBackup();
+                        System.out.println("Auto backup has been enabled for " + webBrowser.getName());
+                    }
+                }
+            });
+            add(backupItem);
+        }
         refreshItem = new JMenuItem("Refresh");
         refreshItem.addActionListener(new ActionListener() {
             @Override
@@ -67,8 +81,6 @@ public class TabPopupMenu extends JPopupMenu {
                 webBrowser.reloadPage();
             }
         });
-        add(timerItem);
-        add(backupItem);
         add(refreshItem);
     }
 
@@ -106,7 +118,7 @@ public class TabPopupMenu extends JPopupMenu {
             optionsText[index * 2] = optionsText[index * 2].replaceAll("-" + prefix + "[^-]*", "");
         } else {
             System.out.println("Adding timer option switch to tab " + index);
-            optionsText[index * 2] = optionsText[index * 2].trim() + " " + fullOption;
+            optionsText[index * 2] = optionsText[index * 2].trim() + " -" + fullOption;
         }
         main.optionsEdit.setOptionsText(optionsText);
         main.writeOptions(main.file, optionsText);

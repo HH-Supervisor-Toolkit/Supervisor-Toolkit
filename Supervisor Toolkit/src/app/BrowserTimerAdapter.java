@@ -7,10 +7,11 @@ package app;
 import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserAdapter;
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserEvent;
+import java.awt.BorderLayout;
 import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
+import javax.swing.JDialog;
 
 /**
  *
@@ -58,9 +59,16 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
                 timeNoticeDifference = Calendar.getInstance().getTimeInMillis() - lastNoticeTime;
                 if (timeDifference > timerDuration * 40000 && timeNoticeDifference > timerDuration * 10000) {
                     lastNoticeTime = Calendar.getInstance().getTimeInMillis();
-                    TimerMessageThread thread = new TimerMessageThread(timeDifference);
-                    thread.start();
-                    System.out.println("A notice about the timer for " + webBrowser.getPageTitle() + " has been given.");
+                    JDialog messageDialog = new JDialog();
+                    messageDialog.add(new TimerWarningPanel("Your timer is at " + (double) timeDifference / (60000) + " of " + timerDuration + " minutes"),BorderLayout.CENTER);
+                    messageDialog.pack();
+                    messageDialog.setTitle("Timer Warning");
+                    messageDialog.setLocationRelativeTo(webBrowser.getParent());
+                    messageDialog.setResizable(false);
+                    messageDialog.setVisible(true);
+                    messageDialog.setAlwaysOnTop(true);
+                    messageDialog.setAlwaysOnTop(false);
+                    System.out.println("A notice about the timer for " + webBrowser.getName() + " has been given.");
                 }
                 try {
                     Thread.sleep(5000);
@@ -68,20 +76,6 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
                     Logger.getLogger(BrowserTimerAdapter.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        }
-    }
-
-    private class TimerMessageThread extends Thread {
-
-        long timeDifference;
-
-        TimerMessageThread(long timeDifference2) {
-            timeDifference = timeDifference2;
-        }
-
-        @Override
-        public void run() {
-            JOptionPane.showMessageDialog(webBrowser, "Your timer is at " + (double) timeDifference / (60000) + " of " + timerDuration + " minutes", "Timer Notification", JOptionPane.WARNING_MESSAGE);
         }
     }
 }

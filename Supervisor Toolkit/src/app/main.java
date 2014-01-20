@@ -76,7 +76,7 @@ public class main {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                JFrame frame = new JFrame("Supervisor Reports");
+                final JFrame frame = new JFrame("Supervisor Reports");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.add(createContent(ReadOptions()), BorderLayout.CENTER);
                 frame.setSize(900, 600);
@@ -103,7 +103,7 @@ public class main {
                     @Override
                     public void windowClosing(WindowEvent we) {
                         String ObjButtons[] = {"Yes", "No"};
-                        int PromptResult = JOptionPane.showOptionDialog(null, "Are you sure you want to exit?", "Nightly Log", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, ObjButtons, ObjButtons[1]);
+                        int PromptResult = JOptionPane.showOptionDialog(frame, "Are you sure you want to exit?", "Nightly Log", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, ObjButtons, ObjButtons[1]);
                         if (PromptResult == JOptionPane.YES_OPTION) {
                             System.exit(0);
                         }
@@ -153,12 +153,12 @@ public class main {
         JOptionPane.showMessageDialog(null, infoMessage, location, JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public static void writeOptions(File file, String[] writeContent) {
+    public static void writeOptions(File file, String[] writeContents) {
         PrintWriter write;
         try {
             write = new PrintWriter(file);
-            for (String writeContent1 : writeContent) {
-                write.println(writeContent1);
+            for (String writeContent : writeContents) {
+                write.println(writeContent);
             }
             write.close();
         } catch (FileNotFoundException ex) {
@@ -181,17 +181,20 @@ public class main {
     }
 
     public static void addTabWithOptions(JTabbedPane webBrowserPane, ExtendedWebBrowser webBrowser, String title) {
-        String[] parsedOptions;
-        int tabTitleEndPos;
-        tabTitleEndPos = title.lastIndexOf("]");
-        System.out.println("Constructing web browser in tab: " + title.substring(1, tabTitleEndPos));
-        parsedOptions = title.substring(tabTitleEndPos + 1).trim().split("-", -1);
-        webBrowserPane.add(title.substring(1, tabTitleEndPos), webBrowser);
+        int tabTitleEndPos = title.lastIndexOf("]");
+        String [] parsedOptions = title.substring(tabTitleEndPos + 1).trim().split("-", -1);
+        String tabTitle = title.substring(1, tabTitleEndPos);
+        System.out.println("Constructing web browser in tab: " + tabTitle);
+        webBrowser.setName(tabTitle);
+        webBrowserPane.add(tabTitle, webBrowser);
         for (String parsedOption : parsedOptions) {
             if (parsedOption.contains("t:")) {
-                System.out.println("Adding a timer to " + webBrowser.getPageTitle() + " from options for " + parsedOption.substring(2).trim() + " minute(s)");
+                System.out.println("Adding a timer to " + tabTitle + " from options for " + parsedOption.substring(2).trim() + " minute(s)");
                 BrowserTimerAdapter browserTimer = new BrowserTimerAdapter(Integer.parseInt(parsedOption.substring(2).trim()), webBrowser);
                 webBrowser.addBrowserTimer(browserTimer);
+            }else if (parsedOption.contains("B")){
+                System.out.println("Enabling auto backup for " + tabTitle);
+                webBrowser.enableBackup();
             }
         }
     }

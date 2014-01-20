@@ -6,7 +6,6 @@
 package app;
 
 import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
-import java.io.File;
 
 /**
  *
@@ -22,30 +21,31 @@ public class ExtendedWebBrowser extends JWebBrowser {
     public boolean isTimerEnabled() {
         return hasTimer;
     }
-    
-    public boolean isBackupEnabled(){
+
+    public boolean isBackupEnabled() {
         return hasBackup;
     }
-    
-    public void enableBackup(){
+
+    public void enableBackup() {
         backupThread = new AutoBackupThread(this);
+        backupThread.start();
         hasBackup = true;
     }
-    
-    public void disableBackup(){
-        backupThread.terminate();
-        hasBackup = false;
-    }
-    
-    public void addBrowserTimer(BrowserTimerAdapter bta){
+
+    public void addBrowserTimer(BrowserTimerAdapter bta) {
         super.addWebBrowserListener(bta);
         hasTimer = true;
         browserTimer = bta;
     }
-    
-    public void removeBrowserTimer(){
+
+    public void removeBrowserTimer() {
         super.removeWebBrowserListener(browserTimer);
         hasTimer = false;
         browserTimer.terminate();
+    }
+
+    public void disableBackup() {
+        backupThread.terminate();
+        hasBackup = false;
     }
 }
