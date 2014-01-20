@@ -44,7 +44,6 @@ public class main {
         "[Attendance Page]", "http://askrose.org/askrose-login"
     };
     static File file;
-    static FileReader read;
     public static OptionsEditPanel optionsEdit;
     public static JFrame frame;
 
@@ -54,10 +53,11 @@ public class main {
         try {
             for (int i = 1; i < address.length; i = i + 2) {
                 webBrowser[(i - 1) / 2] = new ExtendedWebBrowser();
-                addTabWithOptions(webBrowserPane, webBrowser[(i - 1) / 2], address[i - 1]);
                 System.out.println("Navagating to " + address[i]);
                 webBrowser[(i - 1) / 2].navigate(address[i]);
                 webBrowser[(i - 1) / 2].setBarsVisible(false);
+                addTabWithOptions(webBrowserPane, webBrowser[(i - 1) / 2], address[i - 1]);
+                
             }
         } catch (StringIndexOutOfBoundsException ex1) {
             RepairOptions();
@@ -131,7 +131,7 @@ public class main {
                 file.createNewFile();
                 writeOptions(file, Default);
             }
-            read = new FileReader(file);
+           FileReader read = new FileReader(file);
             BufferedReader bufRead = new BufferedReader(read);
             workingLine = bufRead.readLine();
             if (workingLine == null || workingLine.length() <= 0) {
