@@ -57,12 +57,13 @@ public class AutoBackupThread extends Thread {
                     }
                 }
             });
-            while (!pageLoaded) {
+            while (!pageLoaded && webBrowser.getLoadingProgress() < 100) {
                 Thread.sleep(300);
                 System.out.println("Waiting for nightly log to load");
             }
             if (backupFile.length() > 0) {
-                int choice = JOptionPane.showConfirmDialog(webBrowser, "There is an backup available. Would you like to load it?", "Load Backup?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                String ObjButtons[] = {"Yes", "No"};
+                int choice = JOptionPane.showOptionDialog(main.frame, "There is an backup available. Would you like to load it?", "Load Backup?", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, ObjButtons, ObjButtons[1]);
                 if (choice == JOptionPane.YES_OPTION) {
                     loadBackup();
                 }
@@ -88,14 +89,17 @@ public class AutoBackupThread extends Thread {
                     fileInputStream.close();
                     String content = new String(data, "UTF-8");
                     String[] backupEntries = content.split(newLine + customSplitString + newLine, -1);
+                    for (int i = 0; i < backupEntries.length; i++) {
+                        backupEntries[i] = backupEntries[i].replace(newLine, "\\n");
+                    }
                     webBrowser.executeJavascript("document.getElementById(\"entry.50106969_month\").value = " + backupEntries[0]);
                     webBrowser.executeJavascript("document.getElementById(\"entry.50106969_day\").value = " + backupEntries[1]);
                     webBrowser.executeJavascript("document.getElementById(\"entry.50106969_year\").value = " + backupEntries[2]);
-                    webBrowser.executeJavascript("document.getElementById(\"entry_1877084581\").value = " + backupEntries[3]);
-                    webBrowser.executeJavascript("document.getElementById(\"entry_1290029990\").value = " + backupEntries[4]);
-                    webBrowser.executeJavascript("document.getElementById(\"entry_1758939265\").value = " + backupEntries[5]);
-                    webBrowser.executeJavascript("document.getElementById(\"entry_1705517941\").value = " + backupEntries[6]);
-                    webBrowser.executeJavascript("document.getElementById(\"entry_1600669098\").value = " + backupEntries[7]);
+                    webBrowser.executeJavascript("document.getElementById(\"entry_1877084581\").value = \"" + backupEntries[3] + "\"");
+                    webBrowser.executeJavascript("document.getElementById(\"entry_1290029990\").value = \"" + backupEntries[4] + "\"");
+                    webBrowser.executeJavascript("document.getElementById(\"entry_1758939265\").value = \"" + backupEntries[5] + "\"");
+                    webBrowser.executeJavascript("document.getElementById(\"entry_1705517941\").value = \"" + backupEntries[6] + "\"");
+                    webBrowser.executeJavascript("document.getElementById(\"entry_1600669098\").value = \"" + backupEntries[7] + "\"");
                     for (int i = 0; i < 2; i++) {
                         webBrowser.executeJavascript("document.getElementsByName(\"entry.392665480\")[" + i + "].checked = " + backupEntries[8 + i]);
                     }
@@ -157,7 +161,7 @@ public class AutoBackupThread extends Thread {
                             if (backupEntry == null) {
                                 backupWriter.print("" + newLine + customSplitString + newLine);
                             } else {
-                                backupWriter.print(backupEntry + newLine + customSplitString + newLine);
+                                backupWriter.print(backupEntry.replace("\n", newLine) + newLine + customSplitString + newLine);
                             }
                         }
                         backupWriter.close();

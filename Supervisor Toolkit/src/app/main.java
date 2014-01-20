@@ -46,6 +46,7 @@ public class main {
     static File file;
     static FileReader read;
     public static OptionsEditPanel optionsEdit;
+    public static JFrame frame;
 
     public static JComponent createContent(String[] address) {
         ExtendedWebBrowser[] webBrowser = new ExtendedWebBrowser[address.length / 2];
@@ -76,11 +77,11 @@ public class main {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                final JFrame frame = new JFrame("Supervisor Reports");
+                frame = new JFrame("Supervisor Reports");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.add(createContent(ReadOptions()), BorderLayout.CENTER);
                 frame.setSize(900, 600);
                 frame.setLocationByPlatform(true);
+                frame.add(createContent(ReadOptions()), BorderLayout.CENTER);
                 try {
                     String iconPath;
                     if (args.length > 0) {
