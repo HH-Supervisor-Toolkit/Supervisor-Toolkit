@@ -8,6 +8,10 @@ import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserAdapter;
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserEvent;
 import java.awt.BorderLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
+import java.awt.event.WindowListener;
 import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,10 +61,10 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
             while (!terminated) {
                 timeDifference = Calendar.getInstance().getTimeInMillis() - lastRefreshTime;
                 timeNoticeDifference = Calendar.getInstance().getTimeInMillis() - lastNoticeTime;
-                if (timeDifference > timerDuration * 40000 && timeNoticeDifference > timerDuration * 10000) {
+                if (timeDifference > timerDuration * 40000 && timeNoticeDifference > timerDuration * 10000 && timeDifference < timerDuration * 70000) {
                     lastNoticeTime = Calendar.getInstance().getTimeInMillis();
-                    JDialog messageDialog = new JDialog();
-                    messageDialog.add(new TimerWarningPanel("Your timer is at " + (double) timeDifference / (60000) + " of " + timerDuration + " minutes"),BorderLayout.CENTER);
+                    final JDialog messageDialog = new JDialog();
+                    messageDialog.add(new TimerWarningPanel("Your timer for " + webBrowser.getName() + " is at " + (double) timeDifference / (60000) + " of " + timerDuration + " minutes"), BorderLayout.CENTER);
                     messageDialog.pack();
                     messageDialog.setTitle("Timer Warning");
                     messageDialog.setLocationRelativeTo(webBrowser.getParent());
@@ -68,6 +72,18 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
                     messageDialog.setVisible(true);
                     messageDialog.setAlwaysOnTop(true);
                     messageDialog.setAlwaysOnTop(false);
+                    main.frame.addWindowFocusListener(new WindowFocusListener() {
+                        @Override
+                        public void windowGainedFocus(WindowEvent e) {
+                            messageDialog.setAlwaysOnTop(true);
+                            messageDialog.setAlwaysOnTop(false);
+                        }
+
+                        @Override
+                        public void windowLostFocus(WindowEvent e) {
+                            messageDialog.toBack();
+                        }
+                    });
                     System.out.println("A notice about the timer for " + webBrowser.getName() + " has been given.");
                 }
                 try {
