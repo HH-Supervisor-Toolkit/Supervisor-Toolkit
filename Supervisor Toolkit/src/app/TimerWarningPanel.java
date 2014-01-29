@@ -22,6 +22,10 @@ public class TimerWarningPanel extends javax.swing.JPanel {
         initComponents();
         messageLabel.setText(message);
     }
+    
+    public void UpdateMessage(String newMessage){
+        messageLabel.setText(newMessage);
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.

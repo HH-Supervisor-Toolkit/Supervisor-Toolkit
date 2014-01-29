@@ -49,6 +49,8 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
     private class TimerCounterThread extends Thread {
 
         long lastNoticeTime;
+        JDialog messageDialog = null;
+        TimerWarningPanel timerPanel;
 
         TimerCounterThread() {
             lastNoticeTime = Calendar.getInstance().getTimeInMillis();
@@ -63,27 +65,34 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
                 timeNoticeDifference = Calendar.getInstance().getTimeInMillis() - lastNoticeTime;
                 if (timeDifference > timerDuration * 40000 && timeNoticeDifference > timerDuration * 10000 && timeDifference < timerDuration * 70000) {
                     lastNoticeTime = Calendar.getInstance().getTimeInMillis();
-                    final JDialog messageDialog = new JDialog();
-                    messageDialog.add(new TimerWarningPanel("Your timer for " + webBrowser.getName() + " is at " + (double) timeDifference / (60000) + " of " + timerDuration + " minutes"), BorderLayout.CENTER);
-                    messageDialog.pack();
-                    messageDialog.setTitle("Timer Warning");
-                    messageDialog.setLocationRelativeTo(webBrowser.getParent());
-                    messageDialog.setResizable(false);
-                    messageDialog.setVisible(true);
-                    messageDialog.setAlwaysOnTop(true);
-                    messageDialog.setAlwaysOnTop(false);
-                    main.frame.addWindowFocusListener(new WindowFocusListener() {
-                        @Override
-                        public void windowGainedFocus(WindowEvent e) {
-                            messageDialog.setAlwaysOnTop(true);
-                            messageDialog.setAlwaysOnTop(false);
-                        }
+                    if (messageDialog != null && messageDialog.isVisible()) {
+                        timerPanel.UpdateMessage("Your timer for " + webBrowser.getName() + " is at " + (double) timeDifference / (60000) + " of " + timerDuration + " minutes");
+                        messageDialog.setAlwaysOnTop(true);
+                        messageDialog.setAlwaysOnTop(false);
+                    } else {
+                        timerPanel = new TimerWarningPanel("Your timer for " + webBrowser.getName() + " is at " + (double) timeDifference / (60000) + " of " + timerDuration + " minutes");
+                        messageDialog = new JDialog();
+                        messageDialog.add(timerPanel, BorderLayout.CENTER);
+                        messageDialog.pack();
+                        messageDialog.setTitle("Timer Warning");
+                        messageDialog.setLocationRelativeTo(webBrowser.getParent());
+                        messageDialog.setResizable(false);
+                        messageDialog.setVisible(true);
+                        messageDialog.setAlwaysOnTop(true);
+                        messageDialog.setAlwaysOnTop(false);
+                        main.frame.addWindowFocusListener(new WindowFocusListener() {
+                            @Override
+                            public void windowGainedFocus(WindowEvent e) {
+                                messageDialog.setAlwaysOnTop(true);
+                                messageDialog.setAlwaysOnTop(false);
+                            }
 
-                        @Override
-                        public void windowLostFocus(WindowEvent e) {
-                            messageDialog.toBack();
-                        }
-                    });
+                            @Override
+                            public void windowLostFocus(WindowEvent e) {
+                                messageDialog.toBack();
+                            }
+                        });
+                    }
                     System.out.println("A notice about the timer for " + webBrowser.getName() + " has been given.");
                 }
                 try {
@@ -91,6 +100,7 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
                 } catch (InterruptedException ex) {
                     Logger.getLogger(BrowserTimerAdapter.class.getName()).log(Level.SEVERE, null, ex);
                 }
+
             }
         }
     }
