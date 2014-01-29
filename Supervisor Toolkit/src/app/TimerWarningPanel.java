@@ -23,7 +23,7 @@ public class TimerWarningPanel extends javax.swing.JPanel {
         messageLabel.setText(message);
     }
     
-    public void UpdateMessage(String newMessage){
+    public void updateMessage(String newMessage){
         messageLabel.setText(newMessage);
     }
 

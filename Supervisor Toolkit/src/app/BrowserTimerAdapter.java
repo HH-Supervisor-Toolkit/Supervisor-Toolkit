@@ -66,7 +66,7 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
                 if (timeDifference > timerDuration * 40000 && timeNoticeDifference > timerDuration * 10000 && timeDifference < timerDuration * 70000) {
                     lastNoticeTime = Calendar.getInstance().getTimeInMillis();
                     if (messageDialog != null && messageDialog.isVisible()) {
-                        timerPanel.UpdateMessage("Your timer for " + webBrowser.getName() + " is at " + (double) timeDifference / (60000) + " of " + timerDuration + " minutes");
+                        timerPanel.updateMessage("Your timer for " + webBrowser.getName() + " is at " + (double) timeDifference / (60000) + " of " + timerDuration + " minutes");
                         messageDialog.setAlwaysOnTop(true);
                         messageDialog.setAlwaysOnTop(false);
                     } else {
