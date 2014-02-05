@@ -13,13 +13,16 @@ import javax.swing.SwingUtilities;
  * @author Sloan
  */
 public class TimerWarningPanel extends javax.swing.JPanel {
+    
+    ExtendedWebBrowser webBrowser;
 
     /**
      * Creates new form TimerWarningPanel
      * @param message
      */
-    public TimerWarningPanel(String message) {
+    public TimerWarningPanel(String message, ExtendedWebBrowser ewb) {
         initComponents();
+        webBrowser = ewb;
         messageLabel.setText(message);
     }
     
@@ -38,6 +41,7 @@ public class TimerWarningPanel extends javax.swing.JPanel {
 
         messageLabel = new javax.swing.JLabel();
         okayButton = new javax.swing.JButton();
+        reloadButton = new javax.swing.JButton();
 
         messageLabel.setText("Test Text");
 
@@ -48,15 +52,26 @@ public class TimerWarningPanel extends javax.swing.JPanel {
             }
         });
 
+        reloadButton.setText("Reload");
+        reloadButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                reloadButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(okayButton)
-                    .addComponent(messageLabel))
+                .addComponent(okayButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(reloadButton)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(messageLabel)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -65,7 +80,9 @@ public class TimerWarningPanel extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(messageLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(okayButton)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(okayButton)
+                    .addComponent(reloadButton))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -74,9 +91,15 @@ public class TimerWarningPanel extends javax.swing.JPanel {
         SwingUtilities.getRoot(this).setVisible(false);
     }//GEN-LAST:event_okayButtonActionPerformed
 
+    private void reloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadButtonActionPerformed
+        webBrowser.reloadPage();
+        SwingUtilities.getRoot(this).setVisible(false);
+    }//GEN-LAST:event_reloadButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel messageLabel;
     private javax.swing.JButton okayButton;
+    private javax.swing.JButton reloadButton;
     // End of variables declaration//GEN-END:variables
 }

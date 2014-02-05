@@ -52,7 +52,7 @@ public class TabPopupMenu extends JPopupMenu {
             }
         });
         add(timerItem);
-        if (webBrowser.isBackupEnabled() || webBrowser.getResourceLocation().equals(AutoBackupThread.nightlyLogURL)) {
+        if (webBrowser.isBackupEnabled() || webBrowser.getResourceLocation().equals(main.Default[2])) {
             backupItem = new JCheckBoxMenuItem("Enable auto backup");
             if (webBrowser.isBackupEnabled()) {
                 backupItem.setSelected(true);

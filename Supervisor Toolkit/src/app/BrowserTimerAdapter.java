@@ -4,14 +4,11 @@
  */
 package app;
 
-import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserAdapter;
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserEvent;
 import java.awt.BorderLayout;
-import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
-import java.awt.event.WindowListener;
 import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,11 +22,11 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
 
     int timerDuration;
     long lastRefreshTime;
-    JWebBrowser webBrowser;
+    ExtendedWebBrowser webBrowser;
     TimerCounterThread timerThread;
     boolean terminated = false;
 
-    public BrowserTimerAdapter(int minutes, JWebBrowser webBrowser2) {
+    public BrowserTimerAdapter(int minutes, ExtendedWebBrowser webBrowser2) {
         timerDuration = minutes;
         webBrowser = webBrowser2;
         lastRefreshTime = Calendar.getInstance().getTimeInMillis();
@@ -70,7 +67,7 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
                         messageDialog.setAlwaysOnTop(true);
                         messageDialog.setAlwaysOnTop(false);
                     } else {
-                        timerPanel = new TimerWarningPanel("Your timer for " + webBrowser.getName() + " is at " + (double) timeDifference / (60000) + " of " + timerDuration + " minutes");
+                        timerPanel = new TimerWarningPanel("Your timer for " + webBrowser.getName() + " is at " + (double) timeDifference / (60000) + " of " + timerDuration + " minutes",webBrowser);
                         messageDialog = new JDialog();
                         messageDialog.add(timerPanel, BorderLayout.CENTER);
                         messageDialog.pack();

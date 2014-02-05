@@ -25,11 +25,9 @@ public class AutoBackupThread extends Thread {
     private final File backupFile;
     private final ExtendedWebBrowser webBrowser;
     private boolean terminated = false;
-    private boolean pageLoaded = false;
     private final String newLine;
     private final String customSplitString;
     private PrintWriter backupWriter;
-    public final static String nightlyLogURL = "https://docs.google.com/forms/d/172-Elqzog2MgLSMe9WvCHkuxHsJAb5IaFJZKq74KxPw/viewform";
 
     AutoBackupThread(ExtendedWebBrowser ewb) {
         newLine = System.getProperty("line.separator");
@@ -42,10 +40,6 @@ public class AutoBackupThread extends Thread {
         terminated = true;
     }
 
-    private void pageReady() {
-        pageLoaded = true;
-    }
-
     @Override
     public void run() {
         try {
@@ -53,21 +47,17 @@ public class AutoBackupThread extends Thread {
                 @Override
                 public void loadingProgressChanged(WebBrowserEvent e) {
                     if (e.getWebBrowser().getLoadingProgress() == 100) {
-                        pageReady();
+                        if (backupFile.length() > 0 && webBrowser.getResourceLocation().equals(main.Default[1])) {
+                            String ObjButtons[] = {"Yes", "No"};
+                            int choice = JOptionPane.showOptionDialog(main.frame, "There is an backup available. Would you like to load it?", "Load Backup?", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, ObjButtons, ObjButtons[1]);
+                            if (choice == JOptionPane.YES_OPTION) {
+                                loadBackup();
+                            }
+                        }
+                        e.getWebBrowser().removeWebBrowserListener(this);
                     }
                 }
             });
-            while (!pageLoaded && webBrowser.getLoadingProgress() < 100) {
-                Thread.sleep(300);
-                System.out.println("Waiting for nightly log to load");
-            }
-            if (backupFile.length() > 0) {
-                String ObjButtons[] = {"Yes", "No"};
-                int choice = JOptionPane.showOptionDialog(main.frame, "There is an backup available. Would you like to load it?", "Load Backup?", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, ObjButtons, ObjButtons[1]);
-                if (choice == JOptionPane.YES_OPTION) {
-                    loadBackup();
-                }
-            }
             Thread.sleep(30000);
             while (!terminated) {
                 saveBackup();
@@ -91,6 +81,7 @@ public class AutoBackupThread extends Thread {
                     String[] backupEntries = content.split(newLine + customSplitString + newLine, -1);
                     for (int i = 0; i < backupEntries.length; i++) {
                         backupEntries[i] = backupEntries[i].replace(newLine, "\\n");
+                        backupEntries[i] = backupEntries[i].replace("\"", "\\\"");
                     }
                     webBrowser.executeJavascript("document.getElementById(\"entry.50106969_month\").value = " + backupEntries[0]);
                     webBrowser.executeJavascript("document.getElementById(\"entry.50106969_day\").value = " + backupEntries[1]);
@@ -129,8 +120,8 @@ public class AutoBackupThread extends Thread {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-
-                if (webBrowser.getResourceLocation().equals(nightlyLogURL)) {
+                if (webBrowser.getResourceLocation().equals(main.Default[1])) {
+                    System.out.println("Saving a backup of the Nightly log");
                     try {
                         String[] backupEntries = new String[22];
                         backupEntries[0] = (String) webBrowser.executeJavascriptWithResult("return document.getElementById(\"entry.50106969_month\").value");
