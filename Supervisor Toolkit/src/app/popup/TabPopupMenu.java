@@ -2,8 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package app;
+package app.popup;
 
+import app.browser.ExtendedWebBrowser;
+import app.main;
+import app.timer.BrowserTimerAdapter;
 import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

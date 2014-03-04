@@ -3,8 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package app;
+package app.browser;
 
+import app.timer.BrowserTimerAdapter;
+import app.backup.AutoBackupThread;
 import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
 
 /**

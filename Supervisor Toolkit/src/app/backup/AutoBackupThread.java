@@ -2,8 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package app;
+package app.backup;
 
+import app.browser.ExtendedWebBrowser;
+import app.main;
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserAdapter;
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserEvent;
 import java.io.File;
@@ -29,7 +31,7 @@ public class AutoBackupThread extends Thread {
     private final String customSplitString;
     private PrintWriter backupWriter;
 
-    AutoBackupThread(ExtendedWebBrowser ewb) {
+    public AutoBackupThread(ExtendedWebBrowser ewb) {
         newLine = System.getProperty("line.separator");
         customSplitString = "!!split!!";
         backupFile = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Backup_Log.txt");

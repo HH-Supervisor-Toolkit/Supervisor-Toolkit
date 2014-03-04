@@ -4,8 +4,9 @@
  * and open the template in the editor.
  */
 
-package app;
+package app.timer;
 
+import app.browser.ExtendedWebBrowser;
 import javax.swing.SwingUtilities;
 
 /**

@@ -2,8 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package app;
+package app.timer;
 
+import app.browser.ExtendedWebBrowser;
+import app.main;
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserAdapter;
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserEvent;
 import java.awt.BorderLayout;

@@ -4,6 +4,11 @@
  */
 package app;
 
+import app.alarms.AlarmsEditPanel;
+import app.browser.ExtendedWebBrowser;
+import app.popup.TabbedPaneMouseAdapter;
+import app.options.OptionsEditPanel;
+import app.timer.BrowserTimerAdapter;
 import chrriis.common.UIUtils;
 import chrriis.dj.nativeswing.swtimpl.NativeInterface;
 import java.awt.BorderLayout;
@@ -35,7 +40,7 @@ import javax.swing.SwingUtilities;
  */
 public class main {
 
-    final static String[] Default = {"[Nightly Log]", "https://docs.google.com/forms/d/172-Elqzog2MgLSMe9WvCHkuxHsJAb5IaFJZKq74KxPw/viewform",
+    public final static String[] Default = {"[Nightly Log]", "https://docs.google.com/forms/d/172-Elqzog2MgLSMe9WvCHkuxHsJAb5IaFJZKq74KxPw/viewform",
         "[Equipment Problem Report]", "https://docs.google.com/forms/d/1X8K1XeWBykPRnnxn5TWaLGUcc68Yn3JiejvpSgwiJTc/viewform",
         "[Incident Report]", "https://docs.google.com/forms/d/1Zy4Hd4FxPlpSAOZMigRfUVywnL78-pBm5HP5E69TasE/viewform",
         "[Textbook Request Form]", "https://docs.google.com/forms/d/1wW0GEoEqkOlpTIPP__2kRSWbD1RskTBo4wtBaO738BM/viewform",
@@ -43,9 +48,10 @@ public class main {
         "[Phone Surveys]", "https://prod11gbss8.rose-hulman.edu/BanSS/rhit_hwhl.P_QuestionPage",
         "[Attendance Page]", "http://askrose.org/askrose-login"
     };
-    static File file;
+    public static File file;
     public static OptionsEditPanel optionsEdit;
     public static JFrame frame;
+    public static int addressCount;
 
     public static JComponent createContent(String[] address) {
         ExtendedWebBrowser[] webBrowser = new ExtendedWebBrowser[address.length / 2];
@@ -57,7 +63,7 @@ public class main {
                 webBrowser[(i - 1) / 2].navigate(address[i]);
                 webBrowser[(i - 1) / 2].setStatusBarVisible(false);
                 addTabWithOptions(webBrowserPane, webBrowser[(i - 1) / 2], address[i - 1]);
-                
+
             }
         } catch (StringIndexOutOfBoundsException ex1) {
             RepairOptions();
@@ -65,8 +71,10 @@ public class main {
         }
         optionsEdit = new OptionsEditPanel(false);
         webBrowserPane.addTab("Options", optionsEdit);
+        webBrowserPane.addTab("Alarms", new AlarmsEditPanel());
         webBrowserPane.addMouseListener(new TabbedPaneMouseAdapter(webBrowserPane));
         webBrowserPane.setName("Tabbed Pane");
+        addressCount = address.length / 2;
         return webBrowserPane;
     }
 
@@ -86,14 +94,14 @@ public class main {
                     String iconPath;
                     if (args.length > 0) {
                         if (args[0].equals("don'tfeedthebears")) {
-                            iconPath = "img/bear.png";
+                            iconPath = "./img/bear.png";
                         } else {
-                            iconPath = "img/icon.png";
+                            iconPath = "./img/icon.png";
                         }
                     } else {
-                        iconPath = "img/icon.png";
+                        iconPath = "./img/icon.png";
                     }
-                    InputStream iconStream = main.class.getResourceAsStream(iconPath);
+                    InputStream iconStream = app.main.class.getResourceAsStream(iconPath);
                     BufferedImage icon = ImageIO.read(iconStream);
                     frame.setIconImage(icon);
                 } catch (IOException ex) {
@@ -131,7 +139,7 @@ public class main {
                 file.createNewFile();
                 writeOptions(file, Default);
             }
-           FileReader read = new FileReader(file);
+            FileReader read = new FileReader(file);
             BufferedReader bufRead = new BufferedReader(read);
             workingLine = bufRead.readLine();
             if (workingLine == null || workingLine.length() <= 0) {
@@ -183,7 +191,7 @@ public class main {
 
     public static void addTabWithOptions(JTabbedPane webBrowserPane, ExtendedWebBrowser webBrowser, String title) {
         int tabTitleEndPos = title.lastIndexOf("]");
-        String [] parsedOptions = title.substring(tabTitleEndPos + 1).trim().split("-", -1);
+        String[] parsedOptions = title.substring(tabTitleEndPos + 1).trim().split("-", -1);
         String tabTitle = title.substring(1, tabTitleEndPos);
         System.out.println("Constructing web browser in tab: " + tabTitle);
         webBrowser.setName(tabTitle);
@@ -193,7 +201,7 @@ public class main {
                 System.out.println("Adding a timer to " + tabTitle + " from options for " + parsedOption.substring(2).trim() + " minute(s)");
                 BrowserTimerAdapter browserTimer = new BrowserTimerAdapter(Integer.parseInt(parsedOption.substring(2).trim()), webBrowser);
                 webBrowser.addBrowserTimer(browserTimer);
-            }else if (parsedOption.contains("B")){
+            } else if (parsedOption.contains("B")) {
                 System.out.println("Enabling auto backup for " + tabTitle);
                 webBrowser.enableBackup();
             }
