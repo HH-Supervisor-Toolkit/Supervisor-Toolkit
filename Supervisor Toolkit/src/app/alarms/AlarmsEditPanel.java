@@ -3,24 +3,38 @@
  * and open the template in the editor.
  */
 package app.alarms;
-
-import java.awt.Dimension;
-
 /**
  *
  * @author haywoosd
  */
 public class AlarmsEditPanel extends javax.swing.JPanel {
 
-    private void addEntry(String text) {
-        AlarmsEntryPanel alarmEntry = new AlarmsEntryPanel(text);
-        System.out.println("Adding new alarm entry: " + text);
+    private int entryNumber = 0;
+    private AlarmsAlertThread alertThread;
+
+    private void addEntry(int hour, int minute, int period, String name) {
+
+        AlarmsAlertThread.timerMinutes.add(minute);
+        AlarmsAlertThread.timerNames.add(name);
+        if (period < 1){
+            AlarmsAlertThread.timerHours.add(hour);
+        }else{
+            if (hour == 12){
+                AlarmsAlertThread.timerHours.add(0);
+            }else{
+                AlarmsAlertThread.timerHours.add(hour + 12);
+            }
+        }
+        AlarmsEntryPanel alarmEntry = new AlarmsEntryPanel(hour, minute, period, name, entryNumber);
+        System.out.println("Adding new alarm entry: " + name);
         entryContainerPanel.add(alarmEntry);
         entryContainerPanel.validate();
         entryContainerScrollPane.validate();
+        entryNumber++;
     }
 
     public AlarmsEditPanel() {
+        new AlarmsAlertThread(this).start();
         initComponents();
     }
 
@@ -73,6 +87,9 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 nameSelectFocusGained(evt);
             }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                nameSelectFocusLost(evt);
+            }
         });
         nameSelect.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
@@ -124,13 +141,12 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         System.out.println("Manually adding an alarm entry");
-        String text = "\"" + nameSelect.getText() +"\" " + hourSelect.getSelectedItem().toString() + ":" + minuteSelect.getSelectedItem().toString() + " " + periodSelect.getSelectedItem().toString();
-        addEntry(text);
+        addEntry(hourSelect.getSelectedIndex() + 1, minuteSelect.getSelectedIndex(), periodSelect.getSelectedIndex(), nameSelect.getText());
         nameSelect.setText("Alarm Name");
     }//GEN-LAST:event_addButtonActionPerformed
 
     private void nameSelectKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_nameSelectKeyTyped
-       validate();
+        validate();
     }//GEN-LAST:event_nameSelectKeyTyped
 
     private void nameSelectFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_nameSelectFocusGained
@@ -138,6 +154,12 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
             nameSelect.setText("");
         }
     }//GEN-LAST:event_nameSelectFocusGained
+
+    private void nameSelectFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_nameSelectFocusLost
+        if (nameSelect.getText().equals("")) {
+            nameSelect.setText("Alarm Name");
+        }
+    }//GEN-LAST:event_nameSelectFocusLost
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
     private javax.swing.JPanel entryContainerPanel;

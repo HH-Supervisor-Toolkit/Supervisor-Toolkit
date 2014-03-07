@@ -10,13 +10,28 @@ package app.alarms;
  */
 public class AlarmsEntryPanel extends javax.swing.JPanel {
 
-    String timeText;
+    private String timeText;
+    private String nameText;
+    private int entryNumber;
 
     /**
      * Creates new form AlarmsEntryPanel
      */
-    public AlarmsEntryPanel(String text) {
-        timeText = text;
+    public AlarmsEntryPanel(int hour, int minute, int period, String name, int number) {
+        String hourText = String.valueOf(hour);
+        String minuteText = String.valueOf(minute);
+        String periodText;
+        if (minuteText.length() < 2) {
+            minuteText = "0" + minuteText;
+        }
+        if (period < 1) {
+            periodText = "AM";
+        } else {
+            periodText = "PM";
+        }
+        nameText = name;
+        timeText = hourText + ":" + minuteText + " " + periodText;
+        entryNumber = number;
         initComponents();
     }
 
@@ -31,6 +46,7 @@ public class AlarmsEntryPanel extends javax.swing.JPanel {
 
         timeLabel = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(32767, 45));
         setMinimumSize(new java.awt.Dimension(0, 45));
@@ -46,12 +62,17 @@ public class AlarmsEntryPanel extends javax.swing.JPanel {
             }
         });
 
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel1.setText(nameText);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(timeLabel)
                 .addGap(18, 18, 18)
                 .addComponent(jButton1)
@@ -63,16 +84,22 @@ public class AlarmsEntryPanel extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(timeLabel)
-                    .addComponent(jButton1))
+                    .addComponent(jButton1)
+                    .addComponent(jLabel1))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         setVisible(false);
+        System.out.println("Removing alarm entry: " + nameText);
+        AlarmsAlertThread.timerHours.remove(entryNumber);
+        AlarmsAlertThread.timerMinutes.remove(entryNumber);
+        AlarmsAlertThread.timerNames.remove(entryNumber);
     }//GEN-LAST:event_jButton1ActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel timeLabel;
     // End of variables declaration//GEN-END:variables
 }
