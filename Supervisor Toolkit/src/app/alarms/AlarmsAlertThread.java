@@ -5,12 +5,14 @@
 package app.alarms;
 
 import app.main;
+import java.awt.BorderLayout;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 /**
@@ -37,7 +39,9 @@ public class AlarmsAlertThread extends Thread {
             for (int i = 0; i < timerHours.size(); i++) {
                 if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == timerHours.get(i)) {
                     if (Calendar.getInstance().get(Calendar.MINUTE) == timerMinutes.get(i)) {
-                        final AlarmAlertFrame messageDialog = new AlarmAlertFrame(timerNames.get(i), i);
+                        AlarmAlertPanel messagePanel = new AlarmAlertPanel(timerNames.get(i), i);
+                        final JDialog messageDialog = new JDialog();
+                        messageDialog.add(messagePanel, BorderLayout.CENTER);
                         messageDialog.pack();
                         messageDialog.setTitle("Timer Warning");
                         messageDialog.setLocationRelativeTo(parentPanel.getParent());
@@ -54,7 +58,9 @@ public class AlarmsAlertThread extends Thread {
 
                             @Override
                             public void windowLostFocus(WindowEvent e) {
-                                messageDialog.toBack();
+                                if (e.getOppositeWindow() != messageDialog) {
+                                    messageDialog.toBack();
+                                }
                             }
                         });
                     }

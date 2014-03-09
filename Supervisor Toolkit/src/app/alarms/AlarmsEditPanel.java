@@ -3,25 +3,81 @@
  * and open the template in the editor.
  */
 package app.alarms;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
+
 /**
  *
  * @author haywoosd
  */
 public class AlarmsEditPanel extends javax.swing.JPanel {
-
+    
     private int entryNumber = 0;
     private AlarmsAlertThread alertThread;
-
+    File alarmsFile;
+    String newLine;
+    
+    private void loadAlarms() {
+        alarmsFile = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Alarms.txt");
+        try {
+            if (!alarmsFile.exists()) {
+                System.out.println("Alarms file not found attemping to create default");
+                alarmsFile.createNewFile();
+            } else {
+                FileInputStream input = new FileInputStream(alarmsFile);
+                byte[] data = new byte[(int) alarmsFile.length()];
+                input.read(data);
+                String content = new String(data, "UTF-8");
+                String[] splitContent = content.split(newLine, -1);
+                for (int i = 0; i < splitContent.length - 1; i += 4) {
+                    int hour = Integer.parseInt(splitContent[i]);
+                    int minute = Integer.parseInt(splitContent[i + 1]);
+                    int period = Integer.parseInt(splitContent[i + 2]);
+                    String name = splitContent[i + 3];
+                    System.out.println("Adding new alarm from file. " + name);
+                    addEntry(hour, minute, period, name);
+                }
+                input.close();
+            }
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(AlarmsEditPanel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(AlarmsEditPanel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(AlarmsEditPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void writeAlarm(int hour, int minute, int period, String name) {
+        try {
+            FileWriter write = new FileWriter(alarmsFile, true);
+            write.write(Integer.toString(hour) + newLine);
+            write.write(Integer.toString(minute) + newLine);
+            write.write(Integer.toString(period) + newLine);
+            write.write(name + newLine);
+            write.close();
+        } catch (IOException ex) {
+            Logger.getLogger(AlarmsEditPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     private void addEntry(int hour, int minute, int period, String name) {
-
         AlarmsAlertThread.timerMinutes.add(minute);
         AlarmsAlertThread.timerNames.add(name);
-        if (period < 1){
+        if (period < 1) {
             AlarmsAlertThread.timerHours.add(hour);
-        }else{
-            if (hour == 12){
+        } else {
+            if (hour == 12) {
                 AlarmsAlertThread.timerHours.add(0);
-            }else{
+            } else {
                 AlarmsAlertThread.timerHours.add(hour + 12);
             }
         }
@@ -32,10 +88,18 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
         entryContainerScrollPane.validate();
         entryNumber++;
     }
-
+    
     public AlarmsEditPanel() {
+        newLine = System.getProperty("line.separator");
         new AlarmsAlertThread(this).start();
         initComponents();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                loadAlarms();
+            }
+        });
+        
     }
 
     /**
@@ -142,19 +206,20 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         System.out.println("Manually adding an alarm entry");
         addEntry(hourSelect.getSelectedIndex() + 1, minuteSelect.getSelectedIndex(), periodSelect.getSelectedIndex(), nameSelect.getText());
+        writeAlarm(hourSelect.getSelectedIndex() + 1, minuteSelect.getSelectedIndex(), periodSelect.getSelectedIndex(), nameSelect.getText());
         nameSelect.setText("Alarm Name");
     }//GEN-LAST:event_addButtonActionPerformed
-
+    
     private void nameSelectKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_nameSelectKeyTyped
         validate();
     }//GEN-LAST:event_nameSelectKeyTyped
-
+    
     private void nameSelectFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_nameSelectFocusGained
         if (nameSelect.getText().equals("Alarm Name")) {
             nameSelect.setText("");
         }
     }//GEN-LAST:event_nameSelectFocusGained
-
+    
     private void nameSelectFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_nameSelectFocusLost
         if (nameSelect.getText().equals("")) {
             nameSelect.setText("Alarm Name");

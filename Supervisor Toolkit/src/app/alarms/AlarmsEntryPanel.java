@@ -4,6 +4,15 @@
  */
 package app.alarms;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author haywoosd
@@ -45,20 +54,22 @@ public class AlarmsEntryPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         timeLabel = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        removeButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
-        setMaximumSize(new java.awt.Dimension(32767, 45));
-        setMinimumSize(new java.awt.Dimension(0, 45));
+        setMaximumSize(new java.awt.Dimension(32767, 43));
+        setMinimumSize(new java.awt.Dimension(0, 43));
         setName(""); // NOI18N
+        setOpaque(false);
+        setPreferredSize(new java.awt.Dimension(256, 43));
 
         timeLabel.setText(timeText);
         timeLabel.setToolTipText("");
 
-        jButton1.setText("Remove");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        removeButton.setText("Remove");
+        removeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                removeButtonActionPerformed(evt);
             }
         });
 
@@ -75,31 +86,58 @@ public class AlarmsEntryPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(timeLabel)
                 .addGap(18, 18, 18)
-                .addComponent(jButton1)
+                .addComponent(removeButton)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(timeLabel)
-                    .addComponent(jButton1)
+                    .addComponent(removeButton)
                     .addComponent(jLabel1))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
         setVisible(false);
         System.out.println("Removing alarm entry: " + nameText);
         AlarmsAlertThread.timerHours.remove(entryNumber);
         AlarmsAlertThread.timerMinutes.remove(entryNumber);
         AlarmsAlertThread.timerNames.remove(entryNumber);
-    }//GEN-LAST:event_jButton1ActionPerformed
+        String newLine = System.getProperty("line.separator");
+        try {
+            File alarmsFile = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Alarms.txt");
+            FileInputStream input = new FileInputStream(alarmsFile);
+            byte[] data = new byte[(int) alarmsFile.length()];
+            input.read(data);
+            input.close();
+            String[] splitContent = new String(data, "UTF-8").split(newLine, -1);
+            FileWriter alarmsWriter = new FileWriter(alarmsFile);
+            for (int i = 0; i < (splitContent.length - 1) / 4; i++) {
+                if (i == entryNumber) {
+                    continue;
+                } else {
+                    alarmsWriter.write(splitContent[i * 4] + newLine);
+                    alarmsWriter.write(splitContent[i * 4 + 1] + newLine);
+                    alarmsWriter.write(splitContent[i * 4 + 2] + newLine);
+                    alarmsWriter.write(splitContent[i * 4 + 3] + newLine);
+                }
+            }
+            alarmsWriter.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(AlarmsEntryPanel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(AlarmsEntryPanel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(AlarmsEntryPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_removeButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton removeButton;
     private javax.swing.JLabel timeLabel;
     // End of variables declaration//GEN-END:variables
 }
