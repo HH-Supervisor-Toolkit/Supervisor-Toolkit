@@ -69,7 +69,7 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
                         messageDialog.setAlwaysOnTop(true);
                         messageDialog.setAlwaysOnTop(false);
                     } else {
-                        timerPanel = new TimerWarningPanel("Your timer for " + webBrowser.getName() + " is at " + (double) timeDifference / (60000) + " of " + timerDuration + " minutes",webBrowser);
+                        timerPanel = new TimerWarningPanel("Your timer for " + webBrowser.getName() + " is at " + (double) timeDifference / (60000) + " of " + timerDuration + " minutes", webBrowser);
                         messageDialog = new JDialog();
                         messageDialog.add(timerPanel, BorderLayout.CENTER);
                         messageDialog.pack();
@@ -88,7 +88,9 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
 
                             @Override
                             public void windowLostFocus(WindowEvent e) {
-                                messageDialog.toBack();
+                                if (e.getOppositeWindow() != messageDialog) {
+                                    messageDialog.toBack();
+                                }
                             }
                         });
                     }
