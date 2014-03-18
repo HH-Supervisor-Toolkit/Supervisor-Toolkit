@@ -94,14 +94,14 @@ public class main {
                     String iconPath;
                     if (args.length > 0) {
                         if (args[0].equals("don'tfeedthebears")) {
-                            iconPath = "./img/bear.png";
+                            iconPath = "img/bear.png";
                         } else {
-                            iconPath = "./img/icon.png";
+                            iconPath = "img/icon.png";
                         }
                     } else {
-                        iconPath = "./img/icon.png";
+                        iconPath = "img/icon.png";
                     }
-                    InputStream iconStream = app.main.class.getResourceAsStream(iconPath);
+                    InputStream iconStream = main.class.getResourceAsStream(iconPath);
                     BufferedImage icon = ImageIO.read(iconStream);
                     frame.setIconImage(icon);
                 } catch (IOException ex) {
