@@ -211,7 +211,9 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_addButtonActionPerformed
     
     private void nameSelectKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_nameSelectKeyTyped
-        validate();
+        if(nameSelect.hasFocus()){
+            validate();
+        }
     }//GEN-LAST:event_nameSelectKeyTyped
     
     private void nameSelectFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_nameSelectFocusGained

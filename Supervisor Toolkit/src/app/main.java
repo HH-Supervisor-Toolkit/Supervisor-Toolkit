@@ -61,7 +61,8 @@ public class main {
                 webBrowser[(i - 1) / 2] = new ExtendedWebBrowser();
                 System.out.println("Navagating to " + address[i]);
                 webBrowser[(i - 1) / 2].navigate(address[i]);
-                webBrowser[(i - 1) / 2].setStatusBarVisible(false);
+                webBrowser[(i - 1) / 2].setBarsVisible(false);
+                webBrowser[(i-1)/2].setButtonBarVisible(true);
                 addTabWithOptions(webBrowserPane, webBrowser[(i - 1) / 2], address[i - 1]);
 
             }
