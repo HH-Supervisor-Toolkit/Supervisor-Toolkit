@@ -52,8 +52,10 @@ public class AlarmsAlertThread extends Thread {
                         main.frame.addWindowFocusListener(new WindowFocusListener() {
                             @Override
                             public void windowGainedFocus(WindowEvent e) {
+                                if (e.getOppositeWindow() != messageDialog){
                                 messageDialog.setAlwaysOnTop(true);
                                 messageDialog.setAlwaysOnTop(false);
+                                }
                             }
 
                             @Override

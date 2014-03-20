@@ -82,8 +82,10 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
                         main.frame.addWindowFocusListener(new WindowFocusListener() {
                             @Override
                             public void windowGainedFocus(WindowEvent e) {
-                                messageDialog.setAlwaysOnTop(true);
-                                messageDialog.setAlwaysOnTop(false);
+                                if (e.getOppositeWindow() != messageDialog) {
+                                    messageDialog.setAlwaysOnTop(true);
+                                    messageDialog.setAlwaysOnTop(false);
+                                }
                             }
 
                             @Override
