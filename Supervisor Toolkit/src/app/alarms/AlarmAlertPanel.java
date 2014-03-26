@@ -4,7 +4,7 @@
  */
 package app.alarms;
 
-import javax.swing.SwingUtilities;
+import javax.swing.JDialog;
 
 /**
  *
@@ -13,13 +13,17 @@ import javax.swing.SwingUtilities;
 public class AlarmAlertPanel extends javax.swing.JPanel {
     String messageText;
     int entryNumber;
+    JDialog dialog;
+    
     /**
      * Creates new form AlarmAlertFrame
      */
-    public AlarmAlertPanel(String alarmName, int number) {
+    public AlarmAlertPanel(String alarmName, int number, JDialog dialog1) {
         messageText = alarmName;
         entryNumber = number;
+        dialog = dialog1;
         initComponents();
+        
     }
 
     /**
@@ -151,11 +155,11 @@ public class AlarmAlertPanel extends javax.swing.JPanel {
             AlarmsAlertThread.timerMinutes.set(entryNumber, AlarmsAlertThread.timerMinutes.get(entryNumber) - 60*hoursIncrease);
         }
         System.out.println("New time for alarm is: " + AlarmsAlertThread.timerHours.get(entryNumber) + ":" + AlarmsAlertThread.timerMinutes.get(entryNumber));
-        SwingUtilities.getRoot(this).setVisible(false);
+        dialog.dispose();
     }//GEN-LAST:event_postponeButtonActionPerformed
 
     private void endButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_endButtonActionPerformed
-        SwingUtilities.getRoot(this).setVisible(false);
+        dialog.dispose();
     }//GEN-LAST:event_endButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
