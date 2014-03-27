@@ -8,7 +8,6 @@ package app.timer;
 
 import app.browser.ExtendedWebBrowser;
 import javax.swing.JDialog;
-import javax.swing.SwingUtilities;
 
 /**
  *
