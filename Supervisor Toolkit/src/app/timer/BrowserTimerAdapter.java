@@ -21,13 +21,13 @@ import javax.swing.JDialog;
  * @author haywoosd
  */
 public class BrowserTimerAdapter extends WebBrowserAdapter {
-
+    
     int timerDuration;
     long lastRefreshTime;
     ExtendedWebBrowser webBrowser;
     TimerCounterThread timerThread;
     boolean terminated = false;
-
+    
     public BrowserTimerAdapter(int minutes, ExtendedWebBrowser webBrowser2) {
         timerDuration = minutes;
         webBrowser = webBrowser2;
@@ -35,26 +35,26 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
         timerThread = new TimerCounterThread();
         timerThread.start();
     }
-
+    
     public void terminate() {
         terminated = true;
     }
-
+    
     @Override
     public void titleChanged(WebBrowserEvent wbe) {
         lastRefreshTime = Calendar.getInstance().getTimeInMillis();
     }
-
+    
     private class TimerCounterThread extends Thread {
-
+        
         long lastNoticeTime;
         JDialog messageDialog = null;
         TimerWarningPanel timerPanel;
-
+        
         TimerCounterThread() {
             lastNoticeTime = Calendar.getInstance().getTimeInMillis();
         }
-
+        
         @Override
         public void run() {
             long timeDifference;
@@ -83,15 +83,23 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
                             @Override
                             public void windowGainedFocus(WindowEvent e) {
                                 if (e.getOppositeWindow() != messageDialog) {
-                                    messageDialog.setAlwaysOnTop(true);
-                                    messageDialog.setAlwaysOnTop(false);
+                                    if (messageDialog.isVisible()) {
+                                        messageDialog.setAlwaysOnTop(true);
+                                        messageDialog.setAlwaysOnTop(false);
+                                    } else {
+                                        main.frame.removeWindowFocusListener(this);
+                                    }
                                 }
                             }
-
+                            
                             @Override
                             public void windowLostFocus(WindowEvent e) {
                                 if (e.getOppositeWindow() != messageDialog) {
-                                    messageDialog.toBack();
+                                    if (messageDialog.isVisible()) {
+                                        messageDialog.toBack();
+                                    } else {
+                                        main.frame.removeWindowFocusListener(this);
+                                    }
                                 }
                             }
                         });
@@ -103,7 +111,7 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
                 } catch (InterruptedException ex) {
                     Logger.getLogger(BrowserTimerAdapter.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
+                
             }
         }
     }

@@ -20,19 +20,19 @@ import javax.swing.JPanel;
  * @author haywoosd
  */
 public class AlarmsAlertThread extends Thread {
-
+    
     public static ArrayList<Integer> timerHours;
     public static ArrayList<Integer> timerMinutes;
     public static ArrayList<String> timerNames;
     JPanel parentPanel;
-
+    
     public AlarmsAlertThread(JPanel parent) {
         parentPanel = parent;
         timerHours = new ArrayList();
         timerMinutes = new ArrayList();
         timerNames = new ArrayList();
     }
-
+    
     @Override
     public void run() {
         while (true) {
@@ -53,15 +53,23 @@ public class AlarmsAlertThread extends Thread {
                             @Override
                             public void windowGainedFocus(WindowEvent e) {
                                 if (e.getOppositeWindow() != messageDialog) {
-                                    messageDialog.setAlwaysOnTop(true);
-                                    messageDialog.setAlwaysOnTop(false);
+                                    if (messageDialog.isVisible()) {
+                                        messageDialog.setAlwaysOnTop(true);
+                                        messageDialog.setAlwaysOnTop(false);
+                                    } else {
+                                        main.frame.removeWindowFocusListener(this);
+                                    }
                                 }
                             }
-
+                            
                             @Override
                             public void windowLostFocus(WindowEvent e) {
                                 if (e.getOppositeWindow() != messageDialog) {
-                                    messageDialog.toBack();
+                                    if (messageDialog.isVisible()) {
+                                        messageDialog.toBack();
+                                    } else {
+                                        main.frame.removeWindowFocusListener(this);
+                                    }
                                 }
                             }
                         });
