@@ -14,9 +14,8 @@ import chrriis.dj.nativeswing.swtimpl.NativeInterface;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.GridBagLayout;
-import java.awt.Image;
+import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -27,7 +26,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,12 +45,12 @@ import javax.swing.SwingUtilities;
  */
 public class main {
 
-    public final static String[] Default = {"[Nightly Log]", "https://docs.google.com/forms/d/172-Elqzog2MgLSMe9WvCHkuxHsJAb5IaFJZKq74KxPw/viewform",
+    public final static String[] Default = {"[Nightly Log] -B", "https://docs.google.com/forms/d/172-Elqzog2MgLSMe9WvCHkuxHsJAb5IaFJZKq74KxPw/viewform",
         "[Equipment Problem Report]", "https://docs.google.com/forms/d/1X8K1XeWBykPRnnxn5TWaLGUcc68Yn3JiejvpSgwiJTc/viewform",
         "[Incident Report]", "https://docs.google.com/forms/d/1Zy4Hd4FxPlpSAOZMigRfUVywnL78-pBm5HP5E69TasE/viewform",
         "[Textbook Request Form]", "https://docs.google.com/forms/d/1wW0GEoEqkOlpTIPP__2kRSWbD1RskTBo4wtBaO738BM/viewform",
         "[Real-Time Agent]", "http://geomantce-cra.rose-hulman.edu/ACEAdmin/Admin/login.asp?entire=yes&returnpage=http://geomantce-cra.rose-hulman.edu:8080/ACEReport/",
-        "[Phone Surveys]", "https://prod11gbss8.rose-hulman.edu/BanSS/rhit_hwhl.P_QuestionPage",
+        "[Phone Surveys] -t:30", "https://prod11gbss8.rose-hulman.edu/BanSS/rhit_hwhl.P_QuestionPage",
         "[Attendance Page]", "http://askrose.org/askrose-login"
     };
     public final static String[] bearsLinks = {"http://www.firstpeople.us/pictures/bear/1600x1200/Feeling_Grizzly-1600x1200.jpg",
@@ -67,6 +65,7 @@ public class main {
     public static JFrame frame;
     public static int addressCount;
     public static boolean bears = false;
+    static BufferedImage icon;
 
     public static JComponent createContent(String[] address) {
         ExtendedWebBrowser[] webBrowser = new ExtendedWebBrowser[address.length / 2];
@@ -123,7 +122,6 @@ public class main {
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setSize(900, 600);
                 frame.setLocationByPlatform(true);
-                frame.add(createContent(ReadOptions()), BorderLayout.CENTER);
                 try {
                     String iconPath;
                     if (bears) {
@@ -132,11 +130,12 @@ public class main {
                         iconPath = "img/icon.png";
                     }
                     InputStream iconStream = main.class.getResourceAsStream(iconPath);
-                    BufferedImage icon = ImageIO.read(iconStream);
+                    icon = ImageIO.read(iconStream);
                     frame.setIconImage(icon);
                 } catch (IOException ex) {
                     Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                frame.add(createContent(ReadOptions()), BorderLayout.CENTER);
                 frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
                 frame.addWindowListener(new WindowAdapter() {
                     @Override
@@ -160,7 +159,7 @@ public class main {
         try {
             System.out.println("Attempting to read options file");
             file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Options.txt");
-            if (!file.exists()) {
+            if (!file.exists() || file.length() == 0) {
                 System.out.println("Options file not found attemping to create default");
                 if (!file.getParentFile().exists()) {
                     System.out.println("SuperToolkit directory not found attempting to create it");
@@ -208,12 +207,13 @@ public class main {
     public static void RepairOptions() {
         System.out.println("Options file not formatted correctly. Opening repair window");
         infoBox("Options file is not formatted correctly please repair it manually.", "Bad Startup");
-        JDialog diag = new JDialog();
+        JDialog diag = new JDialog((Window)null);
         diag.setTitle("Options Manual Repair");
         diag.add(new OptionsEditPanel(true), BorderLayout.CENTER);
         diag.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
         diag.setSize(900, 600);
         diag.setLocationByPlatform(true);
+        diag.setIconImage(icon);
         diag.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         diag.setVisible(true);
         System.out.println("Options revision submitted");

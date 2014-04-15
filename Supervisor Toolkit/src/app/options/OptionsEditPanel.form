@@ -24,7 +24,8 @@
           <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Component id="cancelButton" max="32767" attributes="0"/>
-                  <Component id="applyButton" min="-2" max="-2" attributes="0"/>
+                  <Component id="applyButton" max="32767" attributes="0"/>
+                  <Component id="resetButton" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jScrollPane2" max="32767" attributes="0"/>
@@ -41,6 +42,8 @@
                       <Component id="applyButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="cancelButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="resetButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
                   <Component id="jScrollPane2" pref="557" max="32767" attributes="0"/>
@@ -101,5 +104,22 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JButton" name="resetButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Reset"/>
+        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[65, 23]"/>
+        </Property>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[65, 23]"/>
+        </Property>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[65, 23]"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="resetButtonActionPerformed"/>
+      </Events>
+    </Component>
   </SubComponents>
 </Form>

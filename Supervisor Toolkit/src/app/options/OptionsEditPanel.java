@@ -79,6 +79,7 @@ public class OptionsEditPanel extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         optionsEditorArea = new javax.swing.JTextArea();
+        resetButton = new javax.swing.JButton();
 
         applyButton.setText("Apply");
         applyButton.setMaximumSize(new java.awt.Dimension(65, 23));
@@ -105,6 +106,16 @@ public class OptionsEditPanel extends javax.swing.JPanel {
         optionsEditorArea.setRows(5);
         jScrollPane2.setViewportView(optionsEditorArea);
 
+        resetButton.setText("Reset");
+        resetButton.setMaximumSize(new java.awt.Dimension(65, 23));
+        resetButton.setMinimumSize(new java.awt.Dimension(65, 23));
+        resetButton.setPreferredSize(new java.awt.Dimension(65, 23));
+        resetButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -116,7 +127,8 @@ public class OptionsEditPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(cancelButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(applyButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(applyButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(resetButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2))
         );
@@ -130,6 +142,8 @@ public class OptionsEditPanel extends javax.swing.JPanel {
                         .addComponent(applyButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cancelButton)
+                        .addGap(18, 18, 18)
+                        .addComponent(resetButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 557, Short.MAX_VALUE)))
         );
@@ -159,11 +173,21 @@ public class OptionsEditPanel extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_applyButtonActionPerformed
+
+    private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
+        int choice = JOptionPane.showConfirmDialog(null, "Are you sure you want to reset to default options?", "Confirm reset", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if (choice == JOptionPane.YES_OPTION) {
+            main.writeOptions(main.file, main.Default);
+            FillEditPane();
+        }
+    }//GEN-LAST:event_resetButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton applyButton;
     private javax.swing.JButton cancelButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea optionsEditorArea;
+    private javax.swing.JButton resetButton;
     // End of variables declaration//GEN-END:variables
 }
