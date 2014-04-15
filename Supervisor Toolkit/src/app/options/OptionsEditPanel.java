@@ -30,7 +30,11 @@ public class OptionsEditPanel extends javax.swing.JPanel {
             workingLine = bufRead.readLine();
             optionsEditorArea.setText(null);
             while (workingLine != null) {
-                optionsEditorArea.setText(optionsEditorArea.getText() + workingLine + System.getProperty("line.separator"));
+                if (main.bears) {
+                    optionsEditorArea.setText(optionsEditorArea.getText() + "BEARS!" + System.getProperty("line.separator"));
+                } else {
+                    optionsEditorArea.setText(optionsEditorArea.getText() + workingLine + System.getProperty("line.separator"));
+                }
                 workingLine = bufRead.readLine();
             }
             System.out.println("Options pane sucessfully filled");
@@ -40,13 +44,14 @@ public class OptionsEditPanel extends javax.swing.JPanel {
             Logger.getLogger(OptionsEditPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    public String[] getOptionsText(){
+
+    public String[] getOptionsText() {
         return optionsEditorArea.getText().split(System.getProperty("line.separator"));
     }
-    
-    public void setOptionsText(String[] optionsText){
+
+    public void setOptionsText(String[] optionsText) {
         optionsEditorArea.setText("");
-        for (int i = 0; i < optionsText.length; i++){
+        for (int i = 0; i < optionsText.length; i++) {
             optionsEditorArea.setText(optionsEditorArea.getText() + optionsText[i] + System.getProperty("line.separator"));
         }
     }

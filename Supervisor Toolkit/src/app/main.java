@@ -13,6 +13,10 @@ import chrriis.common.UIUtils;
 import chrriis.dj.nativeswing.swtimpl.NativeInterface;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -23,6 +27,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +35,9 @@ import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
@@ -48,10 +55,18 @@ public class main {
         "[Phone Surveys]", "https://prod11gbss8.rose-hulman.edu/BanSS/rhit_hwhl.P_QuestionPage",
         "[Attendance Page]", "http://askrose.org/askrose-login"
     };
+    public final static String[] bearsLinks = {"http://www.firstpeople.us/pictures/bear/1600x1200/Feeling_Grizzly-1600x1200.jpg",
+        "http://www.firstpeople.us/pictures/bear/1600x1200/Grin_and_Bear_It-1600x1200.jpg",
+        "http://cdn.zmescience.com/wp-content/uploads/2011/11/grizzly-bear.jpg",
+        "http://images.nationalgeographic.com/wpf/media-live/photos/000/095/cache/bald-bears_9572_600x450.jpg",
+        "http://www.nationalgeographic.com/adventure/images/05_06/bears-2.jpg",
+        "http://upload.wikimedia.org/wikipedia/commons/a/a0/Sun_Bear_7.jpg",
+        "http://media.247sports.com/Uploads/Avatars/248/293481.jpg"};
     public static File file;
     public static OptionsEditPanel optionsEdit;
     public static JFrame frame;
     public static int addressCount;
+    public static boolean bears = false;
 
     public static JComponent createContent(String[] address) {
         ExtendedWebBrowser[] webBrowser = new ExtendedWebBrowser[address.length / 2];
@@ -60,9 +75,13 @@ public class main {
             for (int i = 1; i < address.length; i = i + 2) {
                 webBrowser[(i - 1) / 2] = new ExtendedWebBrowser();
                 System.out.println("Navagating to " + address[i]);
-                webBrowser[(i - 1) / 2].navigate(address[i]);
+                if (bears) {
+                    webBrowser[(i - 1) / 2].navigate(bearsLinks[i / 2 - i / (2 * bearsLinks.length)]);
+                } else {
+                    webBrowser[(i - 1) / 2].navigate(address[i]);
+                }
                 webBrowser[(i - 1) / 2].setBarsVisible(false);
-                webBrowser[(i-1)/2].setButtonBarVisible(true);
+                webBrowser[(i - 1) / 2].setButtonBarVisible(true);
                 addTabWithOptions(webBrowserPane, webBrowser[(i - 1) / 2], address[i - 1]);
 
             }
@@ -72,15 +91,29 @@ public class main {
         }
         optionsEdit = new OptionsEditPanel(false);
         webBrowserPane.addTab("Options", optionsEdit);
-        webBrowserPane.addTab("Alarms", new AlarmsEditPanel());
+        if (bears) {
+            JPanel bearPanel = new JPanel();
+            JLabel bearLabel = new JLabel();
+            bearLabel.setFont(new Font(bearLabel.getFont().getName(),Font.PLAIN,86));
+            bearLabel.setText("BEARS!");
+            bearPanel.setLayout(new GridBagLayout());
+            bearPanel.add(bearLabel);
+            webBrowserPane.addTab("Alarms",bearPanel);
+        } else {
+            webBrowserPane.addTab("Alarms", new AlarmsEditPanel());
+        }
         webBrowserPane.addMouseListener(new TabbedPaneMouseAdapter(webBrowserPane));
-        webBrowserPane.setName("Tabbed Pane");
         addressCount = address.length / 2;
         return webBrowserPane;
     }
 
     /* Standard main method to try that test as a standalone application. */
     public static void main(final String[] args) {
+        for (String arg : args) {
+            if (arg.equals("don'tfeedthebears")) {
+                bears = true;
+            }
+        }
         NativeInterface.open();
         UIUtils.setPreferredLookAndFeel();
         SwingUtilities.invokeLater(new Runnable() {
@@ -93,12 +126,8 @@ public class main {
                 frame.add(createContent(ReadOptions()), BorderLayout.CENTER);
                 try {
                     String iconPath;
-                    if (args.length > 0) {
-                        if (args[0].equals("don'tfeedthebears")) {
-                            iconPath = "img/bear.png";
-                        } else {
-                            iconPath = "img/icon.png";
-                        }
+                    if (bears) {
+                        iconPath = "img/bear.png";
                     } else {
                         iconPath = "img/icon.png";
                     }
