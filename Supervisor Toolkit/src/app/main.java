@@ -62,26 +62,27 @@ public class main {
         "http://media.247sports.com/Uploads/Avatars/248/293481.jpg"};
     public static File file;
     public static OptionsEditPanel optionsEdit;
+    public static ExtendedWebBrowser[] webBrowsers;
     public static JFrame frame;
     public static int addressCount;
     public static boolean bears = false;
     static BufferedImage icon;
 
     public static JComponent createContent(String[] address) {
-        ExtendedWebBrowser[] webBrowser = new ExtendedWebBrowser[address.length / 2];
+        webBrowsers = new ExtendedWebBrowser[address.length / 2];
         JTabbedPane webBrowserPane = new JTabbedPane();
         try {
             for (int i = 1; i < address.length; i = i + 2) {
-                webBrowser[(i - 1) / 2] = new ExtendedWebBrowser();
+                webBrowsers[(i - 1) / 2] = new ExtendedWebBrowser();
                 System.out.println("Navagating to " + address[i]);
                 if (bears) {
-                    webBrowser[(i - 1) / 2].navigate(bearsLinks[i / 2 - i / (2 * bearsLinks.length)]);
+                    webBrowsers[(i - 1) / 2].navigate(bearsLinks[i / 2 - i / (2 * bearsLinks.length)]);
                 } else {
-                    webBrowser[(i - 1) / 2].navigate(address[i]);
+                    webBrowsers[(i - 1) / 2].navigate(address[i]);
                 }
-                webBrowser[(i - 1) / 2].setBarsVisible(false);
-                webBrowser[(i - 1) / 2].setButtonBarVisible(true);
-                addTabWithOptions(webBrowserPane, webBrowser[(i - 1) / 2], address[i - 1]);
+                webBrowsers[(i - 1) / 2].setBarsVisible(false);
+                webBrowsers[(i - 1) / 2].setButtonBarVisible(true);
+                addTabWithOptions(webBrowserPane, webBrowsers[(i - 1) / 2], address[i - 1]);
 
             }
         } catch (StringIndexOutOfBoundsException ex1) {
@@ -93,11 +94,11 @@ public class main {
         if (bears) {
             JPanel bearPanel = new JPanel();
             JLabel bearLabel = new JLabel();
-            bearLabel.setFont(new Font(bearLabel.getFont().getName(),Font.PLAIN,86));
+            bearLabel.setFont(new Font(bearLabel.getFont().getName(), Font.PLAIN, 86));
             bearLabel.setText("BEARS!");
             bearPanel.setLayout(new GridBagLayout());
             bearPanel.add(bearLabel);
-            webBrowserPane.addTab("Alarms",bearPanel);
+            webBrowserPane.addTab("Alarms", bearPanel);
         } else {
             webBrowserPane.addTab("Alarms", new AlarmsEditPanel());
         }
@@ -143,6 +144,9 @@ public class main {
                         String ObjButtons[] = {"Yes", "No"};
                         int PromptResult = JOptionPane.showOptionDialog(frame, "Are you sure you want to exit?", "Nightly Log", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, ObjButtons, ObjButtons[1]);
                         if (PromptResult == JOptionPane.YES_OPTION) {
+                            for (ExtendedWebBrowser webBrowser : webBrowsers) {
+                                webBrowser.executeJavascript("window.onbeforeunload = null");
+                            }
                             System.exit(0);
                         }
                     }
@@ -207,7 +211,7 @@ public class main {
     public static void RepairOptions() {
         System.out.println("Options file not formatted correctly. Opening repair window");
         infoBox("Options file is not formatted correctly please repair it manually.", "Bad Startup");
-        JDialog diag = new JDialog((Window)null);
+        JDialog diag = new JDialog((Window) null);
         diag.setTitle("Options Manual Repair");
         diag.add(new OptionsEditPanel(true), BorderLayout.CENTER);
         diag.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
