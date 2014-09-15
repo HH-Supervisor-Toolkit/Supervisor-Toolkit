@@ -21,13 +21,13 @@ import javax.swing.JDialog;
  * @author haywoosd
  */
 public class BrowserTimerAdapter extends WebBrowserAdapter {
-    
+
     int timerDuration;
     long lastRefreshTime;
     ExtendedWebBrowser webBrowser;
     TimerCounterThread timerThread;
     boolean terminated = false;
-    
+
     public BrowserTimerAdapter(int minutes, ExtendedWebBrowser webBrowser2) {
         timerDuration = minutes;
         webBrowser = webBrowser2;
@@ -35,26 +35,26 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
         timerThread = new TimerCounterThread();
         timerThread.start();
     }
-    
+
     public void terminate() {
         terminated = true;
     }
-    
+
     @Override
     public void titleChanged(WebBrowserEvent wbe) {
         lastRefreshTime = Calendar.getInstance().getTimeInMillis();
     }
-    
+
     private class TimerCounterThread extends Thread {
-        
+
         long lastNoticeTime;
         JDialog messageDialog = null;
         TimerWarningPanel timerPanel;
-        
+
         TimerCounterThread() {
             lastNoticeTime = Calendar.getInstance().getTimeInMillis();
         }
-        
+
         @Override
         public void run() {
             long timeDifference;
@@ -65,16 +65,17 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
                 if (timeDifference > timerDuration * 40000 && timeNoticeDifference > timerDuration * 10000 && timeDifference < timerDuration * 70000) {
                     lastNoticeTime = Calendar.getInstance().getTimeInMillis();
                     if (messageDialog != null && messageDialog.isVisible()) {
-                        timerPanel.updateMessage("Your timer for " + webBrowser.getName() + " is at " + (double) timeDifference / (60000) + " of " + timerDuration + " minutes");
+                        timerPanel.updateMessage("Your timer for " + webBrowser.getName() + " is at " + limitDoublePercision((double) timeDifference / (60000), 2) + " of " + timerDuration + " minutes");
+                        messageDialog.pack();
                         messageDialog.setAlwaysOnTop(true);
                         messageDialog.setAlwaysOnTop(false);
                     } else {
                         messageDialog = new JDialog();
-                        timerPanel = new TimerWarningPanel("Your timer for " + webBrowser.getName() + " is at " + (double) timeDifference / (60000) + " of " + timerDuration + " minutes", webBrowser, messageDialog);
+                        timerPanel = new TimerWarningPanel("Your timer for " + webBrowser.getName() + " is at " + limitDoublePercision((double) timeDifference / (60000), 2) + " of " + timerDuration + " minutes", webBrowser, messageDialog);
                         messageDialog.add(timerPanel, BorderLayout.CENTER);
-                        messageDialog.pack();
                         messageDialog.setTitle("Timer Warning");
                         messageDialog.setLocationRelativeTo(webBrowser.getParent());
+                        messageDialog.pack();
                         messageDialog.setResizable(false);
                         messageDialog.setVisible(true);
                         messageDialog.setAlwaysOnTop(true);
@@ -91,7 +92,7 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
                                     }
                                 }
                             }
-                            
+
                             @Override
                             public void windowLostFocus(WindowEvent e) {
                                 if (e.getOppositeWindow() != messageDialog) {
@@ -111,8 +112,14 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
                 } catch (InterruptedException ex) {
                     Logger.getLogger(BrowserTimerAdapter.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
+
             }
         }
+    }
+
+    public double limitDoublePercision(double d, int decimals) {
+        int d1 = (int) (d * Math.pow(10, decimals));
+        double d2 = ((double) d1) / Math.pow(10, decimals);
+        return d2;
     }
 }
