@@ -119,7 +119,7 @@ public class BrowserTimerAdapter extends WebBrowserAdapter {
 
     public double limitDoublePercision(double d, int decimals) {
         int d1 = (int) (d * Math.pow(10, decimals));
-        double d2 = ((double) d1) / Math.pow(10, decimals);
+        double d2 = d1 / Math.pow(10, decimals);
         return d2;
     }
 }
