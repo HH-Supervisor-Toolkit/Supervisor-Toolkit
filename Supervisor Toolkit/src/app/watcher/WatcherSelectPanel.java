@@ -22,6 +22,13 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
     public WatcherSelectPanel(ExtendedWebBrowser webBrowser1) {
         webBrowser = webBrowser1;
         initComponents();
+        int TutorCount = ((Double) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows.length")).intValue();
+        String[] tutorNameList = new String[TutorCount - 1];
+        for (int i = 1; i < TutorCount; i++){
+            String tempName = (String) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].innerHTML");
+            tutorNameList[i-1] = tempName.substring(tempName.lastIndexOf("&nbsp;") + 6 ,tempName.length());
+        }
+        watchableList.setListData(tutorNameList);
     }
 
     /**
@@ -35,7 +42,7 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
 
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList();
+        watchableList = new javax.swing.JList();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jList2 = new javax.swing.JList();
@@ -45,7 +52,7 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
 
         jLabel1.setText("Who would you like to add a watcher for?");
 
-        jScrollPane1.setViewportView(jList1);
+        jScrollPane1.setViewportView(watchableList);
 
         jLabel2.setText("Users currently being watched:");
 
@@ -118,9 +125,9 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
     private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JList jList1;
     private javax.swing.JList jList2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JList watchableList;
     // End of variables declaration//GEN-END:variables
 }

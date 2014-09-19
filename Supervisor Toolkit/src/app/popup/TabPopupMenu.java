@@ -18,13 +18,14 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 
 /**
  *
  * @author haywoosd
  */
 public class TabPopupMenu extends JPopupMenu {
-    
+
     JCheckBoxMenuItem timerItem;
     JCheckBoxMenuItem backupItem;
     JMenuItem watcherItem;
@@ -32,7 +33,7 @@ public class TabPopupMenu extends JPopupMenu {
     ExtendedWebBrowser webBrowser;
     boolean hasTimer = false;
     BrowserTimerAdapter timerListener;
-    
+
     public TabPopupMenu(ExtendedWebBrowser webBrowser2) {
         webBrowser = webBrowser2;
         timerItem = new JCheckBoxMenuItem("Add timer");
@@ -65,7 +66,7 @@ public class TabPopupMenu extends JPopupMenu {
                 backupItem.setSelected(true);
             }
             backupItem.addActionListener(new ActionListener() {
-                
+
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (webBrowser.isBackupEnabled()) {
@@ -84,7 +85,7 @@ public class TabPopupMenu extends JPopupMenu {
         if (webBrowser.getResourceLocation().equals(main.Default[9])) {
             watcherItem = new JMenuItem("Watcher");
             watcherItem.addActionListener(new ActionListener() {
-                
+
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     JDialog watcherFrame = new JDialog(main.frame);
@@ -106,7 +107,7 @@ public class TabPopupMenu extends JPopupMenu {
         });
         add(refreshItem);
     }
-    
+
     private int GetTimerMinutes(JWebBrowser webBrowser) {
         int minutes;
         String timerDurationStr = JOptionPane.showInputDialog(webBrowser, "How many minutes should the timer be for?", "Timer Duration", JOptionPane.PLAIN_MESSAGE);
@@ -124,7 +125,7 @@ public class TabPopupMenu extends JPopupMenu {
         }
         return minutes;
     }
-    
+
     private void ModifyOptions(boolean removing, String prefix, String fullOption) {
         int index = 0;
         JTabbedPane tabbedPane = (JTabbedPane) webBrowser.getParent();
