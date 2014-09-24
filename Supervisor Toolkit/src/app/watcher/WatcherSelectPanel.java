@@ -3,30 +3,33 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package app.watcher;
 
 import app.browser.ExtendedWebBrowser;
+import javax.swing.SwingUtilities;
 
 /**
  *
  * @author haywoosd
  */
 public class WatcherSelectPanel extends javax.swing.JPanel {
+
     private static ExtendedWebBrowser webBrowser;
 
     /**
      * Creates new form WatcherSelectPanel
+     *
      * @param webBrowser1
      */
     public WatcherSelectPanel(ExtendedWebBrowser webBrowser1) {
         webBrowser = webBrowser1;
         initComponents();
         int TutorCount = ((Double) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows.length")).intValue();
+        System.out.println("There are " + TutorCount + " tutors online right now. Loaded them into the watcher selection screen.");
         String[] tutorNameList = new String[TutorCount - 1];
-        for (int i = 1; i < TutorCount; i++){
+        for (int i = 1; i < TutorCount; i++) {
             String tempName = (String) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].innerHTML");
-            tutorNameList[i-1] = tempName.substring(tempName.lastIndexOf("&nbsp;") + 6 ,tempName.length());
+            tutorNameList[i - 1] = tempName.substring(tempName.lastIndexOf("&nbsp;") + 6, tempName.length());
         }
         watchableList.setListData(tutorNameList);
     }
@@ -45,10 +48,10 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
         watchableList = new javax.swing.JList();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jList2 = new javax.swing.JList();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        removeList = new javax.swing.JList();
+        selectButton = new javax.swing.JButton();
+        cancelButton = new javax.swing.JButton();
+        removeButton = new javax.swing.JButton();
 
         jLabel1.setText("Who would you like to add a watcher for?");
 
@@ -56,18 +59,28 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
 
         jLabel2.setText("Users currently being watched:");
 
-        jScrollPane2.setViewportView(jList2);
+        jScrollPane2.setViewportView(removeList);
 
-        jButton1.setText("Select");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        selectButton.setText("Select");
+        selectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                selectButtonActionPerformed(evt);
             }
         });
 
-        jButton2.setText("Cancel");
+        cancelButton.setText("Cancel");
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
 
-        jButton3.setText("Remove");
+        removeButton.setText("Remove");
+        removeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                removeButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -84,13 +97,13 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton1)
-                            .addComponent(jButton2)
-                            .addComponent(jButton3))))
+                            .addComponent(selectButton)
+                            .addComponent(cancelButton)
+                            .addComponent(removeButton))))
                 .addContainerGap())
         );
 
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jButton1, jButton2, jButton3});
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {cancelButton, removeButton, selectButton});
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -101,33 +114,57 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton1)
+                        .addComponent(selectButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2)))
+                        .addComponent(cancelButton)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2)
-                    .addComponent(jButton3))
+                    .addComponent(removeButton))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void selectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectButtonActionPerformed
+        Object[] watchAddList = watchableList.getSelectedValues();
+        int listSize = watchAddList.length;
+        if (!webBrowser.isWatcherEnabled()) {
+            webBrowser.enableWatcher();
+        }
+        for (int i = 0; i < listSize; i++) {
+            System.out.println("Adding " + watchAddList[i] + " to the watcher thread.");
+            webBrowser.addWatched((String) watchAddList[i]);
+        }
+        SwingUtilities.getRoot(this).setVisible(false);
+    }//GEN-LAST:event_selectButtonActionPerformed
+
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        SwingUtilities.getRoot(this).setVisible(false);
+    }//GEN-LAST:event_cancelButtonActionPerformed
+
+    private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
+        if (webBrowser.isWatcherEnabled()) {
+            Object[] watchRemoveList = removeList.getSelectedValues();
+            int listSize = watchRemoveList.length;
+            for (int i = 0; i < listSize; i++) {
+                webBrowser.removeWatched((String) watchRemoveList[i]);
+            }
+            SwingUtilities.getRoot(this).setVisible(false);
+        }
+    }//GEN-LAST:event_removeButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
+    private javax.swing.JButton cancelButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JList jList2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JButton removeButton;
+    private javax.swing.JList removeList;
+    private javax.swing.JButton selectButton;
     private javax.swing.JList watchableList;
     // End of variables declaration//GEN-END:variables
 }
