@@ -54,7 +54,19 @@ public class ExtendedWebBrowser extends JWebBrowser {
     }
 
     public boolean isWatcherEnabled() {
-        return watcherThread.isAlive();
+        if (watcherThread != null) {
+            return watcherThread.isAlive();
+        } else {
+            return false;
+        }
+    }
+    
+    public String[] getWatched(){
+        if (isWatcherEnabled()){
+            return watcherThread.getWatched();
+        }else{
+            return null;
+        }
     }
 
     public void enableWatcher() {

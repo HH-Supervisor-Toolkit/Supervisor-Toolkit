@@ -17,7 +17,7 @@ import javax.swing.SwingUtilities;
  */
 public class AgentWatcherThread extends Thread {
 
-    private final ArrayList<String> watchedAgents = new ArrayList<String>();
+    public final ArrayList<String> watchedAgents = new ArrayList<String>();
     private final ExtendedWebBrowser webBrowser;
     private boolean running = true;
 
@@ -40,10 +40,9 @@ public class AgentWatcherThread extends Thread {
                             String listedName = tempName.substring(tempName.lastIndexOf("&nbsp;") + 6, tempName.length());
                             if (isWatched(listedName)) {
                                 System.out.println("Checking to see if " + listedName + " is on a call.");
-                                System.out.println(webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[2].children[0].children[2].onclick"));
-                                if (webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[2].children[0].children[2].onclick") != null) {
+                                if (webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].onclick") != null) {
                                     System.out.println("Watcher is activating to start listening to " + listedName);
-                                    webBrowser.executeJavascript("frames[0].document.getElementById(\"tagents\").rows[2].children[0].children[2].click()");
+                                    webBrowser.executeJavascript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].click()");
                                     watchedAgents.clear();
                                     running = false;
                                     break;
@@ -63,6 +62,7 @@ public class AgentWatcherThread extends Thread {
                 Logger.getLogger(AgentWatcherThread.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        System.out.println("The watcher thread is shuting down.");
     }
 
     public void addWatchedAgent(String watch) {
@@ -79,7 +79,11 @@ public class AgentWatcherThread extends Thread {
         for (int i = 0; i < arrayLength; i++) {
             if (watchedAgents.get(i).equals(watch)) {
                 watchedAgents.remove(i);
+                break;
             }
+        }
+        if (watchedAgents.isEmpty()){
+            running = false;
         }
     }
 
@@ -91,5 +95,9 @@ public class AgentWatcherThread extends Thread {
             }
         }
         return false;
+    }
+    
+    public String[] getWatched(){
+        return watchedAgents.toArray(new String[1]);
     }
 }

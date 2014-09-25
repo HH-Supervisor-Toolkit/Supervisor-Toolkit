@@ -32,6 +32,12 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
             tutorNameList[i - 1] = tempName.substring(tempName.lastIndexOf("&nbsp;") + 6, tempName.length());
         }
         watchableList.setListData(tutorNameList);
+        if (webBrowser.isWatcherEnabled()) {
+            String[] watchedList = webBrowser.getWatched();
+            if (watchedList.length > 0) {
+                removeList.setListData(webBrowser.getWatched());
+            }
+        }
     }
 
     /**
@@ -134,7 +140,6 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
             webBrowser.enableWatcher();
         }
         for (int i = 0; i < listSize; i++) {
-            System.out.println("Adding " + watchAddList[i] + " to the watcher thread.");
             webBrowser.addWatched((String) watchAddList[i]);
         }
         SwingUtilities.getRoot(this).setVisible(false);
