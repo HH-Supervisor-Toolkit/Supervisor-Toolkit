@@ -6,6 +6,7 @@
 package app.watcher;
 
 import app.browser.ExtendedWebBrowser;
+import java.util.Arrays;
 import javax.swing.SwingUtilities;
 
 /**
@@ -31,6 +32,7 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
             String tempName = (String) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].innerHTML");
             tutorNameList[i - 1] = tempName.substring(tempName.lastIndexOf("&nbsp;") + 6, tempName.length());
         }
+        Arrays.sort(tutorNameList);
         watchableList.setListData(tutorNameList);
         if (webBrowser.isWatcherEnabled()) {
             String[] watchedList = webBrowser.getWatched();
