@@ -30,11 +30,7 @@ public class OptionsEditPanel extends javax.swing.JPanel {
             workingLine = bufRead.readLine();
             optionsEditorArea.setText(null);
             while (workingLine != null) {
-                if (main.bears) {
-                    optionsEditorArea.setText(optionsEditorArea.getText() + "BEARS!" + System.getProperty("line.separator"));
-                } else {
-                    optionsEditorArea.setText(optionsEditorArea.getText() + workingLine + System.getProperty("line.separator"));
-                }
+                optionsEditorArea.setText(optionsEditorArea.getText() + workingLine + System.getProperty("line.separator"));
                 workingLine = bufRead.readLine();
             }
             System.out.println("Options pane sucessfully filled");

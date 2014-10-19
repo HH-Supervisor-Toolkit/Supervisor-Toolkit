@@ -53,20 +53,13 @@ public class main {
         "[Phone Surveys] -t:30", "https://prod11gbss8.rose-hulman.edu/BanSS/rhit_hwhl.P_QuestionPage",
         "[Attendance Page]", "http://askrose.org/askrose-login"
     };
-    public final static String[] bearsLinks = {"http://www.firstpeople.us/pictures/bear/1600x1200/Feeling_Grizzly-1600x1200.jpg",
-        "http://www.firstpeople.us/pictures/bear/1600x1200/Grin_and_Bear_It-1600x1200.jpg",
-        "http://cdn.zmescience.com/wp-content/uploads/2011/11/grizzly-bear.jpg",
-        "http://images.nationalgeographic.com/wpf/media-live/photos/000/095/cache/bald-bears_9572_600x450.jpg",
-        "http://www.nationalgeographic.com/adventure/images/05_06/bears-2.jpg",
-        "http://upload.wikimedia.org/wikipedia/commons/a/a0/Sun_Bear_7.jpg",
-        "http://media.247sports.com/Uploads/Avatars/248/293481.jpg"};
     public static File file;
     public static OptionsEditPanel optionsEdit;
     public static ExtendedWebBrowser[] webBrowsers;
     public static JFrame frame;
     public static int addressCount;
-    public static boolean bears = false;
     static BufferedImage icon;
+    static boolean bears = false;
 
     public static JComponent createContent(String[] address) {
         webBrowsers = new ExtendedWebBrowser[address.length / 2];
@@ -75,11 +68,7 @@ public class main {
             for (int i = 1; i < address.length; i = i + 2) {
                 webBrowsers[(i - 1) / 2] = new ExtendedWebBrowser();
                 System.out.println("Navagating to " + address[i]);
-                if (bears) {
-                    webBrowsers[(i - 1) / 2].navigate(bearsLinks[i / 2 - i / (2 * bearsLinks.length)]);
-                } else {
-                    webBrowsers[(i - 1) / 2].navigate(address[i]);
-                }
+                webBrowsers[(i - 1) / 2].navigate(address[i]);
                 webBrowsers[(i - 1) / 2].setBarsVisible(false);
                 webBrowsers[(i - 1) / 2].setButtonBarVisible(true);
                 addTabWithOptions(webBrowserPane, webBrowsers[(i - 1) / 2], address[i - 1]);
@@ -91,17 +80,7 @@ public class main {
         }
         optionsEdit = new OptionsEditPanel(false);
         webBrowserPane.addTab("Options", optionsEdit);
-        if (bears) {
-            JPanel bearPanel = new JPanel();
-            JLabel bearLabel = new JLabel();
-            bearLabel.setFont(new Font(bearLabel.getFont().getName(), Font.PLAIN, 86));
-            bearLabel.setText("BEARS!");
-            bearPanel.setLayout(new GridBagLayout());
-            bearPanel.add(bearLabel);
-            webBrowserPane.addTab("Alarms", bearPanel);
-        } else {
-            webBrowserPane.addTab("Alarms", new AlarmsEditPanel());
-        }
+        webBrowserPane.addTab("Alarms", new AlarmsEditPanel());
         webBrowserPane.addMouseListener(new TabbedPaneMouseAdapter(webBrowserPane));
         addressCount = address.length / 2;
         return webBrowserPane;
@@ -110,7 +89,12 @@ public class main {
     /* Standard main method to try that test as a standalone application. */
     public static void main(final String[] args) {
         for (String arg : args) {
-            if (arg.equals("don'tfeedthebears")) {
+            if (arg.equals("don'tfeedthebears")
+                    || arg.equals("don'tfeedthebear")
+                    || arg.equals("bear")
+                    || arg.equals("bears")
+                    || arg.equals("dontfeedthebears")
+                    || arg.equals("dontfeedthebear")) {
                 bears = true;
             }
         }

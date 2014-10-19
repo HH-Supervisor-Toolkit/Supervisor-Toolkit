@@ -82,7 +82,7 @@ public class TabPopupMenu extends JPopupMenu {
             });
             add(backupItem);
         }
-        if (webBrowser.getResourceLocation().equals(main.Default[9])) {
+        if (webBrowser.isWatcherEnabled() || webBrowser.getResourceLocation().equals(main.Default[9])) {
             watcherItem = new JMenuItem("Watcher");
             watcherItem.addActionListener(new ActionListener() {
 
