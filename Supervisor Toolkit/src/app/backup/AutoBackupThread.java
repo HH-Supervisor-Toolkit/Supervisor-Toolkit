@@ -143,6 +143,16 @@ public class AutoBackupThread extends Thread {
                         for (int i = 0; i < 6; i++) {
                             backupEntries[14 + i] = webBrowser.executeJavascriptWithResult("return document.getElementsByName(\"entry.398759739\")[" + i + "].checked").toString();
                         }
+                        boolean backupFailed = true;
+                        for (String backupEntry: backupEntries){
+                            if (backupEntry != null){
+                                backupFailed = false;
+                            }
+                        }
+                        if (backupFailed) {
+                            System.out.println("The backup seems to have not retured anything. Not saving");
+                            return;
+                        }
                         backupWriter = new PrintWriter(backupFile);
                         for (String backupEntry : backupEntries) {
                             if (backupEntry == null) {
