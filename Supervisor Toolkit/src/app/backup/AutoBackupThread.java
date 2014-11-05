@@ -27,6 +27,7 @@ public class AutoBackupThread extends Thread {
     private final File backupFile;
     private final ExtendedWebBrowser webBrowser;
     private boolean terminated = false;
+    private boolean loaded = false;
     private final String newLine;
     private final String customSplitString;
     private PrintWriter backupWriter;
@@ -57,10 +58,14 @@ public class AutoBackupThread extends Thread {
                             }
                         }
                         e.getWebBrowser().removeWebBrowserListener(this);
+                        loaded = true;
                     }
                 }
             });
             Thread.sleep(30000);
+            while (!loaded){
+                Thread.sleep(2000);
+            }
             while (!terminated) {
                 saveBackup();
                 Thread.sleep(30000);
