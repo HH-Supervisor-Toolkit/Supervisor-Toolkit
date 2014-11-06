@@ -18,7 +18,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Component id="entryContainerScrollPane" alignment="0" max="32767" attributes="0"/>
           <Group type="102" alignment="1" attributes="0">
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="nameSelect" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="hourSelect" min="-2" max="-2" attributes="0"/>
@@ -30,7 +30,7 @@
               <Component id="periodSelect" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
               <Component id="addButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="32767" attributes="0"/>
@@ -208,7 +208,6 @@
       <Events>
         <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="nameSelectFocusGained"/>
         <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="nameSelectFocusLost"/>
-        <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="nameSelectKeyTyped"/>
       </Events>
     </Component>
   </SubComponents>

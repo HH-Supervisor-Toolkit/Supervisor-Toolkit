@@ -19,12 +19,12 @@ import javax.swing.SwingUtilities;
  * @author haywoosd
  */
 public class AlarmsEditPanel extends javax.swing.JPanel {
-    
+
     private int entryNumber = 0;
     private AlarmsAlertThread alertThread;
     File alarmsFile;
     String newLine;
-    
+
     private void loadAlarms() {
         alarmsFile = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Alarms.txt");
         try {
@@ -55,7 +55,7 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
             Logger.getLogger(AlarmsEditPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private void writeAlarm(int hour, int minute, int period, String name) {
         try {
             FileWriter write = new FileWriter(alarmsFile, true);
@@ -68,7 +68,7 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
             Logger.getLogger(AlarmsEditPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private void addEntry(int hour, int minute, int period, String name) {
         AlarmsAlertThread.timerMinutes.add(minute);
         AlarmsAlertThread.timerNames.add(name);
@@ -88,7 +88,7 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
         entryContainerScrollPane.validate();
         entryNumber++;
     }
-    
+
     public AlarmsEditPanel() {
         newLine = System.getProperty("line.separator");
         new AlarmsAlertThread(this).start();
@@ -99,7 +99,7 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
                 loadAlarms();
             }
         });
-        
+
     }
 
     /**
@@ -155,11 +155,6 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
                 nameSelectFocusLost(evt);
             }
         });
-        nameSelect.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                nameSelectKeyTyped(evt);
-            }
-        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -167,7 +162,7 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(entryContainerScrollPane)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
                 .addComponent(nameSelect)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(hourSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -179,7 +174,7 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
                 .addComponent(periodSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(addButton)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel1)
@@ -209,24 +204,19 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
         writeAlarm(hourSelect.getSelectedIndex() + 1, minuteSelect.getSelectedIndex(), periodSelect.getSelectedIndex(), nameSelect.getText());
         nameSelect.setText("Alarm Name");
     }//GEN-LAST:event_addButtonActionPerformed
-    
-    private void nameSelectKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_nameSelectKeyTyped
-        if(nameSelect.hasFocus()){
-            validate();
-        }
-    }//GEN-LAST:event_nameSelectKeyTyped
-    
+
     private void nameSelectFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_nameSelectFocusGained
         if (nameSelect.getText().equals("Alarm Name")) {
             nameSelect.setText("");
         }
     }//GEN-LAST:event_nameSelectFocusGained
-    
+
     private void nameSelectFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_nameSelectFocusLost
         if (nameSelect.getText().equals("")) {
             nameSelect.setText("Alarm Name");
         }
     }//GEN-LAST:event_nameSelectFocusLost
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
     private javax.swing.JPanel entryContainerPanel;

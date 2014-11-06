@@ -49,24 +49,31 @@ public class AutoBackupThread extends Thread {
             webBrowser.addWebBrowserListener(new WebBrowserAdapter() {
                 @Override
                 public void loadingProgressChanged(WebBrowserEvent e) {
-
                     if (e.getWebBrowser().getLoadingProgress() == 100) {
                         if (backupFile.length() > 0 && webBrowser.getResourceLocation().equals(main.Default[1])) {
-                            String ObjButtons[] = {"Yes", "No"};
+                            String[] ObjButtons = {"Yes", "No"};
                             int choice = JOptionPane.showOptionDialog(main.frame, "There is an backup available. Would you like to load it?", "Load Backup?", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, ObjButtons, ObjButtons[1]);
                             if (choice == JOptionPane.YES_OPTION) {
                                 loadBackup();
                             }
                         }
                         e.getWebBrowser().removeWebBrowserListener(this);
-                        synchronized (syncObject) {
-                            syncObject.notify();
-                        }
+                        Thread syncRelease = new Thread() {
+                            @Override
+                            public void run() {
+                                synchronized (syncObject) {
+                                    System.out.println("Giving notice that prompt has been responsed to.");
+                                    syncObject.notify();
+                                }
+                            }
+                        };
+                        syncRelease.start();
                     }
                 }
             });
-            Thread.sleep(30000);
             synchronized (syncObject) {
+                Thread.sleep(30000);
+                System.out.println("Waiting to start thread until response to prompt is given.");
                 syncObject.wait();
             }
             while (!terminated) {
