@@ -27,10 +27,10 @@ public class AutoBackupThread extends Thread {
     private final File backupFile;
     private final ExtendedWebBrowser webBrowser;
     private boolean terminated = false;
-    private boolean loaded = false;
     private final String newLine;
     private final String customSplitString;
     private PrintWriter backupWriter;
+    private final Object syncObject = new Object();
 
     public AutoBackupThread(ExtendedWebBrowser ewb) {
         newLine = System.getProperty("line.separator");
@@ -49,6 +49,7 @@ public class AutoBackupThread extends Thread {
             webBrowser.addWebBrowserListener(new WebBrowserAdapter() {
                 @Override
                 public void loadingProgressChanged(WebBrowserEvent e) {
+
                     if (e.getWebBrowser().getLoadingProgress() == 100) {
                         if (backupFile.length() > 0 && webBrowser.getResourceLocation().equals(main.Default[1])) {
                             String ObjButtons[] = {"Yes", "No"};
@@ -58,13 +59,15 @@ public class AutoBackupThread extends Thread {
                             }
                         }
                         e.getWebBrowser().removeWebBrowserListener(this);
-                        loaded = true;
+                        synchronized (syncObject) {
+                            syncObject.notify();
+                        }
                     }
                 }
             });
             Thread.sleep(30000);
-            while (!loaded){
-                Thread.sleep(2000);
+            synchronized (syncObject) {
+                syncObject.wait();
             }
             while (!terminated) {
                 saveBackup();
@@ -149,8 +152,8 @@ public class AutoBackupThread extends Thread {
                             backupEntries[14 + i] = webBrowser.executeJavascriptWithResult("return document.getElementsByName(\"entry.398759739\")[" + i + "].checked").toString();
                         }
                         boolean backupFailed = true;
-                        for (String backupEntry: backupEntries){
-                            if (backupEntry != null){
+                        for (String backupEntry : backupEntries) {
+                            if (backupEntry != null) {
                                 backupFailed = false;
                             }
                         }
