@@ -8,13 +8,11 @@ import app.alarms.AlarmsEditPanel;
 import app.browser.ExtendedWebBrowser;
 import app.popup.TabbedPaneMouseAdapter;
 import app.options.OptionsEditPanel;
-import app.timer.BrowserTimerAdapter;
+import app.timer.BrowserTimerThread;
 import chrriis.common.UIUtils;
 import chrriis.dj.nativeswing.swtimpl.NativeInterface;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
-import java.awt.Font;
-import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -33,9 +31,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
@@ -217,7 +213,7 @@ public class main {
         for (String parsedOption : parsedOptions) {
             if (parsedOption.contains("t:")) {
                 System.out.println("Adding a timer to " + tabTitle + " from options for " + parsedOption.substring(2).trim() + " minute(s)");
-                BrowserTimerAdapter browserTimer = new BrowserTimerAdapter(Integer.parseInt(parsedOption.substring(2).trim()), webBrowser);
+                BrowserTimerThread browserTimer = new BrowserTimerThread(Integer.parseInt(parsedOption.substring(2).trim()), webBrowser);
                 webBrowser.addBrowserTimer(browserTimer);
             } else if (parsedOption.contains("B")) {
                 System.out.println("Enabling auto backup for " + tabTitle);

@@ -6,19 +6,17 @@ package app.popup;
 
 import app.browser.ExtendedWebBrowser;
 import app.main;
-import app.timer.BrowserTimerAdapter;
+import app.timer.BrowserTimerThread;
 import app.watcher.WatcherSelectPanel;
 import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
 
 /**
  *
@@ -32,7 +30,6 @@ public class TabPopupMenu extends JPopupMenu {
     JMenuItem refreshItem;
     ExtendedWebBrowser webBrowser;
     boolean hasTimer = false;
-    BrowserTimerAdapter timerListener;
 
     public TabPopupMenu(ExtendedWebBrowser webBrowser2) {
         webBrowser = webBrowser2;
@@ -54,7 +51,7 @@ public class TabPopupMenu extends JPopupMenu {
                     }
                     System.out.println("A " + minutes + " minute timer has been added to " + webBrowser.getName());
                     ModifyOptions(false, null, "t:" + minutes);
-                    timerListener = new BrowserTimerAdapter(minutes, webBrowser);
+                    BrowserTimerThread timerListener = new BrowserTimerThread(minutes, webBrowser);
                     webBrowser.addBrowserTimer(timerListener);
                 }
             }

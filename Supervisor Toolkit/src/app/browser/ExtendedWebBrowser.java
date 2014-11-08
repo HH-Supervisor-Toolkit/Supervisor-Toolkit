@@ -6,7 +6,7 @@
 package app.browser;
 
 import app.backup.AutoBackupThread;
-import app.timer.BrowserTimerAdapter;
+import app.timer.BrowserTimerThread;
 import app.watcher.AgentWatcherThread;
 import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
 
@@ -19,7 +19,7 @@ public class ExtendedWebBrowser extends JWebBrowser {
     private boolean hasTimer = false;
     private boolean hasBackup = false;
     private AutoBackupThread backupThread;
-    private BrowserTimerAdapter browserTimer;
+    private BrowserTimerThread browserTimer;
     private AgentWatcherThread watcherThread;
 
     public boolean isTimerEnabled() {
@@ -36,14 +36,13 @@ public class ExtendedWebBrowser extends JWebBrowser {
         hasBackup = true;
     }
 
-    public void addBrowserTimer(BrowserTimerAdapter bta) {
-        super.addWebBrowserListener(bta);
+    public void addBrowserTimer(BrowserTimerThread bta) {
         hasTimer = true;
         browserTimer = bta;
+        browserTimer.start();
     }
 
     public void removeBrowserTimer() {
-        super.removeWebBrowserListener(browserTimer);
         hasTimer = false;
         browserTimer.terminate();
     }

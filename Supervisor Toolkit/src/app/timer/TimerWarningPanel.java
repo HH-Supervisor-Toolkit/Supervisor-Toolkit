@@ -8,6 +8,7 @@ package app.timer;
 
 import app.browser.ExtendedWebBrowser;
 import javax.swing.JDialog;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -21,11 +22,11 @@ public class TimerWarningPanel extends javax.swing.JPanel {
     /**
      * Creates new form TimerWarningPanel
      * @param message
+     * @param ewb
      */
-    public TimerWarningPanel(String message, ExtendedWebBrowser ewb, JDialog dialog1) {
+    public TimerWarningPanel(String message, ExtendedWebBrowser ewb) {
         initComponents();
         webBrowser = ewb;
-        dialog = dialog1;
         messageLabel.setText(message);
     }
     
@@ -91,12 +92,12 @@ public class TimerWarningPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void okayButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okayButtonActionPerformed
-        dialog.dispose();
+        SwingUtilities.getRoot(this).setVisible(false);
     }//GEN-LAST:event_okayButtonActionPerformed
 
     private void reloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadButtonActionPerformed
         webBrowser.reloadPage();
-        dialog.dispose();
+        SwingUtilities.getRoot(this).setVisible(false);
     }//GEN-LAST:event_reloadButtonActionPerformed
 
 
