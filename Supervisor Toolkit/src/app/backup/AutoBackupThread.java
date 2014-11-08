@@ -179,6 +179,8 @@ public class AutoBackupThread extends Thread {
                         backupWriter.close();
                     } catch (FileNotFoundException ex) {
                         Logger.getLogger(AutoBackupThread.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (NullPointerException ex){
+                        System.out.println("Failed to aquire data from nightly log site. Perhaps the page isn't loaded correctly");
                     }
                 }
             }
