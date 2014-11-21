@@ -9,8 +9,6 @@ import app.main;
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserAdapter;
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserEvent;
 import java.awt.BorderLayout;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowFocusListener;
 import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,7 +45,6 @@ public class BrowserTimerThread extends Thread {
         };
         webBrowser.addWebBrowserListener(refreshAdapter);
         long timeDifference;
-        long timeNoticeDifference;
         TimerWarningPanel timerPanel = null;
         lastRefreshTime = Calendar.getInstance().getTimeInMillis();
         while (!terminated) {
