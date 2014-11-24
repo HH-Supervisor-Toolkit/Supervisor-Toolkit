@@ -6,9 +6,11 @@ package app.popup;
 
 import app.browser.ExtendedWebBrowser;
 import app.main;
+import app.monitor.StatusMonitorOptionsPanel;
 import app.timer.BrowserTimerThread;
 import app.watcher.WatcherSelectPanel;
 import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
+import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JCheckBoxMenuItem;
@@ -26,16 +28,18 @@ public class TabPopupMenu extends JPopupMenu {
 
     JCheckBoxMenuItem timerItem;
     JCheckBoxMenuItem backupItem;
+    JCheckBoxMenuItem monitorItem;
     JMenuItem watcherItem;
     JMenuItem refreshItem;
     ExtendedWebBrowser webBrowser;
-    boolean hasTimer = false;
 
     public TabPopupMenu(ExtendedWebBrowser webBrowser2) {
         webBrowser = webBrowser2;
-        timerItem = new JCheckBoxMenuItem("Add timer");
         if (webBrowser.isTimerEnabled()) {
+            timerItem = new JCheckBoxMenuItem("Disable timer");
             timerItem.setSelected(true);
+        }else{
+            timerItem = new JCheckBoxMenuItem("Enable timer");
         }
         timerItem.addActionListener(new ActionListener() {
             @Override
@@ -58,9 +62,11 @@ public class TabPopupMenu extends JPopupMenu {
         });
         add(timerItem);
         if (webBrowser.isBackupEnabled() || webBrowser.getResourceLocation().equals(main.Default[1])) {
-            backupItem = new JCheckBoxMenuItem("Enable auto backup");
             if (webBrowser.isBackupEnabled()) {
+                backupItem = new JCheckBoxMenuItem("Disable auto backup");
                 backupItem.setSelected(true);
+            }else{
+                backupItem = new JCheckBoxMenuItem("Enable auto backup");
             }
             backupItem.addActionListener(new ActionListener() {
 
@@ -79,15 +85,33 @@ public class TabPopupMenu extends JPopupMenu {
             });
             add(backupItem);
         }
+        if (webBrowser.isMonitorEnabled() || webBrowser.getResourceLocation().equals(main.Default[9])){
+            monitorItem = new JCheckBoxMenuItem("Status Monitor");
+            if (webBrowser.isMonitorEnabled()){
+                monitorItem.setSelected(true);
+            }
+            monitorItem.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JDialog monitorDialog = new JDialog(main.frame, "Status Monitor");
+                    monitorDialog.add(new StatusMonitorOptionsPanel(webBrowser));
+                    monitorDialog.pack();
+                    monitorDialog.setLocationRelativeTo(main.frame);
+                    monitorDialog.setResizable(false);
+                    monitorDialog.setVisible(true);
+                }
+            });
+            add(monitorItem);
+        }
         if (webBrowser.isWatcherEnabled() || webBrowser.getResourceLocation().equals(main.Default[9])) {
             watcherItem = new JMenuItem("Watcher");
             watcherItem.addActionListener(new ActionListener() {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    JDialog watcherFrame = new JDialog(main.frame);
+                    JDialog watcherFrame = new JDialog(main.frame, "Watcher Select", ModalityType.APPLICATION_MODAL);
                     watcherFrame.add(new WatcherSelectPanel(webBrowser));
-                    watcherFrame.setTitle("Watcher Select");
                     watcherFrame.pack();
                     watcherFrame.setLocationRelativeTo(main.frame);
                     watcherFrame.setVisible(true);

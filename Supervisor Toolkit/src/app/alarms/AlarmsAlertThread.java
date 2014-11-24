@@ -6,8 +6,6 @@ package app.alarms;
 
 import app.main;
 import java.awt.BorderLayout;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowFocusListener;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.logging.Level;
@@ -39,11 +37,10 @@ public class AlarmsAlertThread extends Thread {
             for (int i = 0; i < timerHours.size(); i++) {
                 if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == timerHours.get(i)) {
                     if (Calendar.getInstance().get(Calendar.MINUTE) == timerMinutes.get(i)) {
-                        final JDialog messageDialog = new JDialog(main.frame, true);
+                        final JDialog messageDialog = new JDialog(main.frame, "Alarm Warning");
                         AlarmAlertPanel messagePanel = new AlarmAlertPanel(timerNames.get(i), i);
                         messageDialog.add(messagePanel, BorderLayout.CENTER);
                         messageDialog.pack();
-                        messageDialog.setTitle("Timer Warning");
                         messageDialog.setLocationRelativeTo(parentPanel.getParent());
                         messageDialog.setResizable(false);
                         messageDialog.setVisible(true);
