@@ -297,6 +297,7 @@ public class StatusMonitorOptionsPanel extends javax.swing.JPanel {
     private void enableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enableButtonActionPerformed
         if (webBrowser.isMonitorEnabled()) {
             saveSettings();
+            webBrowser.updateMonitor();
         } else {
             saveSettings();
             webBrowser.enableMonitor();

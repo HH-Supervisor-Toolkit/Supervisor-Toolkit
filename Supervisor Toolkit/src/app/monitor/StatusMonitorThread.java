@@ -29,6 +29,7 @@ public class StatusMonitorThread extends Thread {
     ArrayList<String> supervisorList = new ArrayList<String>();
     ArrayList<String> alertedUsers = new ArrayList<String>();
     ArrayList<String> alertedModes = new ArrayList<String>();
+    boolean errorNoticeGiven = false;
 
     public StatusMonitorThread(ExtendedWebBrowser webBrowser1) {
         webBrowser = webBrowser1;
@@ -39,7 +40,7 @@ public class StatusMonitorThread extends Thread {
         enabled = false;
     }
 
-    private void loadOptions() {
+    public final void loadOptions() {
         File file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Monitor_Settings.txt");
         if (file.exists()) {
             try {
@@ -53,10 +54,11 @@ public class StatusMonitorThread extends Thread {
                 temp = read.nextLine();
                 tempArray = temp.split(":");
                 WrapupTime = Integer.parseInt(tempArray[0]) * 60 + Integer.parseInt(tempArray[1]);
+                supervisorList.clear();
                 while (read.hasNextLine()) {
                     supervisorList.add(read.nextLine());
                 }
-
+                read.close();
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(StatusMonitorOptionsPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -83,16 +85,21 @@ public class StatusMonitorThread extends Thread {
                     try {
                         int tutorCount = ((Double) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows.length")).intValue();
                         // Add code that check to see if a tutor whom an alert was given for has changed modes and therefore can recieve new notices
-                        for (int i = 0; i < tutorCount; i++) {
+                        for (String alertedUser : alertedUsers) {
+                            for (int i = 0; i < tutorCount; i++) {
 
+                            }
                         }
                         //Add code that checks to see if a user has been on a mode too long
                         for (int i = 0; i < tutorCount; i++) {
 
                         }
-                        
-                    }catch (NullPointerException e){
-                        System.out.println("Failed to get number of tutors for status monitor. Perhaps not on the right webpage?");
+                        errorNoticeGiven = false;
+                    } catch (NullPointerException e) {
+                        if (!errorNoticeGiven) {
+                            System.out.println("Failed to get number of tutors for status monitor. Perhaps not on the right webpage?");
+                            errorNoticeGiven = true;
+                        }
                     }
                 }
             });

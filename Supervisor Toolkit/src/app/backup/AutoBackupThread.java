@@ -8,13 +8,16 @@ import app.browser.ExtendedWebBrowser;
 import app.main;
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserAdapter;
 import chrriis.dj.nativeswing.swtimpl.components.WebBrowserEvent;
+import java.awt.Dialog.ModalityType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -25,6 +28,7 @@ import javax.swing.SwingUtilities;
 public class AutoBackupThread extends Thread {
 
     private final File backupFile;
+    private final File longTermBackups;
     private final ExtendedWebBrowser webBrowser;
     private boolean terminated = false;
     private final String newLine;
@@ -36,11 +40,29 @@ public class AutoBackupThread extends Thread {
         newLine = System.getProperty("line.separator");
         customSplitString = "!!split!!";
         backupFile = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Backup_Log.txt");
+        longTermBackups = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Backups_Old");
+        if (!longTermBackups.isDirectory()) {
+            longTermBackups.mkdir();
+        }
         webBrowser = ewb;
     }
 
     public void terminate() {
         terminated = true;
+    }
+
+    public void storeLatestBackup() {
+        if (backupFile.exists()) {
+            System.out.println("Moving backup file to long term storage with new file name: " + "Backup_Log_" + +backupFile.lastModified() + ".txt");
+            backupFile.renameTo(new File(longTermBackups.getAbsolutePath() + "\\Backup_Log_" + +backupFile.lastModified() + ".txt"));
+            File[] longTermList = longTermBackups.listFiles();
+            if (longTermList.length > 30){
+                Arrays.sort(longTermList);
+                for (int i = 0; i < longTermList.length - 30; i++){
+                    longTermList[i].delete();
+                }
+            }
+        }
     }
 
     @Override
@@ -50,11 +72,31 @@ public class AutoBackupThread extends Thread {
                 @Override
                 public void loadingProgressChanged(WebBrowserEvent e) {
                     if (e.getWebBrowser().getLoadingProgress() == 100) {
-                        if (backupFile.length() > 0 && webBrowser.getResourceLocation().equals(main.Default[1])) {
+                        if ((backupFile.exists() || longTermBackups.list().length > 0) && webBrowser.getResourceLocation().equals(main.Default[1])) {
                             String[] ObjButtons = {"Yes", "No"};
                             int choice = JOptionPane.showOptionDialog(main.frame, "There is an backup available. Would you like to load it?", "Load Backup?", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, ObjButtons, ObjButtons[1]);
                             if (choice == JOptionPane.YES_OPTION) {
-                                loadBackup();
+                                JDialog diag = new JDialog(main.frame, "Select Backup", ModalityType.APPLICATION_MODAL);
+                                AutoBackupSelectPanel selectPanel = new AutoBackupSelectPanel(backupFile, longTermBackups);
+                                diag.add(selectPanel);
+                                diag.pack();
+                                diag.setLocationRelativeTo(main.frame);
+                                diag.setResizable(false);
+                                diag.setVisible(true);
+                                if (selectPanel.getSelectedFile() == null) {
+                                    storeLatestBackup();
+                                } else {
+                                    if (backupFile.equals(selectPanel.getSelectedFile())) {
+                                        System.out.println("Loading latest backup.");
+                                        loadBackup(backupFile);
+                                    }else{
+                                        System.out.println("Loading old backup. Will store latest backup if possible.");
+                                        loadBackup(selectPanel.getSelectedFile());
+                                        storeLatestBackup();
+                                    }
+                                }
+                            } else {
+                                storeLatestBackup();
                             }
                         }
                         e.getWebBrowser().removeWebBrowserListener(this);
@@ -85,13 +127,13 @@ public class AutoBackupThread extends Thread {
         }
     }
 
-    private void loadBackup() {
+    public void loadBackup(final File file) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 try {
-                    FileInputStream fileInputStream = new FileInputStream(backupFile);
-                    byte[] data = new byte[(int) backupFile.length()];
+                    FileInputStream fileInputStream = new FileInputStream(file);
+                    byte[] data = new byte[(int) file.length()];
                     fileInputStream.read(data);
                     fileInputStream.close();
                     String content = new String(data, "UTF-8");
@@ -169,7 +211,7 @@ public class AutoBackupThread extends Thread {
                         backupWriter.close();
                     } catch (FileNotFoundException ex) {
                         Logger.getLogger(AutoBackupThread.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (NullPointerException ex){
+                    } catch (NullPointerException ex) {
                         System.out.println("Failed to aquire data from nightly log site. Perhaps the page isn't loaded correctly");
                     }
                 }

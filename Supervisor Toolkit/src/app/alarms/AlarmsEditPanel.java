@@ -22,9 +22,9 @@ import javax.swing.SwingUtilities;
 public class AlarmsEditPanel extends javax.swing.JPanel {
 
     private int entryNumber = 0;
-    private AlarmsAlertThread alertThread;
+    public static AlarmsAlertThread alertThread;
     File alarmsFile;
-    String newLine;
+    String newLine = System.getProperty("line.separator");
 
     private void loadAlarms() {
         alarmsFile = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Alarms.txt");
@@ -88,11 +88,54 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
         entryContainerPanel.validate();
         entryContainerScrollPane.validate();
         entryNumber++;
+        if (alertThread == null || !alertThread.isAlive()) {
+            System.out.println("Starting the alarms alert thread");
+            alertThread = new AlarmsAlertThread();
+            alertThread.start();
+        }
+    }
+
+    public void removeEntry(int number) {
+        System.out.println("Removing alarm entry: " + number);
+        AlarmsAlertThread.timerHours.remove(number);
+        AlarmsAlertThread.timerMinutes.remove(number);
+        AlarmsAlertThread.timerNames.remove(number);
+        try {
+            FileInputStream input = new FileInputStream(alarmsFile);
+            byte[] data = new byte[(int) alarmsFile.length()];
+            input.read(data);
+            input.close();
+            String[] splitContent = new String(data, "UTF-8").split(newLine, -1);
+            FileWriter alarmsWriter = new FileWriter(alarmsFile);
+            for (int i = 0; i < (splitContent.length - 1) / 4; i++) {
+                if (i != number) {
+                    alarmsWriter.write(splitContent[i * 4] + newLine);
+                    alarmsWriter.write(splitContent[i * 4 + 1] + newLine);
+                    alarmsWriter.write(splitContent[i * 4 + 2] + newLine);
+                    alarmsWriter.write(splitContent[i * 4 + 3] + newLine);
+                }
+            }
+            if ((splitContent.length - 1) / 4 < 2) {
+                System.out.println("Stopping the alarms alert thread");
+                AlarmsEditPanel.alertThread.terminate();
+            }
+            alarmsWriter.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(AlarmsEntryPanel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(AlarmsEntryPanel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(AlarmsEntryPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        entryContainerPanel.remove(number);
+        for (int i = number; i < entryContainerPanel.getComponentCount(); i++) {
+            System.out.println("Setting entry " + i + " to be " + i);
+            ((AlarmsEntryPanel) entryContainerPanel.getComponent(i)).setEntryNumber(i);
+        }
+        entryNumber--;
     }
 
     public AlarmsEditPanel() {
-        newLine = System.getProperty("line.separator");
-        new AlarmsAlertThread(this).start();
         initComponents();
         SwingUtilities.invokeLater(new Runnable() {
             @Override

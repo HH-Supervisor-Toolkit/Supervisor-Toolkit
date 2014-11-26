@@ -99,4 +99,8 @@ public class ExtendedWebBrowser extends JWebBrowser {
         statusMonitor.terminate();
     }
 
+    public void updateMonitor(){
+        statusMonitor.loadOptions();
+    }
+    
 }

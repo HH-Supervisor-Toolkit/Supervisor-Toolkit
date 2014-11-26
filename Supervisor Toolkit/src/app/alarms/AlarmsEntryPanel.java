@@ -19,12 +19,18 @@ import java.util.logging.Logger;
  */
 public class AlarmsEntryPanel extends javax.swing.JPanel {
 
-    private String timeText;
-    private String nameText;
+    private final String timeText;
+    private final String nameText;
     private int entryNumber;
 
     /**
      * Creates new form AlarmsEntryPanel
+     *
+     * @param hour
+     * @param minute
+     * @param period
+     * @param name
+     * @param number
      */
     public AlarmsEntryPanel(int hour, int minute, int period, String name, int number) {
         String hourText = String.valueOf(hour);
@@ -42,6 +48,10 @@ public class AlarmsEntryPanel extends javax.swing.JPanel {
         timeText = hourText + ":" + minuteText + " " + periodText;
         entryNumber = number;
         initComponents();
+    }
+    
+    public void setEntryNumber(int number){
+        entryNumber = number;
     }
 
     /**
@@ -103,37 +113,7 @@ public class AlarmsEntryPanel extends javax.swing.JPanel {
 
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
         setVisible(false);
-        System.out.println("Removing alarm entry: " + nameText);
-        AlarmsAlertThread.timerHours.remove(entryNumber);
-        AlarmsAlertThread.timerMinutes.remove(entryNumber);
-        AlarmsAlertThread.timerNames.remove(entryNumber);
-        String newLine = System.getProperty("line.separator");
-        try {
-            File alarmsFile = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Alarms.txt");
-            FileInputStream input = new FileInputStream(alarmsFile);
-            byte[] data = new byte[(int) alarmsFile.length()];
-            input.read(data);
-            input.close();
-            String[] splitContent = new String(data, "UTF-8").split(newLine, -1);
-            FileWriter alarmsWriter = new FileWriter(alarmsFile);
-            for (int i = 0; i < (splitContent.length - 1) / 4; i++) {
-                if (i == entryNumber) {
-                    continue;
-                } else {
-                    alarmsWriter.write(splitContent[i * 4] + newLine);
-                    alarmsWriter.write(splitContent[i * 4 + 1] + newLine);
-                    alarmsWriter.write(splitContent[i * 4 + 2] + newLine);
-                    alarmsWriter.write(splitContent[i * 4 + 3] + newLine);
-                }
-            }
-            alarmsWriter.close();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(AlarmsEntryPanel.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(AlarmsEntryPanel.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(AlarmsEntryPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        ((AlarmsEditPanel)getParent().getParent().getParent().getParent()).removeEntry(entryNumber);
     }//GEN-LAST:event_removeButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;

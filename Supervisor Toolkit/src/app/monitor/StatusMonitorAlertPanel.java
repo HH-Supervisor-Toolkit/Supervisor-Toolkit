@@ -5,6 +5,7 @@
  */
 package app.monitor;
 
+import app.browser.ExtendedWebBrowser;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -23,8 +24,10 @@ public class StatusMonitorAlertPanel extends javax.swing.JPanel {
      */
     String labelText;
     String name;
+    ExtendedWebBrowser webBrowser;
 
-    public StatusMonitorAlertPanel(String name, String mode) {
+    public StatusMonitorAlertPanel(String name, String mode, ExtendedWebBrowser webBrowser) {
+        this.webBrowser = webBrowser;
         this.name = name;
         labelText = "User " + name + " has been on " + mode + " too long.";
         initComponents();
@@ -97,6 +100,7 @@ public class StatusMonitorAlertPanel extends javax.swing.JPanel {
         } catch (FileNotFoundException ex) {
             Logger.getLogger(StatusMonitorAlertPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
+        webBrowser.updateMonitor();
         SwingUtilities.getRoot(this).setVisible(false);
     }//GEN-LAST:event_addSupervisorButtonActionPerformed
 
