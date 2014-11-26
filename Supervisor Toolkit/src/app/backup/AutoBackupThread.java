@@ -35,6 +35,7 @@ public class AutoBackupThread extends Thread {
     private final String customSplitString;
     private PrintWriter backupWriter;
     private final Object syncObject = new Object();
+    private final int maxBackups = 30;
 
     public AutoBackupThread(ExtendedWebBrowser ewb) {
         newLine = System.getProperty("line.separator");
@@ -56,9 +57,10 @@ public class AutoBackupThread extends Thread {
             System.out.println("Moving backup file to long term storage with new file name: " + "Backup_Log_" + +backupFile.lastModified() + ".txt");
             backupFile.renameTo(new File(longTermBackups.getAbsolutePath() + "\\Backup_Log_" + +backupFile.lastModified() + ".txt"));
             File[] longTermList = longTermBackups.listFiles();
-            if (longTermList.length > 30){
+            if (longTermList.length > maxBackups){
                 Arrays.sort(longTermList);
-                for (int i = 0; i < longTermList.length - 30; i++){
+                for (int i = 0; i < longTermList.length - maxBackups; i++){
+                    System.out.println("Too many backup files. Deleting file: " + longTermList[i].getName());
                     longTermList[i].delete();
                 }
             }
