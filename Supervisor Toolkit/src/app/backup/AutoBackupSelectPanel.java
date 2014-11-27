@@ -9,7 +9,6 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
-import javax.swing.JComboBox;
 import javax.swing.SwingUtilities;
 
 /**
@@ -30,33 +29,32 @@ public class AutoBackupSelectPanel extends javax.swing.JPanel {
         selectedFile = null;
         this.backupFile = backupFile;
         longTermFileList = longTermBackups.listFiles();
-        fileNames = new String[longTermFileList.length];
 
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy HH:mm");
 
-        for (int i = 0; i < longTermFileList.length; i++) {
-            String tempName = longTermFileList[i].getName();
-            fileNames[i] = sdf.format(Long.parseLong(tempName.substring(11, tempName.length() - 4)));
+        if (backupFile.exists()) {
+            fileNames = new String[longTermFileList.length + 1];
+            fileNames[0] = sdf.format(backupFile.lastModified()) + " (Latest)";
+            for (int i = 0; i < longTermFileList.length; i++) {
+                String tempName = longTermFileList[i].getName();
+                fileNames[i + 1] = sdf.format(Long.parseLong(tempName.substring(11, tempName.length() - 4)));
+            }
+        } else {
+            fileNames = new String[longTermFileList.length];
+            for (int i = 0; i < longTermFileList.length; i++) {
+                String tempName = longTermFileList[i].getName();
+                fileNames[i] = sdf.format(Long.parseLong(tempName.substring(11, tempName.length() - 4)));
+            }
         }
 
         Arrays.sort(fileNames);
         Collections.reverse(Arrays.asList(fileNames));
-
-        if (backupFile.exists()) {
-            String[] tempNames = fileNames;
-            fileNames = new String[fileNames.length + 1];
-            for (int i = 1; i < fileNames.length; i++) {
-                fileNames[i] = tempNames[i - 1];
-            }
-            fileNames[0] = sdf.format(backupFile.lastModified()) + " (Latest)";
-        }
-
         Arrays.sort(longTermFileList);
         Collections.reverse(Arrays.asList(longTermFileList));
         initComponents();
     }
-    
-    public File getSelectedFile(){
+
+    public File getSelectedFile() {
         return selectedFile;
     }
 
@@ -117,7 +115,7 @@ public class AutoBackupSelectPanel extends javax.swing.JPanel {
             } else {
                 selectedFile = longTermFileList[fileSelectBox.getSelectedIndex() - 1];
             }
-        }else{
+        } else {
             selectedFile = longTermFileList[fileSelectBox.getSelectedIndex()];
         }
         SwingUtilities.getRoot(this).setVisible(false);
