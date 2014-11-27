@@ -20,13 +20,12 @@ public class AutoBackupSelectPanel extends javax.swing.JPanel {
     /**
      * Creates new form AutoBackupSelectPanel
      */
-    String[] fileNames;
+    private final String[] fileNames;
     private File selectedFile;
     private final File backupFile;
-    File[] longTermFileList;
+    private final File[] longTermFileList;
 
     public AutoBackupSelectPanel(File backupFile, File longTermBackups) {
-        selectedFile = null;
         this.backupFile = backupFile;
         longTermFileList = longTermBackups.listFiles();
 
