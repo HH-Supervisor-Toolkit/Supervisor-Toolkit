@@ -4,7 +4,6 @@
  */
 package app;
 
-import app.alarms.AlarmsAlertThread;
 import app.alarms.AlarmsEditPanel;
 import app.browser.ExtendedWebBrowser;
 import app.popup.TabbedPaneMouseAdapter;
