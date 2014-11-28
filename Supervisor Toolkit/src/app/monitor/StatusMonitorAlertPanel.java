@@ -7,10 +7,8 @@ package app.monitor;
 
 import app.browser.ExtendedWebBrowser;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
@@ -95,10 +93,9 @@ public class StatusMonitorAlertPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void addSupervisorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addSupervisorButtonActionPerformed
-        FileWriter write = null;
         try {
             File file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Monitor_Settings.txt");
-            write = new FileWriter(file, true);
+            FileWriter write = new FileWriter(file, true);
             write.write(name + System.getProperty("line.separator"));
             write.close();
             webBrowser.updateMonitor();
