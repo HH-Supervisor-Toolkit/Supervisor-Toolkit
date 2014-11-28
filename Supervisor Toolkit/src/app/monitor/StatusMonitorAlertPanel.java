@@ -8,6 +8,8 @@ package app.monitor;
 import app.browser.ExtendedWebBrowser;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,6 +62,7 @@ public class StatusMonitorAlertPanel extends javax.swing.JPanel {
             }
         });
 
+        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel1.setText(labelText);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -71,11 +74,11 @@ public class StatusMonitorAlertPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(addSupervisorButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
+                        .addGap(18, 18, Short.MAX_VALUE)
                         .addComponent(dismissButton))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 0, 0)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -83,7 +86,7 @@ public class StatusMonitorAlertPanel extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(addSupervisorButton)
                     .addComponent(dismissButton))
@@ -92,15 +95,16 @@ public class StatusMonitorAlertPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void addSupervisorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addSupervisorButtonActionPerformed
-        File file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Monitor_Settings.txt");
+        FileWriter write = null;
         try {
-            PrintWriter write = new PrintWriter(file);
-            write.append(name + System.getProperty("line.separator"));
+            File file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Monitor_Settings.txt");
+            write = new FileWriter(file, true);
+            write.write(name + System.getProperty("line.separator"));
             write.close();
-        } catch (FileNotFoundException ex) {
+            webBrowser.updateMonitor();
+        } catch (IOException ex) {
             Logger.getLogger(StatusMonitorAlertPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        webBrowser.updateMonitor();
         SwingUtilities.getRoot(this).setVisible(false);
     }//GEN-LAST:event_addSupervisorButtonActionPerformed
 

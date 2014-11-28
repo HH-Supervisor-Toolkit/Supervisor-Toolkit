@@ -6,6 +6,7 @@
 package app.monitor;
 
 import app.browser.ExtendedWebBrowser;
+import app.main;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
 /**
@@ -76,6 +78,32 @@ public class StatusMonitorThread extends Thread {
         }
     }
 
+    private String getUserMode(int row) {
+        if (((String) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + row + "].children[7].innerHTML")).equals("AUX")) {
+            return "AUX";
+        } else {
+            return (String) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + row + "].children[3].innerHTML");
+        }
+    }
+
+    private int getUserTime(int row) {
+        String tempTime = (String) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + row + "].children[4].innerHTML");
+        String[] parsedTime = tempTime.split(":");
+        int time = Integer.parseInt(parsedTime[0]) * 3600 + Integer.parseInt(parsedTime[1]) * 60 + Integer.parseInt(parsedTime[2]);
+        return time;
+    }
+
+    private void giveAlert(String name, String mode) {
+        JDialog diag = new JDialog(main.frame, "Status Monitor");
+        diag.add(new StatusMonitorAlertPanel(name, mode, webBrowser));
+        diag.pack();
+        diag.setLocationRelativeTo(main.frame);
+        diag.setResizable(false);
+        diag.setVisible(true);
+        alertedUsers.add(name);
+        alertedModes.add(mode);
+    }
+
     @Override
     public void run() {
         while (enabled) {
@@ -84,15 +112,39 @@ public class StatusMonitorThread extends Thread {
                 public void run() {
                     try {
                         int tutorCount = ((Double) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows.length")).intValue();
-                        // Add code that check to see if a tutor whom an alert was given for has changed modes and therefore can recieve new notices
-                        for (String alertedUser : alertedUsers) {
-                            for (int i = 0; i < tutorCount; i++) {
-
+                        for (int i = 0; i < alertedUsers.size(); i++) {
+                            for (int i2 = 1; i2 < tutorCount; i2++) {
+                                String tempName = (String) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + i2 + "].children[0].innerHTML");
+                                String listedName = tempName.substring(tempName.lastIndexOf("&nbsp;") + 6, tempName.length());
+                                if (listedName.equals(alertedUsers.get(i))) {
+                                    if (!alertedModes.get(i).equals(getUserMode(i2))) {
+                                        alertedModes.remove(i);
+                                        alertedUsers.remove(i);
+                                    }
+                                }
                             }
                         }
-                        //Add code that checks to see if a user has been on a mode too long
-                        for (int i = 0; i < tutorCount; i++) {
-
+                        for (int i = 1; i < tutorCount; i++) {
+                            String tempMode = getUserMode(i);
+                            String tempName = (String) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].innerHTML");
+                            String listedName = tempName.substring(tempName.lastIndexOf("&nbsp;") + 6, tempName.length());
+                            if (!supervisorList.contains(listedName)) {
+                                if (!alertedUsers.contains(listedName)) {
+                                    if (tempMode.equals("AUX")) {
+                                        if (getUserTime(i) > AUXTime) {
+                                            giveAlert(listedName, tempMode);
+                                        }
+                                    } else if (tempMode.equals("ACW")) {
+                                        if (getUserTime(i) > ACWTime) {
+                                            giveAlert(listedName, tempMode);
+                                        }
+                                    } else if (tempMode.equals("Wrapup")) {
+                                        if (getUserTime(i) > WrapupTime) {
+                                            giveAlert(listedName, tempMode);
+                                        }
+                                    }
+                                }
+                            }
                         }
                         errorNoticeGiven = false;
                     } catch (NullPointerException e) {
