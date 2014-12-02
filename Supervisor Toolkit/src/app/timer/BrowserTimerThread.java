@@ -62,6 +62,8 @@ public class BrowserTimerThread extends Thread {
                         messageDialog.pack();
                         messageDialog.setResizable(false);
                         messageDialog.setVisible(true);
+                        messageDialog.setAlwaysOnTop(true);
+                        messageDialog.setAlwaysOnTop(false);
                     }
                     System.out.println("A notice about the timer for " + webBrowser.getName() + " has been given.");
                 }

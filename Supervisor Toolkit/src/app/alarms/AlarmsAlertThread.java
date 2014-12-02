@@ -38,6 +38,8 @@ public class AlarmsAlertThread extends Thread {
                         messageDialog.setLocationRelativeTo(main.frame);
                         messageDialog.setResizable(false);
                         messageDialog.setVisible(true);
+                        messageDialog.setAlwaysOnTop(true);
+                        messageDialog.setAlwaysOnTop(false);
                     }
                 }
             }

@@ -85,6 +85,8 @@ public class AutoBackupThread extends Thread {
                                 diag.setLocationRelativeTo(main.frame);
                                 diag.setResizable(false);
                                 diag.setVisible(true);
+                                diag.setAlwaysOnTop(true);
+                                diag.setAlwaysOnTop(false);
                                 if (selectPanel.getSelectedFile() == null) {
                                     storeLatestBackup();
                                 } else {

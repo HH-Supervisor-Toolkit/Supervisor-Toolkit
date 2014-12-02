@@ -79,7 +79,7 @@ public class StatusMonitorThread extends Thread {
     }
 
     private String getUserMode(int row) {
-        if (((String) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + row + "].children[7].innerHTML")).equals("AUX")) {
+        if (((String) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + row + "].children[7].innerHTML")) != null) {
             return "AUX";
         } else {
             return (String) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + row + "].children[3].innerHTML");
@@ -94,12 +94,15 @@ public class StatusMonitorThread extends Thread {
     }
 
     private void giveAlert(String name, String mode) {
+        System.out.println("Giving status alert for " + name + " for " + mode);
         JDialog diag = new JDialog(main.frame, "Status Monitor");
         diag.add(new StatusMonitorAlertPanel(name, mode, webBrowser));
         diag.pack();
         diag.setLocationRelativeTo(main.frame);
         diag.setResizable(false);
         diag.setVisible(true);
+        diag.setAlwaysOnTop(true);
+        diag.setAlwaysOnTop(false);
         alertedUsers.add(name);
         alertedModes.add(mode);
     }
@@ -112,14 +115,18 @@ public class StatusMonitorThread extends Thread {
                 public void run() {
                     try {
                         int tutorCount = ((Double) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows.length")).intValue();
+                        errorNoticeGiven = false;
                         for (int i = 0; i < alertedUsers.size(); i++) {
                             for (int i2 = 1; i2 < tutorCount; i2++) {
                                 String tempName = (String) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + i2 + "].children[0].innerHTML");
                                 String listedName = tempName.substring(tempName.lastIndexOf("&nbsp;") + 6, tempName.length());
                                 if (listedName.equals(alertedUsers.get(i))) {
                                     if (!alertedModes.get(i).equals(getUserMode(i2))) {
+                                        System.out.println("Removing " + listedName + " from list of alerted users");
                                         alertedModes.remove(i);
                                         alertedUsers.remove(i);
+                                        i--;
+                                        break;
                                     }
                                 }
                             }
@@ -146,7 +153,6 @@ public class StatusMonitorThread extends Thread {
                                 }
                             }
                         }
-                        errorNoticeGiven = false;
                     } catch (NullPointerException e) {
                         if (!errorNoticeGiven) {
                             System.out.println("Failed to get number of tutors for status monitor. Perhaps not on the right webpage?");
