@@ -6,7 +6,9 @@
 package app.watcher;
 
 import app.browser.ExtendedWebBrowser;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
@@ -27,34 +29,45 @@ public class AgentWatcherThread extends Thread {
 
     @Override
     public void run() {
-        running = true;
         while (running) {
+            boolean inCall = false;
             try {
-                SwingUtilities.invokeLater(new Runnable() {
+                Scanner scan = new Scanner(Runtime.getRuntime().exec("tasklist /fi \"imagename eq lync.exe\" /v").getInputStream());
+                while (scan.hasNext()) {
+                    if (scan.nextLine().contains("[CE]")) {
+                        inCall = true;
+                        break;
+                    }
+                }
+            } catch (IOException ex) {
+                inCall = false;
+            }
+            if (!inCall) {
+                try {
+                    SwingUtilities.invokeLater(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        int TutorCount = ((Double) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows.length")).intValue();
-                        for (int i = 1; i < TutorCount; i++) {
-                            String tempName = (String) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].innerHTML");
-                            String listedName = tempName.substring(tempName.lastIndexOf("&nbsp;") + 6, tempName.length());
-                            if (isWatched(listedName)) {
-                                System.out.println("Checking to see if " + listedName + " is on a call.");
-                                if (webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].onclick") != null) {
-                                    System.out.println("Watcher is activating to start listening to " + listedName);
-                                    webBrowser.executeJavascript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].click()");
-                                    watchedAgents.clear();
-                                    running = false;
-                                    break;
+                        @Override
+                        public void run() {
+                            int TutorCount = ((Double) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows.length")).intValue();
+                            for (int i = 1; i < TutorCount; i++) {
+                                String tempName = (String) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].innerHTML");
+                                String listedName = tempName.substring(tempName.lastIndexOf("&nbsp;") + 6, tempName.length());
+                                if (watchedAgents.contains(listedName)) {
+                                    System.out.println("Checking to see if " + listedName + " is on a call.");
+                                    if (webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].onclick") != null) {
+                                        System.out.println("Watcher is activating to start listening to " + listedName);
+                                        webBrowser.executeJavascript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].click()");
+                                        break;
+                                    }
                                 }
                             }
                         }
-                    }
-                });
+                    });
 
-            } catch (NullPointerException e) {
-                System.out.println("The tab with the watcher has left the real-time agent page. The watcher thread will now shutdown.");
-                running = false;
+                } catch (NullPointerException e) {
+                    System.out.println("The tab with the watcher has left the real-time agent page. The watcher thread will now shutdown.");
+                    running = false;
+                }
             }
             try {
                 Thread.sleep(2000);
@@ -66,7 +79,7 @@ public class AgentWatcherThread extends Thread {
     }
 
     public void addWatchedAgent(String watch) {
-        if (!isWatched(watch)) {
+        if (!watchedAgents.contains(watch)) {
             watchedAgents.add(watch);
             System.out.println("Adding " + watch + " to the watcher thread.");
         } else {
@@ -82,22 +95,12 @@ public class AgentWatcherThread extends Thread {
                 break;
             }
         }
-        if (watchedAgents.isEmpty()){
+        if (watchedAgents.isEmpty()) {
             running = false;
         }
     }
 
-    private boolean isWatched(String watch) {
-        int arrayLength = watchedAgents.size();
-        for (int i = 0; i < arrayLength; i++) {
-            if (watchedAgents.get(i).equals(watch)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    public String[] getWatched(){
+    public String[] getWatched() {
         return watchedAgents.toArray(new String[1]);
     }
 }

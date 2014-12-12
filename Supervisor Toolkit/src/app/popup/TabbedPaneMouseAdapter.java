@@ -5,7 +5,6 @@
 package app.popup;
 
 import app.browser.ExtendedWebBrowser;
-import app.main;
 import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -46,7 +45,7 @@ public class TabbedPaneMouseAdapter extends MouseAdapter {
 
     private boolean isTabReal(MouseEvent e) {
         index = tabPaneParent.indexAtLocation(e.getX(), e.getY());
-        if (index != -1 && index < main.addressCount) {
+        if (index != -1 && index < tabPaneParent.getTabCount() - 2) {
             System.out.println("The tab right clicked is: " + tabPaneParent.getTitleAt(index));
             return true;
         } else {

@@ -115,7 +115,6 @@ public class StatusMonitorThread extends Thread {
                 public void run() {
                     try {
                         int tutorCount = ((Double) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows.length")).intValue();
-                        errorNoticeGiven = false;
                         for (int i = 0; i < alertedUsers.size(); i++) {
                             for (int i2 = 1; i2 < tutorCount; i2++) {
                                 String tempName = (String) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + i2 + "].children[0].innerHTML");
@@ -153,6 +152,7 @@ public class StatusMonitorThread extends Thread {
                                 }
                             }
                         }
+                        errorNoticeGiven = false;
                     } catch (NullPointerException e) {
                         if (!errorNoticeGiven) {
                             System.out.println("Failed to get number of tutors for status monitor. Perhaps not on the right webpage?");

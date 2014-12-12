@@ -37,7 +37,7 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
         if (webBrowser.isWatcherEnabled()) {
             String[] watchedList = webBrowser.getWatched();
             if (watchedList.length > 0) {
-                removeList.setListData(webBrowser.getWatched());
+                removeList.setListData(watchedList);
             }
         }
     }

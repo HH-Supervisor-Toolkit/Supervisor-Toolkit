@@ -51,7 +51,7 @@ public class main {
     };
     public static File file;
     public static OptionsEditPanel optionsEdit;
-    public static ExtendedWebBrowser[] webBrowsers;
+    static ExtendedWebBrowser[] webBrowsers;
     public static JFrame frame;
     public static int addressCount;
     static BufferedImage icon;
