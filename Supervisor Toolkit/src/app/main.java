@@ -122,7 +122,7 @@ public class main {
                     @Override
                     public void windowClosing(WindowEvent we) {
                         String ObjButtons[] = {"Yes", "No"};
-                        int PromptResult = JOptionPane.showOptionDialog(frame, "Are you sure you want to exit?", "Nightly Log", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, ObjButtons, ObjButtons[1]);
+                        int PromptResult = JOptionPane.showOptionDialog(frame, "Are you sure you want to exit?", "Supervisor Toolkit", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, ObjButtons, ObjButtons[1]);
                         if (PromptResult == JOptionPane.YES_OPTION) {
                             for (ExtendedWebBrowser webBrowser : webBrowsers) {
                                 webBrowser.executeJavascript("window.onbeforeunload = null");

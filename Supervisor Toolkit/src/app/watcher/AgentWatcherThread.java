@@ -32,7 +32,7 @@ public class AgentWatcherThread extends Thread {
         while (running) {
             boolean inCall = false;
             try {
-                Scanner scan = new Scanner(Runtime.getRuntime().exec("tasklist /fi \"imagename eq lync.exe\" /v").getInputStream());
+                Scanner scan = new Scanner(Runtime.getRuntime().exec("tasklist /v").getInputStream());
                 while (scan.hasNext()) {
                     if (scan.nextLine().contains("[CE]")) {
                         inCall = true;
@@ -41,6 +41,7 @@ public class AgentWatcherThread extends Thread {
                 }
             } catch (IOException ex) {
                 inCall = false;
+                System.out.println("An error occured while trying to check if already on a lync call");
             }
             if (!inCall) {
                 try {
