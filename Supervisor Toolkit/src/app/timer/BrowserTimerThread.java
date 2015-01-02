@@ -58,7 +58,7 @@ public class BrowserTimerThread extends Thread {
                         messageDialog = new JDialog(main.frame,"Timer Warning");
                         timerPanel = new TimerWarningPanel("Your timer for " + webBrowser.getName() + " is at " + limitDoublePercision((double) timeDifference / (60000), 2) + " of " + timerDuration + " minutes", webBrowser);
                         messageDialog.add(timerPanel, BorderLayout.CENTER);
-                        messageDialog.setLocationRelativeTo(webBrowser.getParent());
+                        messageDialog.setLocationRelativeTo(main.frame);
                         messageDialog.pack();
                         messageDialog.setResizable(false);
                         messageDialog.setVisible(true);
