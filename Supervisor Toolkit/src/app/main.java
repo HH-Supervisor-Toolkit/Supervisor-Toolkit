@@ -40,7 +40,7 @@ import javax.swing.SwingUtilities;
  * @author Sloan
  */
 public class main {
-
+    
     public final static String[] Default = {"[Nightly Log] -B", "https://docs.google.com/forms/d/172-Elqzog2MgLSMe9WvCHkuxHsJAb5IaFJZKq74KxPw/viewform",
         "[Equipment Problem Report]", "https://docs.google.com/forms/d/1X8K1XeWBykPRnnxn5TWaLGUcc68Yn3JiejvpSgwiJTc/viewform",
         "[Incident Report]", "https://docs.google.com/forms/d/1Zy4Hd4FxPlpSAOZMigRfUVywnL78-pBm5HP5E69TasE/viewform",
@@ -84,6 +84,7 @@ public class main {
 
     /* Standard main method to try that test as a standalone application. */
     public static void main(final String[] args) {
+        
         for (String arg : args) {
             if (arg.equals("don'tfeedthebears")
                     || arg.equals("don'tfeedthebear")
@@ -99,7 +100,7 @@ public class main {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                frame = new JFrame("Supervisor Reports");
+                frame = new JFrame("Supervisor Toolkit");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setSize(900, 600);
                 frame.setLocationByPlatform(true);

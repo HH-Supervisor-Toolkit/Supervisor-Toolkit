@@ -57,9 +57,9 @@ public class AutoBackupThread extends Thread {
             System.out.println("Moving backup file to long term storage with new file name: " + "Backup_Log_" + +backupFile.lastModified() + ".txt");
             backupFile.renameTo(new File(longTermBackups.getAbsolutePath() + "\\Backup_Log_" + +backupFile.lastModified() + ".txt"));
             File[] longTermList = longTermBackups.listFiles();
-            if (longTermList.length > maxBackups){
+            if (longTermList.length > maxBackups) {
                 Arrays.sort(longTermList);
-                for (int i = 0; i < longTermList.length - maxBackups; i++){
+                for (int i = 0; i < longTermList.length - maxBackups; i++) {
                     System.out.println("Too many backup files. Deleting file: " + longTermList[i].getName());
                     longTermList[i].delete();
                 }
@@ -74,6 +74,7 @@ public class AutoBackupThread extends Thread {
                 @Override
                 public void loadingProgressChanged(WebBrowserEvent e) {
                     if (e.getWebBrowser().getLoadingProgress() == 100) {
+                        System.out.println(webBrowser.getBrowserVersion());
                         if ((backupFile.exists() || longTermBackups.list().length > 0) && webBrowser.getResourceLocation().equals(main.Default[1])) {
                             String[] ObjButtons = {"Yes", "No"};
                             int choice = JOptionPane.showOptionDialog(main.frame, "There is an backup available. Would you like to load it?", "Load Backup?", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, ObjButtons, ObjButtons[1]);
@@ -93,7 +94,7 @@ public class AutoBackupThread extends Thread {
                                     if (backupFile.equals(selectPanel.getSelectedFile())) {
                                         System.out.println("Loading latest backup.");
                                         loadBackup(backupFile);
-                                    }else{
+                                    } else {
                                         System.out.println("Loading old backup. Will store latest backup if possible.");
                                         loadBackup(selectPanel.getSelectedFile());
                                         storeLatestBackup();
