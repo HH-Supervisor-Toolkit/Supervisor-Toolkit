@@ -17,14 +17,13 @@ import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -154,7 +153,7 @@ public class main {
         String workingLine;
         try {
             System.out.println("Attempting to read options file");
-             File optionsFile = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Options.txt");
+            File optionsFile = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Options.txt");
             if (!optionsFile.exists() || optionsFile.length() == 0) {
                 System.out.println("Options file not found attemping to create default");
                 if (!optionsFile.getParentFile().exists()) {
@@ -164,17 +163,14 @@ public class main {
                 optionsFile.createNewFile();
                 writeOptions(Default);
             }
-            FileReader read = new FileReader(optionsFile);
-            BufferedReader bufRead = new BufferedReader(read);
-            workingLine = bufRead.readLine();
-            if (workingLine == null || workingLine.length() <= 0) {
+            Scanner scan = new Scanner(optionsFile);
+            if (!scan.hasNext()) {
                 RepairOptions();
                 return ReadOptions();
             }
-            while (workingLine != null) {
-                LineList.add(workingLine);
-                workingLine = bufRead.readLine();
-            }
+            do {
+                LineList.add(scan.nextLine());
+            } while (scan.hasNext());
         } catch (FileNotFoundException ex) {
             Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
