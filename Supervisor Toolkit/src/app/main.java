@@ -49,6 +49,7 @@ public class main {
         "[Phone Surveys] -t:30", "https://prod11gbss8.rose-hulman.edu/BanSS/rhit_hwhl.P_QuestionPage",
         "[Attendance Page]", "http://askrose.org/askrose-login"
     };
+    
     static ExtendedWebBrowser[] webBrowsers;
     public static JFrame frame;
     public static int addressCount;
