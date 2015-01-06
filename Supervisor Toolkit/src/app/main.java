@@ -40,7 +40,7 @@ import javax.swing.SwingUtilities;
  * @author Sloan
  */
 public class main {
-    
+
     public final static String[] Default = {"[Nightly Log] -B", "https://docs.google.com/forms/d/172-Elqzog2MgLSMe9WvCHkuxHsJAb5IaFJZKq74KxPw/viewform",
         "[Equipment Problem Report]", "https://docs.google.com/forms/d/1X8K1XeWBykPRnnxn5TWaLGUcc68Yn3JiejvpSgwiJTc/viewform",
         "[Incident Report]", "https://docs.google.com/forms/d/1Zy4Hd4FxPlpSAOZMigRfUVywnL78-pBm5HP5E69TasE/viewform",
@@ -49,17 +49,17 @@ public class main {
         "[Phone Surveys] -t:30", "https://prod11gbss8.rose-hulman.edu/BanSS/rhit_hwhl.P_QuestionPage",
         "[Attendance Page]", "http://askrose.org/askrose-login"
     };
-    public static File file;
-    public static OptionsEditPanel optionsEdit;
     static ExtendedWebBrowser[] webBrowsers;
     public static JFrame frame;
     public static int addressCount;
     static BufferedImage icon;
-    static boolean bears = false;
+    static public OptionsEditPanel optionsEdit;
+    static JTabbedPane webBrowserPane;
 
+    
     public static JComponent createContent(String[] address) {
         webBrowsers = new ExtendedWebBrowser[address.length / 2];
-        JTabbedPane webBrowserPane = new JTabbedPane();
+        webBrowserPane = new JTabbedPane();
         try {
             for (int i = 1; i < address.length; i = i + 2) {
                 webBrowsers[(i - 1) / 2] = new ExtendedWebBrowser();
@@ -84,26 +84,30 @@ public class main {
 
     /* Standard main method to try that test as a standalone application. */
     public static void main(final String[] args) {
-        
-        for (String arg : args) {
-            if (arg.equals("don'tfeedthebears")
-                    || arg.equals("don'tfeedthebear")
-                    || arg.equals("bear")
-                    || arg.equals("bears")
-                    || arg.equals("dontfeedthebears")
-                    || arg.equals("dontfeedthebear")) {
-                bears = true;
-            }
-        }
         NativeInterface.open();
         UIUtils.setPreferredLookAndFeel();
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                
+                boolean bears = false;
+                for (String arg : args) {
+                    if (arg.equals("don'tfeedthebears")
+                            || arg.equals("don'tfeedthebear")
+                            || arg.equals("bear")
+                            || arg.equals("bears")
+                            || arg.equals("dontfeedthebears")
+                            || arg.equals("dontfeedthebear")) {
+                        bears = true;
+                        break;
+                    }
+                }
+                
                 frame = new JFrame("Supervisor Toolkit");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setSize(900, 600);
                 frame.setLocationByPlatform(true);
+                
                 try {
                     String iconPath;
                     if (bears) {
@@ -117,9 +121,11 @@ public class main {
                 } catch (IOException ex) {
                     Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                
                 frame.add(createContent(ReadOptions()), BorderLayout.CENTER);
                 frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
                 frame.addWindowListener(new WindowAdapter() {
+                    
                     @Override
                     public void windowClosing(WindowEvent we) {
                         String ObjButtons[] = {"Yes", "No"};
@@ -132,10 +138,14 @@ public class main {
                         }
                     }
                 });
+                
                 frame.setVisible(true);
+                
             }
         });
+        
         NativeInterface.runEventPump();
+        
     }
 
     static String[] ReadOptions() {
@@ -143,17 +153,17 @@ public class main {
         String workingLine;
         try {
             System.out.println("Attempting to read options file");
-            file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Options.txt");
-            if (!file.exists() || file.length() == 0) {
+             File optionsFile = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Options.txt");
+            if (!optionsFile.exists() || optionsFile.length() == 0) {
                 System.out.println("Options file not found attemping to create default");
-                if (!file.getParentFile().exists()) {
+                if (!optionsFile.getParentFile().exists()) {
                     System.out.println("SuperToolkit directory not found attempting to create it");
-                    file.getParentFile().mkdirs();
+                    optionsFile.getParentFile().mkdirs();
                 }
-                file.createNewFile();
-                writeOptions(file, Default);
+                optionsFile.createNewFile();
+                writeOptions(Default);
             }
-            FileReader read = new FileReader(file);
+            FileReader read = new FileReader(optionsFile);
             BufferedReader bufRead = new BufferedReader(read);
             workingLine = bufRead.readLine();
             if (workingLine == null || workingLine.length() <= 0) {
@@ -176,7 +186,8 @@ public class main {
         JOptionPane.showMessageDialog(null, infoMessage, location, JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public static void writeOptions(File file, String[] writeContents) {
+    public static void writeOptions(String[] writeContents) {
+        File file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Options.txt");
         PrintWriter write;
         try {
             write = new PrintWriter(file);
@@ -219,11 +230,31 @@ public class main {
             } else if (parsedOption.contains("B")) {
                 System.out.println("Enabling auto backup for " + tabTitle);
                 webBrowser.enableBackup();
-            }
-            else if (parsedOption.contains("S")){
+            } else if (parsedOption.contains("S")) {
                 System.out.println("Enabling status monitor for " + tabTitle);
                 webBrowser.enableMonitor();
             }
         }
+    }
+
+    public static void ModifyOptions(boolean removing, String prefix, String fullOption, ExtendedWebBrowser webBrowser) {
+        int index = 0;
+        int componentCount = webBrowserPane.getTabCount();
+        for (int i = 0; i < componentCount; i++) {
+            if (webBrowserPane.getComponentAt(i).equals(webBrowser)) {
+                index = i;
+                break;
+            }
+        }
+        String[] optionsText = main.optionsEdit.getOptionsText();
+        if (removing) {
+            System.out.println("Removing timer option switch from tab " + index);
+            optionsText[index * 2] = optionsText[index * 2].replaceAll("-" + prefix + "[^-]*", "");
+        } else {
+            System.out.println("Adding timer option switch to tab " + index);
+            optionsText[index * 2] = optionsText[index * 2].trim() + " -" + fullOption;
+        }
+        main.optionsEdit.setOptionsText(optionsText);
+        main.writeOptions(optionsText);
     }
 }

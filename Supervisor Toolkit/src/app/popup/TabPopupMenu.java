@@ -18,7 +18,6 @@ import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-import javax.swing.JTabbedPane;
 
 /**
  *
@@ -45,7 +44,7 @@ public class TabPopupMenu extends JPopupMenu {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (webBrowser.isTimerEnabled()) {
-                    ModifyOptions(true, "t:", null);
+                    main.ModifyOptions(true, "t:", null, webBrowser);
                     webBrowser.removeBrowserTimer();
                     System.out.println("A timer has been removed from " + webBrowser.getName());
                 } else {
@@ -54,7 +53,7 @@ public class TabPopupMenu extends JPopupMenu {
                         return;
                     }
                     System.out.println("A " + minutes + " minute timer has been added to " + webBrowser.getName());
-                    ModifyOptions(false, null, "t:" + minutes);
+                    main.ModifyOptions(false, null, "t:" + minutes, webBrowser);
                     BrowserTimerThread timerListener = new BrowserTimerThread(minutes, webBrowser);
                     webBrowser.addBrowserTimer(timerListener);
                 }
@@ -73,11 +72,11 @@ public class TabPopupMenu extends JPopupMenu {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (webBrowser.isBackupEnabled()) {
-                        ModifyOptions(true, "B", null);
+                        main.ModifyOptions(true, "B", null, webBrowser);
                         webBrowser.disableBackup();
                         System.out.println("Auto backup has been disabled for " + webBrowser.getName());
                     } else {
-                        ModifyOptions(false, null, "B");
+                        main.ModifyOptions(false, null, "B", webBrowser);
                         webBrowser.enableBackup();
                         System.out.println("Auto backup has been enabled for " + webBrowser.getName());
                     }
@@ -147,25 +146,4 @@ public class TabPopupMenu extends JPopupMenu {
         return minutes;
     }
 
-    private void ModifyOptions(boolean removing, String prefix, String fullOption) {
-        int index = 0;
-        JTabbedPane tabbedPane = (JTabbedPane) webBrowser.getParent();
-        int componentCount = tabbedPane.getTabCount();
-        for (int i = 0; i < componentCount; i++) {
-            if (tabbedPane.getComponentAt(i).equals(webBrowser)) {
-                index = i;
-                break;
-            }
-        }
-        String[] optionsText = main.optionsEdit.getOptionsText();
-        if (removing) {
-            System.out.println("Removing timer option switch from tab " + index);
-            optionsText[index * 2] = optionsText[index * 2].replaceAll("-" + prefix + "[^-]*", "");
-        } else {
-            System.out.println("Adding timer option switch to tab " + index);
-            optionsText[index * 2] = optionsText[index * 2].trim() + " -" + fullOption;
-        }
-        main.optionsEdit.setOptionsText(optionsText);
-        main.writeOptions(main.file, optionsText);
-    }
 }

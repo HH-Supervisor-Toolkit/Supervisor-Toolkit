@@ -6,9 +6,11 @@ package app.options;
 
 import app.main;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -24,15 +26,17 @@ public class OptionsEditPanel extends javax.swing.JPanel {
 
     private void FillEditPane() {
         try {
-            BufferedReader bufRead = new BufferedReader(new FileReader(main.file));
+            File file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Options.txt");
+            Scanner scan = new Scanner(file);
             System.out.println("Attempting to fill options pane");
             String workingLine;
-            workingLine = bufRead.readLine();
             optionsEditorArea.setText(null);
-            while (workingLine != null) {
+            
+            do {
+                workingLine = scan.nextLine();
                 optionsEditorArea.setText(optionsEditorArea.getText() + workingLine + System.getProperty("line.separator"));
-                workingLine = bufRead.readLine();
-            }
+            }while ((scan.hasNext()));
+            
             System.out.println("Options pane sucessfully filled");
         } catch (FileNotFoundException ex) {
             Logger.getLogger(OptionsEditPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -163,7 +167,7 @@ public class OptionsEditPanel extends javax.swing.JPanel {
     private void applyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyButtonActionPerformed
         int choice = JOptionPane.showConfirmDialog(null, "Are you sure you want save these changes?", "Confirm apply", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (choice == JOptionPane.YES_OPTION) {
-            main.writeOptions(main.file, optionsEditorArea.getText().split(System.getProperty("line.separator")));
+            main.writeOptions(optionsEditorArea.getText().split(System.getProperty("line.separator")));
             if (broken) {
                 SwingUtilities.getRoot(this).setVisible(false);
             }
@@ -173,7 +177,7 @@ public class OptionsEditPanel extends javax.swing.JPanel {
     private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
         int choice = JOptionPane.showConfirmDialog(null, "Are you sure you want to reset to default options?", "Confirm reset", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (choice == JOptionPane.YES_OPTION) {
-            main.writeOptions(main.file, main.Default);
+            main.writeOptions(main.Default);
             FillEditPane();
         }
     }//GEN-LAST:event_resetButtonActionPerformed

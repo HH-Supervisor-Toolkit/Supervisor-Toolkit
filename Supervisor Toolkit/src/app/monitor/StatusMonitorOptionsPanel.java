@@ -13,7 +13,6 @@ import java.io.PrintWriter;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 
 /**
@@ -85,26 +84,6 @@ public class StatusMonitorOptionsPanel extends javax.swing.JPanel {
         }
     }
     
-    private void ModifyOptions(boolean removing) {
-        int index = 0;
-        JTabbedPane tabbedPane = (JTabbedPane) webBrowser.getParent();
-        int componentCount = tabbedPane.getTabCount();
-        for (int i = 0; i < componentCount; i++) {
-            if (tabbedPane.getComponentAt(i).equals(webBrowser)) {
-                index = i;
-                break;
-            }
-        }
-        String[] optionsText = main.optionsEdit.getOptionsText();
-        if (removing) {
-            optionsText[index * 2] = optionsText[index * 2].replaceAll("-S[^-]*", "");
-        } else {
-            optionsText[index * 2] = optionsText[index * 2].trim() + " -S";
-        }
-        main.optionsEdit.setOptionsText(optionsText);
-        main.writeOptions(main.file, optionsText);
-    }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -301,7 +280,7 @@ public class StatusMonitorOptionsPanel extends javax.swing.JPanel {
         } else {
             saveSettings();
             webBrowser.enableMonitor();
-            ModifyOptions(false);
+            main.ModifyOptions(false, "S", "S", webBrowser);
         }
         SwingUtilities.getRoot(this).setVisible(false);
     }//GEN-LAST:event_enableButtonActionPerformed
@@ -309,7 +288,7 @@ public class StatusMonitorOptionsPanel extends javax.swing.JPanel {
     private void disableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disableButtonActionPerformed
         if (webBrowser.isMonitorEnabled()) {
             webBrowser.disableMonitor();
-            ModifyOptions(true);
+            main.ModifyOptions(false, "S", null, webBrowser);
         }
         SwingUtilities.getRoot(this).setVisible(false);
     }//GEN-LAST:event_disableButtonActionPerformed

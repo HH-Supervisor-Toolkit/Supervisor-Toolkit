@@ -74,7 +74,6 @@ public class AutoBackupThread extends Thread {
                 @Override
                 public void loadingProgressChanged(WebBrowserEvent e) {
                     if (e.getWebBrowser().getLoadingProgress() == 100) {
-                        System.out.println(webBrowser.getBrowserVersion());
                         if ((backupFile.exists() || longTermBackups.list().length > 0) && webBrowser.getResourceLocation().equals(main.Default[1])) {
                             String[] ObjButtons = {"Yes", "No"};
                             int choice = JOptionPane.showOptionDialog(main.frame, "There is an backup available. Would you like to load it?", "Load Backup?", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, ObjButtons, ObjButtons[1]);
