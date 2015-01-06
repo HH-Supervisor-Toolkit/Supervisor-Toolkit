@@ -288,7 +288,7 @@ public class StatusMonitorOptionsPanel extends javax.swing.JPanel {
     private void disableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disableButtonActionPerformed
         if (webBrowser.isMonitorEnabled()) {
             webBrowser.disableMonitor();
-            main.ModifyOptions(false, "S", null, webBrowser);
+            main.ModifyOptions(true, "S", null, webBrowser);
         }
         SwingUtilities.getRoot(this).setVisible(false);
     }//GEN-LAST:event_disableButtonActionPerformed
