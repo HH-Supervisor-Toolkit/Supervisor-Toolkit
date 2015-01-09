@@ -6,11 +6,14 @@
 package app.watcher;
 
 import app.browser.ExtendedWebBrowser;
+import app.main;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 /**
@@ -22,6 +25,7 @@ public class AgentWatcherThread extends Thread {
     public final ArrayList<String> watchedAgents = new ArrayList<String>();
     private final ExtendedWebBrowser webBrowser;
     private boolean running = true;
+    private boolean hasActivated = false;
 
     public AgentWatcherThread(ExtendedWebBrowser webBrowser1) {
         webBrowser = webBrowser1;
@@ -44,6 +48,39 @@ public class AgentWatcherThread extends Thread {
                 System.out.println("An error occured while trying to check if already on a lync call");
             }
             if (!inCall) {
+                if (hasActivated) {
+
+                    final Object syncObject = new Object();
+                    
+                    JDialog diag = new JDialog(main.frame);
+                    AgentWatcherResumePanel panel = new AgentWatcherResumePanel(syncObject);
+                    diag.add(panel);
+                    diag.setTitle("Resume Watcher?");
+                    diag.pack();
+                    diag.setResizable(false);
+                    diag.setLocationRelativeTo(main.frame);
+                    diag.setVisible(true);
+                    
+                    synchronized(syncObject){
+                        try {
+                            syncObject.wait();
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(AgentWatcherThread.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    
+                    boolean resumeWatcher = panel.getResult();
+                    
+                    if (!resumeWatcher) {
+                        watchedAgents.clear();
+                        running = false;
+                        hasActivated = false;
+                        break;
+                    }else{
+                        hasActivated = false;
+                    }
+                    
+                }
                 try {
                     SwingUtilities.invokeLater(new Runnable() {
 
@@ -58,6 +95,7 @@ public class AgentWatcherThread extends Thread {
                                     if (webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].onclick") != null) {
                                         System.out.println("Watcher is activating to start listening to " + listedName);
                                         webBrowser.executeJavascript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].click()");
+                                        hasActivated = true;
                                         break;
                                     }
                                 }

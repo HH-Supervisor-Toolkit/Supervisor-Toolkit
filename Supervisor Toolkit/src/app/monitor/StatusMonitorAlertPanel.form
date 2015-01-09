@@ -24,10 +24,7 @@
                       <EmptySpace type="separate" max="32767" attributes="0"/>
                       <Component id="dismissButton" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -52,6 +49,7 @@
     <Component class="javax.swing.JButton" name="addSupervisorButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Add Supervisor"/>
+        <Property name="defaultCapable" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addSupervisorButtonActionPerformed"/>
@@ -60,6 +58,7 @@
     <Component class="javax.swing.JButton" name="dismissButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Dismiss"/>
+        <Property name="defaultCapable" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dismissButtonActionPerformed"/>

@@ -47,6 +47,7 @@ public class StatusMonitorAlertPanel extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
 
         addSupervisorButton.setText("Add Supervisor");
+        addSupervisorButton.setDefaultCapable(false);
         addSupervisorButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addSupervisorButtonActionPerformed(evt);
@@ -54,6 +55,7 @@ public class StatusMonitorAlertPanel extends javax.swing.JPanel {
         });
 
         dismissButton.setText("Dismiss");
+        dismissButton.setDefaultCapable(false);
         dismissButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 dismissButtonActionPerformed(evt);
@@ -74,9 +76,7 @@ public class StatusMonitorAlertPanel extends javax.swing.JPanel {
                         .addComponent(addSupervisorButton)
                         .addGap(18, 18, Short.MAX_VALUE)
                         .addComponent(dismissButton))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(0, 0, 0)))
+                    .addComponent(jLabel1))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
