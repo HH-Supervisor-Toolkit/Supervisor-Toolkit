@@ -51,7 +51,6 @@ public class main {
     
     static ExtendedWebBrowser[] webBrowsers;
     public static JFrame frame;
-    public static int addressCount;
     static BufferedImage icon;
     static public OptionsEditPanel optionsEdit;
     static JTabbedPane webBrowserPane;
@@ -78,14 +77,15 @@ public class main {
         webBrowserPane.addTab("Options", optionsEdit);
         webBrowserPane.addTab("Alarms", new AlarmsEditPanel());
         webBrowserPane.addMouseListener(new TabbedPaneMouseAdapter(webBrowserPane));
-        addressCount = address.length / 2;
         return webBrowserPane;
     }
 
     /* Standard main method to try that test as a standalone application. */
     public static void main(final String[] args) {
         NativeInterface.open();
+        
         UIUtils.setPreferredLookAndFeel();
+        
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {

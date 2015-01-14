@@ -31,6 +31,9 @@ public class AutoBackupSelectPanel extends javax.swing.JPanel {
 
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy HH:mm");
 
+        Arrays.sort(longTermFileList);
+        Collections.reverse(Arrays.asList(longTermFileList));
+                
         if (backupFile.exists()) {
             fileNames = new String[longTermFileList.length + 1];
             fileNames[0] = sdf.format(backupFile.lastModified()) + " (Latest)";
@@ -46,10 +49,7 @@ public class AutoBackupSelectPanel extends javax.swing.JPanel {
             }
         }
 
-        Arrays.sort(fileNames);
-        Collections.reverse(Arrays.asList(fileNames));
-        Arrays.sort(longTermFileList);
-        Collections.reverse(Arrays.asList(longTermFileList));
+        
         initComponents();
     }
 

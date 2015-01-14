@@ -55,7 +55,7 @@ public class AutoBackupThread extends Thread {
     public void storeLatestBackup() {
         if (backupFile.exists()) {
             System.out.println("Moving backup file to long term storage with new file name: " + "Backup_Log_" + +backupFile.lastModified() + ".txt");
-            backupFile.renameTo(new File(longTermBackups.getAbsolutePath() + "\\Backup_Log_" + +backupFile.lastModified() + ".txt"));
+            backupFile.renameTo(new File(longTermBackups.getAbsolutePath() + "\\Backup_Log_" + backupFile.lastModified() + ".txt"));
             File[] longTermList = longTermBackups.listFiles();
             if (longTermList.length > maxBackups) {
                 Arrays.sort(longTermList);
@@ -163,9 +163,7 @@ public class AutoBackupThread extends Thread {
                     for (int i = 0; i < 2; i++) {
                         webBrowser.executeJavascript("document.getElementsByName(\"entry.1657790510\")[" + i + "].checked = " + backupEntries[12 + i]);
                     }
-                    for (int i = 0; i < 6; i++) {
-                        webBrowser.executeJavascript("document.getElementsByName(\"entry.398759739\")[" + i + "].checked = " + backupEntries[14 + i]);
-                    }
+                    webBrowser.executeJavascript("document.getElementById(\"entry_398759739\").value = \"" + backupEntries[14] + "\"");
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(AutoBackupThread.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
@@ -183,7 +181,7 @@ public class AutoBackupThread extends Thread {
                 if (webBrowser.getResourceLocation().equals(main.Default[1])) {
                     System.out.println("Saving a backup of the Nightly log");
                     try {
-                        String[] backupEntries = new String[20];
+                        String[] backupEntries = new String[15];
                         backupEntries[0] = (String) webBrowser.executeJavascriptWithResult("return document.getElementById(\"entry.50106969_month\").value");
                         backupEntries[1] = (String) webBrowser.executeJavascriptWithResult("return document.getElementById(\"entry.50106969_day\").value");
                         backupEntries[2] = (String) webBrowser.executeJavascriptWithResult("return document.getElementById(\"entry.50106969_year\").value");
@@ -201,9 +199,7 @@ public class AutoBackupThread extends Thread {
                         for (int i = 0; i < 2; i++) {
                             backupEntries[12 + i] = webBrowser.executeJavascriptWithResult("return document.getElementsByName(\"entry.1657790510\")[" + i + "].checked").toString();
                         }
-                        for (int i = 0; i < 6; i++) {
-                            backupEntries[14 + i] = webBrowser.executeJavascriptWithResult("return document.getElementsByName(\"entry.398759739\")[" + i + "].checked").toString();
-                        }
+                        backupEntries[14] = (String) webBrowser.executeJavascriptWithResult("return document.getElementById(\"entry_398759739\").value");
                         backupWriter = new PrintWriter(backupFile);
                         for (String backupEntry : backupEntries) {
                             if (backupEntry == null) {
