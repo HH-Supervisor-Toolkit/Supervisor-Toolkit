@@ -79,7 +79,7 @@ public class StatusMonitorThread extends Thread {
     }
 
     private String getUserMode(int row) {
-        if (((String) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + row + "].children[7].innerHTML")) != null) {
+        if ("AUX".equals((String) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + row + "].children[7].innerHTML"))) {
             return "AUX";
         } else {
             return (String) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + row + "].children[3].innerHTML");
