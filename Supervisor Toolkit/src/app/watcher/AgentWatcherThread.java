@@ -43,43 +43,44 @@ public class AgentWatcherThread extends Thread {
                     }
                 }
             } catch (IOException ex) {
-                inCall = false;
                 System.out.println("An error occured while trying to check if already on a lync call");
             }
             if (!inCall) {
                 if (hasActivated) {
 
                     final Object syncObject = new Object();
-                    
+
                     JDialog diag = new JDialog(main.frame);
                     AgentWatcherResumePanel panel = new AgentWatcherResumePanel(syncObject);
                     diag.add(panel);
                     diag.setTitle("Resume Watcher?");
                     diag.pack();
+                    diag.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
                     diag.setResizable(false);
                     diag.setLocationRelativeTo(main.frame);
                     diag.setVisible(true);
-                    
-                    synchronized(syncObject){
+
+                    synchronized (syncObject) {
                         try {
                             syncObject.wait();
                         } catch (InterruptedException ex) {
                             Logger.getLogger(AgentWatcherThread.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
-                    
+
                     boolean resumeWatcher = panel.getResult();
-                    
+
                     if (!resumeWatcher) {
                         watchedAgents.clear();
                         running = false;
                         hasActivated = false;
                         break;
-                    }else{
+                    } else {
                         hasActivated = false;
                     }
-                    
+
                 }
+                final Object syncObject = new Object();
                 try {
                     SwingUtilities.invokeLater(new Runnable() {
 
@@ -93,11 +94,14 @@ public class AgentWatcherThread extends Thread {
                                     System.out.println("Checking to see if " + listedName + " is on a call.");
                                     if (webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].onclick") != null) {
                                         System.out.println("Watcher is activating to start listening to " + listedName);
-                                        webBrowser.executeJavascript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].click()");
                                         hasActivated = true;
+                                        webBrowser.executeJavascript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].click()");
                                         break;
                                     }
                                 }
+                            }
+                            synchronized(syncObject){
+                                syncObject.notify();
                             }
                         }
                     });
@@ -105,6 +109,13 @@ public class AgentWatcherThread extends Thread {
                 } catch (NullPointerException e) {
                     System.out.println("The tab with the watcher has left the real-time agent page. The watcher thread will now shutdown.");
                     running = false;
+                }
+                synchronized (syncObject) {
+                    try {
+                        syncObject.wait();
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(AgentWatcherThread.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
             try {
