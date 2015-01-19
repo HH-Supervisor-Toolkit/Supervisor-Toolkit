@@ -5,11 +5,11 @@
  */
 package app.watcher;
 
+import app.EnumAllWindowNames;
 import app.browser.ExtendedWebBrowser;
 import app.main;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JDialog;
@@ -33,21 +33,18 @@ public class AgentWatcherThread extends Thread {
     @Override
     public void run() {
         while (running) {
+            
             boolean inCall = false;
-            try {
-                Process taskList = Runtime.getRuntime().exec("tasklist /v");
-                Scanner scan = new Scanner(taskList.getInputStream());
-                while (scan.hasNext()) {
-                    if (scan.nextLine().contains("[CE]")) {
-                        inCall = true;
-                        break;
-                    }
+            List<String> windowNames = EnumAllWindowNames.getAllWindowNames();
+            for (String name : windowNames) {
+                if (name.contains("[CE]")) {
+                    inCall = true;
+                    break;
                 }
-                taskList.destroy();
-            } catch (IOException ex) {
-                System.out.println("An error occured while trying to check if already on a lync call");
             }
+            
             if (!inCall) {
+                
                 if (hasActivated) {
 
                     final Object syncObject = new Object();
@@ -82,7 +79,9 @@ public class AgentWatcherThread extends Thread {
                     }
 
                 }
+                
                 final Object syncObject = new Object();
+                
                 try {
                     SwingUtilities.invokeLater(new Runnable() {
 
@@ -102,7 +101,7 @@ public class AgentWatcherThread extends Thread {
                                     }
                                 }
                             }
-                            synchronized(syncObject){
+                            synchronized (syncObject) {
                                 syncObject.notify();
                             }
                         }
