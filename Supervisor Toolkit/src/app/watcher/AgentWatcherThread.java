@@ -5,7 +5,7 @@
  */
 package app.watcher;
 
-import JNI.EnumAllWindowNames;
+import app.JNI.EnumAllWindowNames;
 import app.browser.ExtendedWebBrowser;
 import app.main;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class AgentWatcherThread extends Thread {
         while (running) {
             
             boolean inCall = false;
-            List<String> windowNames = EnumAllWindowNames.getAllWindowNames();
+            String[] windowNames = EnumAllWindowNames.getWindowTitles();
             for (String name : windowNames) {
                 if (name.contains("[CE]")) {
                     inCall = true;
