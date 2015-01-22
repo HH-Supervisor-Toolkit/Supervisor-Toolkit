@@ -34,8 +34,9 @@ public class AgentWatcherThread extends Thread {
     public void run() {
         while (running) {
             
-            boolean inCall = false;
+            boolean inCall = false;            
             String[] windowNames = EnumAllWindowNames.getWindowTitles();
+            
             for (String name : windowNames) {
                 if (name.contains("[CE]")) {
                     inCall = true;
