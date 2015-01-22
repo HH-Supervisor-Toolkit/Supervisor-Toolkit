@@ -7,7 +7,6 @@ package app.JNI;
 
 import app.main;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,12 +54,32 @@ public class EnumAllWindowNames {
             while ((i = in.read(buffer)) > -1) {
                 out.write(buffer, 0, i);
             }
+            
             out.close();
+            in.close();
+            
         } catch (IOException ex) {
             Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        fileOut.deleteOnExit();
-
+        
+        Runtime.getRuntime().addShutdownHook(new RemoveLibraryHook());
+        
+    }
+    
+    private static class RemoveLibraryHook extends Thread{
+        
+        @Override
+        public void run(){
+                        
+            System.out.println("Test Test Test");
+            
+            File dir = new File(System.getProperty("user.home") + "\\AppData\\Local\\Temp\\SuperToolkit");
+            File file = new File(System.getProperty("user.home") + "\\AppData\\Local\\Temp\\SuperToolkit\\cLib.dll");
+                        
+            file.delete();
+            dir.delete();
+            
+        }
+        
     }
 }
