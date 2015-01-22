@@ -5,7 +5,7 @@
  */
 package app.watcher;
 
-import app.EnumAllWindowNames;
+import JNI.EnumAllWindowNames;
 import app.browser.ExtendedWebBrowser;
 import app.main;
 import java.util.ArrayList;
