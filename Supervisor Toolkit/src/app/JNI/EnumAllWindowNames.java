@@ -40,7 +40,7 @@ public class EnumAllWindowNames {
                 copyJNILibrary();
                 loadedLibrary = true;
 
-                cls = cl.findClass("app.JNI.LoadLibrary");
+                cls = cl.findClass("app.JNI.CLibrary");
                 ldl = (CLibraryInterface) cls.newInstance();
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
