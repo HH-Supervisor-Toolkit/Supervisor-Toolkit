@@ -9,7 +9,7 @@ package app.JNI;
  *
  * @author Sloan
  */
-public class LoadLibrary implements LoadLibraryI{
+public class CLibrary implements CLibraryInterface{
 
     static {
         System.load(System.getProperty("user.home") + "\\AppData\\Local\\Temp\\SuperToolkit\\cLib.dll");
@@ -17,10 +17,5 @@ public class LoadLibrary implements LoadLibraryI{
     
     @Override
     public native String[] enumWindows();
-
-    @Override
-    public void finalize() throws Throwable {
-        System.out.println("I have been garbage collected");
-    }
 
 }

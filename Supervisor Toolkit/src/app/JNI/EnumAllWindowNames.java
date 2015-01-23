@@ -9,6 +9,7 @@ import app.main;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,55 +26,60 @@ import java.util.logging.Logger;
 public class EnumAllWindowNames {
 
     private static boolean loadedLibrary = false;
-    private static CustomClassLoader cl = new CustomClassLoader() {
-    };
+    private static CustomClassLoader cl = new CustomClassLoader();
     private static Class cls;
-    private static LoadLibraryI ldl;
+    private static CLibraryInterface ldl;
 
     public static String[] getWindowTitles() {
-        try {
+
+        if (!loadedLibrary) {
             
-            if (!loadedLibrary) {
-                
+            System.out.println("cLib is not loaded. Loading it now.");
+            
+            try {
                 copyJNILibrary();
                 loadedLibrary = true;
 
                 cls = cl.findClass("app.JNI.LoadLibrary");
-                ldl = (LoadLibraryI) cls.newInstance();
-                
+                ldl = (CLibraryInterface) cls.newInstance();
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InstantiationException ex) {
+                Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
-            Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        return ldl.enumWindows();
+        String[] names;
         
+        try {
+            names = ldl.enumWindows();
+        } catch (NullPointerException e) {
+            names = null;
+        }
+        
+        return names;
+
     }
 
     private static void copyJNILibrary() {
 
-        File dir = new File(System.getProperty("user.home") + "\\AppData\\Local\\Temp\\SuperToolkit");
-
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-
-        File fileOut = new File(System.getProperty("user.home") + "\\AppData\\Local\\Temp\\SuperToolkit\\cLib.dll");
-
+        OutputStream out = null;
         try {
+            File dir = new File(System.getProperty("user.home") + "\\AppData\\Local\\Temp\\SuperToolkit");
+
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            File fileOut = new File(System.getProperty("user.home") + "\\AppData\\Local\\Temp\\SuperToolkit\\cLib.dll");
             InputStream in = main.class.getResourceAsStream("/app/JNI/cLib.dll");
-            OutputStream out = new FileOutputStream(fileOut);
+            out = new FileOutputStream(fileOut);
 
             int i;
+
             byte[] buffer = new byte[1024];
 
             while ((i = in.read(buffer)) > -1) {
@@ -83,11 +89,21 @@ public class EnumAllWindowNames {
             out.close();
             in.close();
 
+            Runtime.getRuntime().addShutdownHook(new RemoveLibraryHook());
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } finally {
+            try {
 
-        Runtime.getRuntime().addShutdownHook(new RemoveLibraryHook());
+                out.close();
+
+            } catch (IOException ex) {
+                Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
 
     }
 
@@ -96,22 +112,17 @@ public class EnumAllWindowNames {
         @Override
         public void run() {
 
-            cl = null;
-            cls = null;
             ldl = null;
+            cls = null;
+            cl = null;
+
             System.gc();
-            
-            try {
-                Thread.sleep(20000);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
+
             File dir = new File(System.getProperty("user.home") + "\\AppData\\Local\\Temp\\SuperToolkit");
             File file = new File(System.getProperty("user.home") + "\\AppData\\Local\\Temp\\SuperToolkit\\cLib.dll");
 
-            file.delete();
-            dir.delete();
+            while (!file.delete());
+            while (!dir.delete());
 
         }
 
@@ -119,65 +130,64 @@ public class EnumAllWindowNames {
 
     public static class CustomClassLoader extends ClassLoader {
 
-    /**
-     * The HashMap where the classes will be cached
-     */
-    private Map<String, Class<?>> classes = new HashMap<String, Class<?>>();
+        /**
+         * The HashMap where the classes will be cached
+         */
+        private Map<String, Class<?>> classes = new HashMap<String, Class<?>>();
 
-    @Override
-    public String toString() {
-        return CustomClassLoader.class.getName();
-    }
-
-    @Override
-    protected Class<?> findClass(String name) throws ClassNotFoundException {
-
-        if (classes.containsKey(name)) {
-            return classes.get(name);
+        @Override
+        public String toString() {
+            return CustomClassLoader.class.getName();
         }
 
-        byte[] classData;
+        @Override
+        protected Class<?> findClass(String name) throws ClassNotFoundException {
 
-        try {
-            classData = loadClassData(name);
-        } catch (IOException e) {
-            throw new ClassNotFoundException("Class [" + name
-                    + "] could not be found", e);
+            if (classes.containsKey(name)) {
+                return classes.get(name);
+            }
+
+            byte[] classData;
+
+            try {
+                classData = loadClassData(name);
+            } catch (IOException e) {
+                throw new ClassNotFoundException("Class [" + name
+                        + "] could not be found", e);
+            }
+
+            Class<?> c = defineClass(name, classData, 0, classData.length);
+            resolveClass(c);
+            classes.put(name, c);
+
+            return c;
         }
 
-        Class<?> c = defineClass(name, classData, 0, classData.length);
-        resolveClass(c);
-        classes.put(name, c);
+        /**
+         * Load the class file into byte array
+         *
+         * @param name The name of the class e.g. com.codeslices.test.TestClass}
+         * @return The class file as byte array
+         * @throws IOException
+         */
+        private byte[] loadClassData(String name) throws IOException {
+            BufferedInputStream in = new BufferedInputStream(
+                    ClassLoader.getSystemResourceAsStream(name.replace(".", "/")
+                            + ".class"));
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            int i;
 
-        return c;
-    }
+            while ((i = in.read()) != -1) {
+                out.write(i);
+            }
 
-    /**
-     * Load the class file into byte array
-     * 
-     * @param name
-     *            The name of the class e.g. com.codeslices.test.TestClass}
-     * @return The class file as byte array
-     * @throws IOException
-     */
-    private byte[] loadClassData(String name) throws IOException {
-        BufferedInputStream in = new BufferedInputStream(
-                ClassLoader.getSystemResourceAsStream(name.replace(".", "/")
-                        + ".class"));
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        int i;
+            in.close();
+            byte[] classData = out.toByteArray();
+            out.close();
 
-        while ((i = in.read()) != -1) {
-            out.write(i);
+            return classData;
         }
 
-        in.close();
-        byte[] classData = out.toByteArray();
-        out.close();
-
-        return classData;
     }
 
-}
-    
 }

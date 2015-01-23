@@ -9,6 +9,6 @@ package app.JNI;
  *
  * @author Sloan
  */
-public interface LoadLibraryI {
+public interface CLibraryInterface {
     public String[] enumWindows();
 }

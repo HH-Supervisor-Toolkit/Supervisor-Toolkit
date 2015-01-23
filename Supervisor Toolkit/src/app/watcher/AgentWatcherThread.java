@@ -9,7 +9,6 @@ import app.JNI.EnumAllWindowNames;
 import app.browser.ExtendedWebBrowser;
 import app.main;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JDialog;
@@ -33,19 +32,21 @@ public class AgentWatcherThread extends Thread {
     @Override
     public void run() {
         while (running) {
-            
-            boolean inCall = false;            
+
+            boolean inCall = false;
             String[] windowNames = EnumAllWindowNames.getWindowTitles();
             
-            for (String name : windowNames) {
-                if (name.contains("[CE]")) {
-                    inCall = true;
-                    break;
+            if (windowNames != null) {
+                for (String name : windowNames) {
+                    if (name.contains("[CE]")) {
+                        inCall = true;
+                        break;
+                    }
                 }
             }
-            
+
             if (!inCall) {
-                
+
                 if (hasActivated) {
 
                     final Object syncObject = new Object();
@@ -59,6 +60,8 @@ public class AgentWatcherThread extends Thread {
                     diag.setResizable(false);
                     diag.setLocationRelativeTo(main.frame);
                     diag.setVisible(true);
+                    diag.setAlwaysOnTop(true);
+                    diag.setAlwaysOnTop(false);
 
                     synchronized (syncObject) {
                         try {
@@ -80,9 +83,9 @@ public class AgentWatcherThread extends Thread {
                     }
 
                 }
-                
+
                 final Object syncObject = new Object();
-                
+
                 try {
                     SwingUtilities.invokeLater(new Runnable() {
 
