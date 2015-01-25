@@ -96,7 +96,6 @@ public class AgentWatcherThread extends Thread {
                                 String tempName = (String) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].innerHTML");
                                 String listedName = tempName.substring(tempName.lastIndexOf("&nbsp;") + 6, tempName.length());
                                 if (watchedAgents.contains(listedName)) {
-                                    System.out.println("Checking to see if " + listedName + " is on a call.");
                                     if (webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].onclick") != null) {
                                         System.out.println("Watcher is activating to start listening to " + listedName);
                                         hasActivated = true;
