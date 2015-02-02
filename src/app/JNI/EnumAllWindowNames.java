@@ -57,6 +57,7 @@ public class EnumAllWindowNames {
         try {
             names = ldl.enumWindows();
         } catch (NullPointerException e) {
+            System.out.println("An error occured while tring to enumWindows");
             names = null;
         }
         
