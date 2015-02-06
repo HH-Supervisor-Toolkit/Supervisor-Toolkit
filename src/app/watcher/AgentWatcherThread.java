@@ -50,6 +50,8 @@ public class AgentWatcherThread extends Thread {
                 if (hasActivated) {
 
                     final Object syncObject = new Object();
+                    
+                    System.out.println("Asking user if he/she wants to resume the watcher");
 
                     JDialog diag = new JDialog(main.frame);
                     AgentWatcherResumePanel panel = new AgentWatcherResumePanel(syncObject);
