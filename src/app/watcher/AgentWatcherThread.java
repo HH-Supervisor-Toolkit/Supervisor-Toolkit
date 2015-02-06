@@ -35,7 +35,7 @@ public class AgentWatcherThread extends Thread {
 
             boolean inCall = false;
             String[] windowNames = EnumAllWindowNames.getWindowTitles();
-            
+
             if (windowNames != null) {
                 for (String name : windowNames) {
                     if (name.contains("[CE]")) {
@@ -50,7 +50,7 @@ public class AgentWatcherThread extends Thread {
                 if (hasActivated) {
 
                     final Object syncObject = new Object();
-                    
+
                     System.out.println("Asking user if he/she wants to resume the watcher");
 
                     JDialog diag = new JDialog(main.frame);
@@ -124,11 +124,13 @@ public class AgentWatcherThread extends Thread {
                     }
                 }
             }
+            
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(AgentWatcherThread.class.getName()).log(Level.SEVERE, null, ex);
             }
+            
         }
         System.out.println("The watcher thread is shuting down.");
     }
