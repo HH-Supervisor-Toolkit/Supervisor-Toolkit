@@ -9,8 +9,6 @@ import app.browser.ExtendedWebBrowser;
 import app.popup.TabbedPaneMouseAdapter;
 import app.options.OptionsEditPanel;
 import app.timer.BrowserTimerThread;
-import chrriis.common.UIUtils;
-import chrriis.dj.nativeswing.swtimpl.NativeInterface;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.Window;
@@ -32,7 +30,8 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  *
@@ -48,14 +47,14 @@ public class main {
         "[Phone Surveys] -t:30", "https://prod11gbss8.rose-hulman.edu/BanSS/rhit_hwhl.P_QuestionPage",
         "[Attendance Page]", "http://askrose.org/askrose-login"
     };
-    
+
     static ExtendedWebBrowser[] webBrowsers;
     public static JFrame frame;
     static BufferedImage icon;
     static public OptionsEditPanel optionsEdit;
     static JTabbedPane webBrowserPane;
 
-    
+    @SuppressWarnings("InfiniteRecursion")
     public static JComponent createContent(String[] address) {
         webBrowsers = new ExtendedWebBrowser[address.length / 2];
         webBrowserPane = new JTabbedPane();
@@ -63,9 +62,7 @@ public class main {
             for (int i = 1; i < address.length; i = i + 2) {
                 webBrowsers[(i - 1) / 2] = new ExtendedWebBrowser();
                 System.out.println("Navagating to " + address[i]);
-                webBrowsers[(i - 1) / 2].navigate(address[i]);
-                webBrowsers[(i - 1) / 2].setBarsVisible(false);
-                webBrowsers[(i - 1) / 2].setButtonBarVisible(true);
+                webBrowsers[(i - 1) / 2].loadURL(address[i]);
                 addTabWithOptions(webBrowserPane, webBrowsers[(i - 1) / 2], address[i - 1]);
 
             }
@@ -82,70 +79,66 @@ public class main {
 
     /* Standard main method to try that test as a standalone application. */
     public static void main(final String[] args) {
-        NativeInterface.open();
-        
-        UIUtils.setPreferredLookAndFeel();
-        
-        SwingUtilities.invokeLater(new Runnable() {
+
+        System.setProperty("https.protocols", "SSLv3,TLSv1");
+
+        boolean bears = false;
+        for (String arg : args) {
+            if (arg.equals("don'tfeedthebears")
+                    || arg.equals("don'tfeedthebear")
+                    || arg.equals("bear")
+                    || arg.equals("bears")
+                    || arg.equals("dontfeedthebears")
+                    || arg.equals("dontfeedthebear")) {
+                bears = true;
+                break;
+            }
+        }
+
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        frame = new JFrame("Supervisor Toolkit");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(900, 600);
+        frame.setLocationByPlatform(true);
+
+        try {
+            String iconPath;
+
+            if (bears) {
+                iconPath = "img/bear.png";
+            } else {
+                iconPath = "img/icon.png";
+            }
+
+            InputStream iconStream = main.class.getResourceAsStream(iconPath);
+            icon = ImageIO.read(iconStream);
+            frame.setIconImage(icon);
+
+        } catch (IOException ex) {
+            Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        frame.add(createContent(ReadOptions()), BorderLayout.CENTER);
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter() {
+
             @Override
-            public void run() {
-                
-                boolean bears = false;
-                for (String arg : args) {
-                    if (arg.equals("don'tfeedthebears")
-                            || arg.equals("don'tfeedthebear")
-                            || arg.equals("bear")
-                            || arg.equals("bears")
-                            || arg.equals("dontfeedthebears")
-                            || arg.equals("dontfeedthebear")) {
-                        bears = true;
-                        break;
-                    }
+            public void windowClosing(WindowEvent we) {
+                String ObjButtons[] = {"Yes", "No"};
+                int PromptResult = JOptionPane.showOptionDialog(frame, "Are you sure you want to exit?", "Supervisor Toolkit", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, ObjButtons, ObjButtons[1]);
+                if (PromptResult == JOptionPane.YES_OPTION) {
+                    System.exit(0);
                 }
-                
-                frame = new JFrame("Supervisor Toolkit");
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.setSize(900, 600);
-                frame.setLocationByPlatform(true);
-                
-                try {
-                    String iconPath;
-                    if (bears) {
-                        iconPath = "img/bear.png";
-                    } else {
-                        iconPath = "img/icon.png";
-                    }
-                    InputStream iconStream = main.class.getResourceAsStream(iconPath);
-                    icon = ImageIO.read(iconStream);
-                    frame.setIconImage(icon);
-                } catch (IOException ex) {
-                    Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
-                frame.add(createContent(ReadOptions()), BorderLayout.CENTER);
-                frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-                frame.addWindowListener(new WindowAdapter() {
-                    
-                    @Override
-                    public void windowClosing(WindowEvent we) {
-                        String ObjButtons[] = {"Yes", "No"};
-                        int PromptResult = JOptionPane.showOptionDialog(frame, "Are you sure you want to exit?", "Supervisor Toolkit", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, ObjButtons, ObjButtons[1]);
-                        if (PromptResult == JOptionPane.YES_OPTION) {
-                            for (ExtendedWebBrowser webBrowser : webBrowsers) {
-                                webBrowser.executeJavascript("window.onbeforeunload = null");
-                            }
-                            System.exit(0);
-                        }
-                    }
-                });
-                
-                frame.setVisible(true);
-                
             }
         });
-        
-        NativeInterface.runEventPump();
-        
+
+        frame.setVisible(true);
+
     }
 
     static String[] ReadOptions() {
@@ -213,12 +206,16 @@ public class main {
     }
 
     public static void addTabWithOptions(JTabbedPane webBrowserPane, ExtendedWebBrowser webBrowser, String title) {
+
         int tabTitleEndPos = title.lastIndexOf("]");
         String[] parsedOptions = title.substring(tabTitleEndPos + 1).trim().split("-", -1);
         String tabTitle = title.substring(1, tabTitleEndPos);
+
         System.out.println("Constructing web browser in tab: " + tabTitle);
+
         webBrowser.setName(tabTitle);
         webBrowserPane.add(tabTitle, webBrowser);
+
         for (String parsedOption : parsedOptions) {
             if (parsedOption.contains("t:")) {
                 System.out.println("Adding a timer to " + tabTitle + " from options for " + parsedOption.substring(2).trim() + " minute(s)");
@@ -232,6 +229,7 @@ public class main {
                 webBrowser.enableMonitor();
             }
         }
+
     }
 
     public static void ModifyOptions(boolean removing, String prefix, String fullOption, ExtendedWebBrowser webBrowser) {

@@ -5,7 +5,6 @@
 package app.popup;
 
 import app.browser.ExtendedWebBrowser;
-import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JTabbedPane;
@@ -38,7 +37,7 @@ public class TabbedPaneMouseAdapter extends MouseAdapter {
     private void showMenu(MouseEvent e) {
         tabPaneParent.setSelectedIndex(index);
         TabPopupMenu menu = new TabPopupMenu((ExtendedWebBrowser) tabPaneParent.getComponentAt(index));
-        menu.setInvoker((JWebBrowser) tabPaneParent.getComponentAt(index));
+        menu.setInvoker((ExtendedWebBrowser) tabPaneParent.getComponentAt(index));
         menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
         menu.setVisible(true);
     }

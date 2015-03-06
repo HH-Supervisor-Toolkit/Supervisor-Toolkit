@@ -9,13 +9,12 @@ import app.backup.AutoBackupThread;
 import app.monitor.StatusMonitorThread;
 import app.timer.BrowserTimerThread;
 import app.watcher.AgentWatcherThread;
-import chrriis.dj.nativeswing.swtimpl.components.JWebBrowser;
 
 /**
  *
  * @author Sloan
  */
-public class ExtendedWebBrowser extends JWebBrowser {
+public class ExtendedWebBrowser extends JWebBrowserPanel {
 
     private boolean hasTimer = false;
     private boolean hasBackup = false;

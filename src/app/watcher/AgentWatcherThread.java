@@ -11,8 +11,8 @@ import app.main;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javax.swing.JDialog;
-import javax.swing.SwingUtilities;
 
 /**
  *
@@ -20,7 +20,7 @@ import javax.swing.SwingUtilities;
  */
 public class AgentWatcherThread extends Thread {
 
-    public final ArrayList<String> watchedAgents = new ArrayList<String>();
+    public final ArrayList<String> watchedAgents = new ArrayList<>();
     private final ExtendedWebBrowser webBrowser;
     private boolean running = true;
     private boolean hasActivated = false;
@@ -89,26 +89,22 @@ public class AgentWatcherThread extends Thread {
                 final Object syncObject = new Object();
 
                 try {
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            int TutorCount = ((Double) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows.length")).intValue();
-                            for (int i = 1; i < TutorCount; i++) {
-                                String tempName = (String) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].innerHTML");
-                                String listedName = tempName.substring(tempName.lastIndexOf("&nbsp;") + 6, tempName.length());
-                                if (watchedAgents.contains(listedName)) {
-                                    if (webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].onclick") != null) {
-                                        System.out.println("Watcher is activating to start listening to " + listedName);
-                                        hasActivated = true;
-                                        webBrowser.executeJavascript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].click()");
-                                        break;
-                                    }
+                    Platform.runLater(() -> {
+                        int TutorCount = ((Double) webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows.length")).intValue();
+                        for (int i = 1; i < TutorCount; i++) {
+                            String tempName = (String) webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].innerHTML");
+                            String listedName = tempName.substring(tempName.lastIndexOf("&nbsp;") + 6, tempName.length());
+                            if (watchedAgents.contains(listedName)) {
+                                if (webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].onclick") != null) {
+                                    System.out.println("Watcher is activating to start listening to " + listedName);
+                                    hasActivated = true;
+                                    webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].click()");
+                                    break;
                                 }
                             }
-                            synchronized (syncObject) {
-                                syncObject.notify();
-                            }
+                        }
+                        synchronized (syncObject) {
+                            syncObject.notify();
                         }
                     });
 
@@ -124,13 +120,13 @@ public class AgentWatcherThread extends Thread {
                     }
                 }
             }
-            
+
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(AgentWatcherThread.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
         }
         System.out.println("The watcher thread is shuting down.");
     }

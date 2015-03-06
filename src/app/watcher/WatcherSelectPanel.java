@@ -7,6 +7,8 @@ package app.watcher;
 
 import app.browser.ExtendedWebBrowser;
 import java.util.Arrays;
+import java.util.List;
+import javafx.application.Platform;
 import javax.swing.SwingUtilities;
 
 /**
@@ -20,26 +22,30 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
     /**
      * Creates new form WatcherSelectPanel
      *
-     * @param webBrowser1
+     * @param webBrowser
      */
-    public WatcherSelectPanel(ExtendedWebBrowser webBrowser1) {
-        webBrowser = webBrowser1;
+    public WatcherSelectPanel(ExtendedWebBrowser webBrowser) {
+
+        WatcherSelectPanel.webBrowser = webBrowser;
+
         initComponents();
-        int TutorCount = ((Double) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows.length")).intValue();
-        System.out.println("There are " + TutorCount + " tutors online right now. Loaded them into the watcher selection screen.");
-        String[] tutorNameList = new String[TutorCount - 1];
-        for (int i = 1; i < TutorCount; i++) {
-            String tempName = (String) webBrowser.executeJavascriptWithResult("return frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].innerHTML");
-            tutorNameList[i - 1] = tempName.substring(tempName.lastIndexOf("&nbsp;") + 6, tempName.length());
-        }
-        Arrays.sort(tutorNameList);
-        watchableList.setListData(tutorNameList);
-        if (webBrowser.isWatcherEnabled()) {
-            String[] watchedList = webBrowser.getWatched();
-            if (watchedList.length > 0) {
-                removeList.setListData(watchedList);
+        Platform.runLater(() -> {
+            int TutorCount = ((Integer) webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows.length"));
+            System.out.println("There are " + TutorCount + " tutors online right now. Loaded them into the watcher selection screen.");
+            String[] tutorNameList = new String[TutorCount - 1];
+            for (int i = 1; i < TutorCount; i++) {
+                String tempName = (String) webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].innerHTML");
+                tutorNameList[i - 1] = tempName.substring(tempName.lastIndexOf("&nbsp;") + 6, tempName.length());
             }
-        }
+            Arrays.sort(tutorNameList);
+            watchableList.setListData(tutorNameList);
+            if (webBrowser.isWatcherEnabled()) {
+                String[] watchedList = webBrowser.getWatched();
+                if (watchedList.length > 0) {
+                    removeList.setListData(watchedList);
+                }
+            }
+        });
     }
 
     /**
@@ -136,14 +142,20 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void selectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectButtonActionPerformed
-        Object[] watchAddList = watchableList.getSelectedValues();
-        int listSize = watchAddList.length;
+        List watchAddList = watchableList.getSelectedValuesList();
+
         if (!webBrowser.isWatcherEnabled()) {
+
             webBrowser.enableWatcher();
+
         }
-        for (int i = 0; i < listSize; i++) {
-            webBrowser.addWatched((String) watchAddList[i]);
+
+        for (Object watchAdd : watchAddList) {
+
+            webBrowser.addWatched((String) watchAdd);
+
         }
+
         SwingUtilities.getRoot(this).setVisible(false);
     }//GEN-LAST:event_selectButtonActionPerformed
 
@@ -153,12 +165,16 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
 
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
         if (webBrowser.isWatcherEnabled()) {
-            Object[] watchRemoveList = removeList.getSelectedValues();
-            int listSize = watchRemoveList.length;
-            for (int i = 0; i < listSize; i++) {
-                webBrowser.removeWatched((String) watchRemoveList[i]);
+            List watchRemoveList = removeList.getSelectedValuesList();
+
+            for (Object watchRemove : watchRemoveList) {
+
+                webBrowser.removeWatched((String) watchRemove);
+
             }
+
             SwingUtilities.getRoot(this).setVisible(false);
+
         }
     }//GEN-LAST:event_removeButtonActionPerformed
 

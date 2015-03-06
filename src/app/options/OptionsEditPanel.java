@@ -38,8 +38,6 @@ public class OptionsEditPanel extends javax.swing.JPanel {
             System.out.println("Options pane sucessfully filled");
         } catch (FileNotFoundException ex) {
             Logger.getLogger(OptionsEditPanel.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(OptionsEditPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

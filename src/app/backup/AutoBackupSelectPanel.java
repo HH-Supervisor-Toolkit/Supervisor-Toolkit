@@ -117,6 +117,11 @@ public class AutoBackupSelectPanel extends javax.swing.JPanel {
         } else {
             selectedFile = longTermFileList[fileSelectBox.getSelectedIndex()];
         }
+        
+        synchronized(backupFile){
+            backupFile.notify();
+        }
+        
         SwingUtilities.getRoot(this).setVisible(false);
     }//GEN-LAST:event_selectButtonActionPerformed
 

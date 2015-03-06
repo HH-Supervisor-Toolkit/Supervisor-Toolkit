@@ -7,6 +7,7 @@
 package app.timer;
 
 import app.browser.ExtendedWebBrowser;
+import javafx.application.Platform;
 import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
@@ -96,7 +97,13 @@ public class TimerWarningPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_okayButtonActionPerformed
 
     private void reloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadButtonActionPerformed
-        webBrowser.reloadPage();
+       
+        Platform.runLater(() -> {
+            
+            webBrowser.getEngine().reload();
+            
+        });
+        
         SwingUtilities.getRoot(this).setVisible(false);
     }//GEN-LAST:event_reloadButtonActionPerformed
 

@@ -6,12 +6,13 @@ package app.timer;
 
 import app.browser.ExtendedWebBrowser;
 import app.main;
-import chrriis.dj.nativeswing.swtimpl.components.WebBrowserAdapter;
-import chrriis.dj.nativeswing.swtimpl.components.WebBrowserEvent;
 import java.awt.BorderLayout;
 import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javax.swing.JDialog;
 
 /**
@@ -37,13 +38,17 @@ public class BrowserTimerThread extends Thread {
 
     @Override
     public void run() {
-        WebBrowserAdapter refreshAdapter = new WebBrowserAdapter() {
+        ChangeListener<String> refreshListener = new ChangeListener<String>() {
             @Override
-            public void titleChanged(WebBrowserEvent wbe) {
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
                 lastRefreshTime = Calendar.getInstance().getTimeInMillis();
             }
         };
-        webBrowser.addWebBrowserListener(refreshAdapter);
+        
+        Platform.runLater(() -> {
+            webBrowser.getEngine().locationProperty().addListener(refreshListener);
+        });
+        
         long timeDifference;
         TimerWarningPanel timerPanel = null;
         lastRefreshTime = Calendar.getInstance().getTimeInMillis();
@@ -55,7 +60,7 @@ public class BrowserTimerThread extends Thread {
                         timerPanel.updateMessage("Your timer for " + webBrowser.getName() + " is at " + limitDoublePercision((double) timeDifference / (60000), 2) + " of " + timerDuration + " minutes");
                         messageDialog.pack();
                     } else {
-                        messageDialog = new JDialog(main.frame,"Timer Warning");
+                        messageDialog = new JDialog(main.frame, "Timer Warning");
                         timerPanel = new TimerWarningPanel("Your timer for " + webBrowser.getName() + " is at " + limitDoublePercision((double) timeDifference / (60000), 2) + " of " + timerDuration + " minutes", webBrowser);
                         messageDialog.add(timerPanel, BorderLayout.CENTER);
                         messageDialog.setLocationRelativeTo(main.frame);
@@ -75,7 +80,11 @@ public class BrowserTimerThread extends Thread {
             }
 
         }
-        webBrowser.removeWebBrowserListener(refreshAdapter);
+        
+        Platform.runLater(() -> {
+            webBrowser.getEngine().locationProperty().addListener(refreshListener);
+        });
+        
     }
 
     public double limitDoublePercision(double d, int decimals) {
