@@ -10,8 +10,8 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.embed.swing.JFXPanel;
+import javafx.print.PrinterJob;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -57,6 +57,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         forwardButton = new javax.swing.JButton();
         refreshButton = new javax.swing.JButton();
         webViewContainer = new javax.swing.JPanel();
+        printButton = new javax.swing.JButton();
 
         backButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/img/backIcon.png"))); // NOI18N
         backButton.setBorder(null);
@@ -97,18 +98,33 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
 
         webViewContainer.setLayout(new java.awt.BorderLayout());
 
+        printButton.setForeground(new java.awt.Color(240, 240, 240));
+        printButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/img/printIcon.png"))); // NOI18N
+        printButton.setBorder(null);
+        printButton.setContentAreaFilled(false);
+        printButton.setMaximumSize(new java.awt.Dimension(20, 20));
+        printButton.setMinimumSize(new java.awt.Dimension(20, 20));
+        printButton.setPreferredSize(new java.awt.Dimension(20, 20));
+        printButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                printButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(webViewContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(backButton, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(forwardButton, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(refreshButton, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 636, Short.MAX_VALUE))
-            .addComponent(webViewContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(printButton, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 610, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -116,7 +132,8 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(forwardButton, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(backButton, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(refreshButton, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(refreshButton, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(printButton, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(webViewContainer, javax.swing.GroupLayout.DEFAULT_SIZE, 487, Short.MAX_VALUE))
         );
@@ -139,6 +156,18 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
             engine.executeScript("history.back()");
         });
     }//GEN-LAST:event_backButtonActionPerformed
+
+    private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
+
+        PrinterJob job = PrinterJob.createPrinterJob();
+
+        if (job.showPrintDialog(null)) {
+            System.out.println("Sending pring job to " + job.getPrinter().getName());
+            engine.print(job);
+            job.endJob();
+        }
+
+    }//GEN-LAST:event_printButtonActionPerformed
 
     private void createScene() {
         Platform.runLater(() -> {
@@ -173,13 +202,14 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         }
     }
 
-    public WebEngine getEngine(){
+    public WebEngine getEngine() {
         return engine;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton backButton;
     private javax.swing.JButton forwardButton;
+    private javax.swing.JButton printButton;
     private javax.swing.JButton refreshButton;
     private javax.swing.JPanel webViewContainer;
     // End of variables declaration//GEN-END:variables

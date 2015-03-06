@@ -38,32 +38,33 @@ public class TabPopupMenu extends JPopupMenu {
         this.webBrowser = webBrowser;
         Platform.runLater(() -> {
             synchronized (this.webBrowser) {
+                
                 if (webBrowser.isTimerEnabled()) {
                     timerItem = new JCheckBoxMenuItem("Disable timer");
                     timerItem.setSelected(true);
                 } else {
                     timerItem = new JCheckBoxMenuItem("Enable timer");
                 }
-                timerItem.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if (webBrowser.isTimerEnabled()) {
-                            main.ModifyOptions(true, "t:", null, webBrowser);
-                            webBrowser.removeBrowserTimer();
-                            System.out.println("A timer has been removed from " + webBrowser.getName());
-                        } else {
-                            int minutes = getTimerMinutes(webBrowser);
-                            if (minutes == -1) {
-                                return;
-                            }
-                            System.out.println("A " + minutes + " minute timer has been added to " + webBrowser.getName());
-                            main.ModifyOptions(false, null, "t:" + minutes, webBrowser);
-                            BrowserTimerThread timerListener = new BrowserTimerThread(minutes, webBrowser);
-                            webBrowser.addBrowserTimer(timerListener);
+                
+                timerItem.addActionListener((ActionEvent e) -> {
+                    if (webBrowser.isTimerEnabled()) {
+                        main.ModifyOptions(true, "t:", null, webBrowser);
+                        webBrowser.removeBrowserTimer();
+                        System.out.println("A timer has been removed from " + webBrowser.getName());
+                    } else {
+                        int minutes = getTimerMinutes(webBrowser);
+                        if (minutes == -1) {
+                            return;
                         }
+                        System.out.println("A " + minutes + " minute timer has been added to " + webBrowser.getName());
+                        main.ModifyOptions(false, null, "t:" + minutes, webBrowser);
+                        BrowserTimerThread timerListener = new BrowserTimerThread(minutes, webBrowser);
+                        webBrowser.addBrowserTimer(timerListener);
                     }
+                    
                 });
                 add(timerItem);
+                
                 if (webBrowser.isBackupEnabled() || webBrowser.getEngine().getLocation().equals(main.Default[1])) {
                     if (webBrowser.isBackupEnabled()) {
                         backupItem = new JCheckBoxMenuItem("Disable auto backup");
@@ -71,65 +72,54 @@ public class TabPopupMenu extends JPopupMenu {
                     } else {
                         backupItem = new JCheckBoxMenuItem("Enable auto backup");
                     }
-                    backupItem.addActionListener(new ActionListener() {
-
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            if (webBrowser.isBackupEnabled()) {
-                                main.ModifyOptions(true, "B", null, webBrowser);
-                                webBrowser.disableBackup();
-                                System.out.println("Auto backup has been disabled for " + webBrowser.getName());
-                            } else {
-                                main.ModifyOptions(false, null, "B", webBrowser);
-                                webBrowser.enableBackup();
-                                System.out.println("Auto backup has been enabled for " + webBrowser.getName());
-                            }
+                    backupItem.addActionListener((ActionEvent e) -> {
+                        if (webBrowser.isBackupEnabled()) {
+                            main.ModifyOptions(true, "B", null, webBrowser);
+                            webBrowser.disableBackup();
+                            System.out.println("Auto backup has been disabled for " + webBrowser.getName());
+                        } else {
+                            main.ModifyOptions(false, null, "B", webBrowser);
+                            webBrowser.enableBackup();
+                            System.out.println("Auto backup has been enabled for " + webBrowser.getName());
                         }
                     });
                     add(backupItem);
                 }
+                
                 if (webBrowser.isMonitorEnabled() || webBrowser.getEngine().getLocation().equals(main.Default[9])) {
                     monitorItem = new JCheckBoxMenuItem("Status Monitor");
                     if (webBrowser.isMonitorEnabled()) {
                         monitorItem.setSelected(true);
                     }
-                    monitorItem.addActionListener(new ActionListener() {
-
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            JDialog monitorDialog = new JDialog(main.frame, "Status Monitor");
-                            monitorDialog.add(new StatusMonitorOptionsPanel(webBrowser));
-                            monitorDialog.pack();
-                            monitorDialog.setLocationRelativeTo(main.frame);
-                            monitorDialog.setResizable(false);
-                            monitorDialog.setVisible(true);
-                        }
+                    monitorItem.addActionListener((ActionEvent e) -> {
+                        JDialog monitorDialog = new JDialog(main.frame, "Status Monitor");
+                        monitorDialog.add(new StatusMonitorOptionsPanel(webBrowser));
+                        monitorDialog.pack();
+                        monitorDialog.setLocationRelativeTo(main.frame);
+                        monitorDialog.setResizable(false);
+                        monitorDialog.setVisible(true);
                     });
                     add(monitorItem);
                 }
+                
                 if (webBrowser.isWatcherEnabled() || webBrowser.getEngine().getLocation().equals(main.Default[9])) {
                     watcherItem = new JMenuItem("Watcher");
-                    watcherItem.addActionListener(new ActionListener() {
-
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            JDialog watcherFrame = new JDialog(main.frame, "Watcher Select", ModalityType.APPLICATION_MODAL);
-                            watcherFrame.add(new WatcherSelectPanel(webBrowser));
-                            watcherFrame.pack();
-                            watcherFrame.setLocationRelativeTo(main.frame);
-                            watcherFrame.setVisible(true);
-                        }
+                    watcherItem.addActionListener((ActionEvent e) -> {
+                        JDialog watcherFrame = new JDialog(main.frame, "Watcher Select", ModalityType.APPLICATION_MODAL);
+                        watcherFrame.add(new WatcherSelectPanel(webBrowser));
+                        watcherFrame.pack();
+                        watcherFrame.setLocationRelativeTo(main.frame);
+                        watcherFrame.setVisible(true);
                     });
                     add(watcherItem);
                 }
+                
                 refreshItem = new JMenuItem("Refresh");
-                refreshItem.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        Platform.runLater(() -> {
-                            webBrowser.getEngine().reload();
-                        });
-                    }
+                
+                refreshItem.addActionListener((ActionEvent e) -> {
+                    Platform.runLater(() -> {
+                        webBrowser.getEngine().reload();
+                    });
                 });
                 add(refreshItem);
 

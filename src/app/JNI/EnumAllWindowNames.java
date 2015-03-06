@@ -33,41 +33,35 @@ public class EnumAllWindowNames {
     public static String[] getWindowTitles() {
 
         if (!loadedLibrary) {
-            
+
             System.out.println("cLib is not loaded. Loading it now.");
-            
+
             try {
                 copyJNILibrary();
                 loadedLibrary = true;
 
                 cls = cl.findClass("app.JNI.CLibrary");
                 ldl = (CLibraryInterface) cls.newInstance();
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InstantiationException ex) {
-                Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalAccessException ex) {
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
             }
 
         }
-        
+
         String[] names;
-        
+
         try {
             names = ldl.enumWindows();
         } catch (NullPointerException e) {
             System.out.println("An error occured while tring to enumWindows");
             names = null;
         }
-        
+
         return names;
 
     }
 
     private static void copyJNILibrary() {
-
-        OutputStream out = null;
         try {
             File dir = new File(System.getProperty("user.home") + "\\AppData\\Local\\Temp\\SuperToolkit");
 
@@ -77,7 +71,7 @@ public class EnumAllWindowNames {
 
             File fileOut = new File(System.getProperty("user.home") + "\\AppData\\Local\\Temp\\SuperToolkit\\cLib.dll");
             InputStream in = main.class.getResourceAsStream("/app/JNI/cLib.dll");
-            out = new FileOutputStream(fileOut);
+            FileOutputStream out = new FileOutputStream(fileOut);
 
             int i;
 
@@ -96,14 +90,6 @@ public class EnumAllWindowNames {
             Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-
-                out.close();
-
-            } catch (IOException ex) {
-                Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
 
     }
@@ -111,6 +97,7 @@ public class EnumAllWindowNames {
     private static class RemoveLibraryHook extends Thread {
 
         @Override
+        @SuppressWarnings("empty-statement")
         public void run() {
 
             ldl = null;
@@ -134,7 +121,7 @@ public class EnumAllWindowNames {
         /**
          * The HashMap where the classes will be cached
          */
-        private Map<String, Class<?>> classes = new HashMap<String, Class<?>>();
+        private Map<String, Class<?>> classes = new HashMap<>();
 
         @Override
         public String toString() {
@@ -164,13 +151,6 @@ public class EnumAllWindowNames {
             return c;
         }
 
-        /**
-         * Load the class file into byte array
-         *
-         * @param name The name of the class e.g. com.codeslices.test.TestClass}
-         * @return The class file as byte array
-         * @throws IOException
-         */
         private byte[] loadClassData(String name) throws IOException {
             BufferedInputStream in = new BufferedInputStream(
                     ClassLoader.getSystemResourceAsStream(name.replace(".", "/")

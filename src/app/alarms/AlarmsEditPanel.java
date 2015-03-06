@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.SwingUtilities;
 
 /**
  *
@@ -137,12 +136,7 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
 
     public AlarmsEditPanel() {
         initComponents();
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                loadAlarms();
-            }
-        });
+        loadAlarms();
     }
 
     /**

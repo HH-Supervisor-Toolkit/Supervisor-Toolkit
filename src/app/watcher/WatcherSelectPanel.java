@@ -150,11 +150,9 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
 
         }
 
-        for (Object watchAdd : watchAddList) {
-
+        watchAddList.stream().forEach((watchAdd) -> {
             webBrowser.addWatched((String) watchAdd);
-
-        }
+        });
 
         SwingUtilities.getRoot(this).setVisible(false);
     }//GEN-LAST:event_selectButtonActionPerformed
@@ -167,11 +165,9 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
         if (webBrowser.isWatcherEnabled()) {
             List watchRemoveList = removeList.getSelectedValuesList();
 
-            for (Object watchRemove : watchRemoveList) {
-
+            watchRemoveList.stream().forEach((watchRemove) -> {
                 webBrowser.removeWatched((String) watchRemove);
-
-            }
+            });
 
             SwingUtilities.getRoot(this).setVisible(false);
 

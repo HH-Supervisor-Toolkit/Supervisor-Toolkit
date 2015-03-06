@@ -6,7 +6,6 @@ package app.backup;
 
 import app.browser.ExtendedWebBrowser;
 import app.main;
-import java.awt.Dialog.ModalityType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -33,8 +32,6 @@ public class AutoBackupThread extends Thread {
     private boolean terminated = false;
     private final String newLine;
     private final String customSplitString;
-    private PrintWriter backupWriter;
-    private final Object syncObject = new Object();
     private final int maxBackups = 30;
 
     public AutoBackupThread(ExtendedWebBrowser ewb) {
@@ -130,10 +127,10 @@ public class AutoBackupThread extends Thread {
 
                                         }
                                     }
-                                    synchronized (syncObject) {
+                                    synchronized (newLine) {
 
                                         System.out.println("Giving notice that prompt has been responsed to.");
-                                        syncObject.notify();
+                                        newLine.notify();
 
                                     }
                                 }
@@ -145,10 +142,10 @@ public class AutoBackupThread extends Thread {
 
                 });
             });
-            synchronized (syncObject) {
+            synchronized (newLine) {
                 System.out.println("Waiting to start backup thread until response to prompt is given.");
                 Thread.sleep(30000);
-                syncObject.wait();
+                newLine.wait();
             }
             while (!terminated) {
                 saveBackup();
@@ -240,7 +237,7 @@ public class AutoBackupThread extends Thread {
                         backupEntries[12 + i] = webBrowser.getEngine().executeScript("document.getElementsByName(\"entry.1657790510\")[" + i + "].checked").toString();
                     }
                     backupEntries[14] = (String) webBrowser.getEngine().executeScript("document.getElementById(\"entry_398759739\").value");
-                    backupWriter = new PrintWriter(backupFile);
+                    PrintWriter backupWriter = new PrintWriter(backupFile);
                     for (String backupEntry : backupEntries) {
                         if (backupEntry == null) {
                             backupWriter.print("" + newLine + customSplitString + newLine);

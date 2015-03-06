@@ -19,9 +19,9 @@ import javax.swing.JPanel;
  */
 public class AlarmsAlertThread extends Thread {
 
-    public static ArrayList<Integer> timerHours = new ArrayList<Integer>();
-    public static ArrayList<Integer> timerMinutes = new ArrayList<Integer>();
-    public static ArrayList<String> timerNames = new ArrayList<String>();
+    public static ArrayList<Integer> timerHours = new ArrayList<>();
+    public static ArrayList<Integer> timerMinutes = new ArrayList<>();
+    public static ArrayList<String> timerNames = new ArrayList<>();
     JPanel parentPanel;
     boolean running = true;
 

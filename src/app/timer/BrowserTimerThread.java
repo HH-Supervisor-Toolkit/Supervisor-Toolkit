@@ -38,11 +38,9 @@ public class BrowserTimerThread extends Thread {
 
     @Override
     public void run() {
-        ChangeListener<String> refreshListener = new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                lastRefreshTime = Calendar.getInstance().getTimeInMillis();
-            }
+        
+        ChangeListener<String> refreshListener = (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            lastRefreshTime = Calendar.getInstance().getTimeInMillis();
         };
         
         Platform.runLater(() -> {
