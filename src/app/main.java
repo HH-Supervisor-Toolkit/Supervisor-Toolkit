@@ -45,7 +45,8 @@ public class main {
         "[Textbook Request Form]", "https://docs.google.com/forms/d/1wW0GEoEqkOlpTIPP__2kRSWbD1RskTBo4wtBaO738BM/viewform",
         "[Real-Time Agent] -S", "http://geomantce-cra.rose-hulman.edu:8080/ACEReport/",
         "[Phone Surveys] -t:30", "https://prod11gbss8.rose-hulman.edu/BanSS/rhit_hwhl.P_QuestionPage",
-        "[Attendance Page]", "http://askrose.org/askrose-login"
+        "[Attendance Page]", "http://askrose.org/askrose-login",
+        "[JotForms]", "http://www.jotform.com/login"
     };
 
     static ExtendedWebBrowser[] webBrowsers;
