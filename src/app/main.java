@@ -56,24 +56,34 @@ public class main {
 
     @SuppressWarnings("InfiniteRecursion")
     public static JComponent createContent(String[] address) {
+        
         webBrowsers = new ExtendedWebBrowser[address.length / 2];
         webBrowserPane = new JTabbedPane();
+        
         try {
+            
             for (int i = 1; i < address.length; i = i + 2) {
+                
                 webBrowsers[(i - 1) / 2] = new ExtendedWebBrowser();
                 System.out.println("Navagating to " + address[i]);
+                
                 webBrowsers[(i - 1) / 2].loadURL(address[i]);
                 addTabWithOptions(webBrowserPane, webBrowsers[(i - 1) / 2], address[i - 1]);
 
             }
+            
         } catch (StringIndexOutOfBoundsException ex1) {
+            
             RepairOptions();
             return createContent(ReadOptions());
+            
         }
+        
         optionsEdit = new OptionsEditPanel(false);
         webBrowserPane.addTab("Options", optionsEdit);
         webBrowserPane.addTab("Alarms", new AlarmsEditPanel());
         webBrowserPane.addMouseListener(new TabbedPaneMouseAdapter(webBrowserPane));
+        
         return webBrowserPane;
     }
 
@@ -235,13 +245,14 @@ public class main {
     public static void ModifyOptions(boolean removing, String prefix, String fullOption, ExtendedWebBrowser webBrowser) {
         int index = 0;
         int componentCount = webBrowserPane.getTabCount();
+        
         for (int i = 0; i < componentCount; i++) {
             if (webBrowserPane.getComponentAt(i).equals(webBrowser)) {
                 index = i;
                 break;
             }
         }
-        String[] optionsText = main.optionsEdit.getOptionsText();
+        String[] optionsText = optionsEdit.getOptionsText();
         if (removing) {
             System.out.println("Removing timer option switch from tab " + index);
             optionsText[index * 2] = optionsText[index * 2].replaceAll("-" + prefix + "[^-]*", "");
@@ -249,7 +260,7 @@ public class main {
             System.out.println("Adding timer option switch to tab " + index);
             optionsText[index * 2] = optionsText[index * 2].trim() + " -" + fullOption;
         }
-        main.optionsEdit.setOptionsText(optionsText);
-        main.writeOptions(optionsText);
+        optionsEdit.setOptionsText(optionsText);
+        writeOptions(optionsText);
     }
 }
