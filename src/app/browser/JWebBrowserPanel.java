@@ -162,9 +162,11 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         PrinterJob job = PrinterJob.createPrinterJob();
 
         if (job.showPrintDialog(null)) {
+            
             System.out.println("Sending pring job to " + job.getPrinter().getName());
             engine.print(job);
             job.endJob();
+            
         }
 
     }//GEN-LAST:event_printButtonActionPerformed
