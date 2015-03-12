@@ -5,16 +5,28 @@
  */
 package app.browser;
 
+import app.main;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker.State;
 import javafx.embed.swing.JFXPanel;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.event.EventHandler;
+import javafx.geometry.Rectangle2D;
 import javafx.print.PrinterJob;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.web.PopupFeatures;
 import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebErrorEvent;
+import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
+import javafx.stage.Stage;
 
 /**
  *
@@ -42,6 +54,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
             }
 
         }
+
     }
 
     /**
@@ -162,11 +175,11 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         PrinterJob job = PrinterJob.createPrinterJob();
 
         if (job.showPrintDialog(null)) {
-            
+
             System.out.println("Sending pring job to " + job.getPrinter().getName());
             engine.print(job);
             job.endJob();
-            
+
         }
 
     }//GEN-LAST:event_printButtonActionPerformed
@@ -176,6 +189,24 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
             synchronized (fxWebViewPanel) {
                 WebView view = new WebView();
                 engine = view.getEngine();
+
+                engine.setCreatePopupHandler((PopupFeatures param) -> {
+                    Stage stage = new Stage();
+                    WebView popupView = new WebView();
+
+                    popupView.getEngine().locationProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+                        if (newValue.startsWith("conf:sip")) {
+                            stage.close();
+                        }
+                    });
+
+                    stage.setScene(new Scene(popupView));
+                    stage.setTitle("Supervisor Toolkit Popup");
+                    stage.getIcons().add(SwingFXUtils.toFXImage(main.icon, null));
+                    stage.show();
+
+                    return popupView.getEngine();
+                });
 
                 fxWebViewPanel.setScene(new Scene(view));
                 fxWebViewPanel.notify();

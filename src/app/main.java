@@ -20,6 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -51,7 +52,7 @@ public class main {
 
     static ExtendedWebBrowser[] webBrowsers;
     public static JFrame frame;
-    static BufferedImage icon;
+    static public BufferedImage icon;
     static public OptionsEditPanel optionsEdit;
     static JTabbedPane webBrowserPane;
 
@@ -92,6 +93,16 @@ public class main {
     public static void main(final String[] args) {
 
         System.setProperty("https.protocols", "SSLv3,TLSv1");
+        
+        URL.setURLStreamHandlerFactory((String protocol) -> {
+            
+            if (protocol.equals("conf")) {
+                return new ConfURLHandlerClass();
+            } else {
+                return null;
+            }
+            
+        });
 
         boolean bears = false;
         for (String arg : args) {

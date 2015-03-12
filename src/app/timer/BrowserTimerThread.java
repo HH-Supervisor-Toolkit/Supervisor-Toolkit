@@ -38,15 +38,22 @@ public class BrowserTimerThread extends Thread {
 
     @Override
     public void run() {
-        
-        ChangeListener<String> refreshListener = (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-            lastRefreshTime = Calendar.getInstance().getTimeInMillis();
+
+        ChangeListener<Number> refreshListener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+
+            if (newValue.intValue() == 100) {
+
+                System.out.println("A timer has seen a change of page");
+                lastRefreshTime = Calendar.getInstance().getTimeInMillis();
+
+            }
+
         };
-        
+
         Platform.runLater(() -> {
-            webBrowser.getEngine().locationProperty().addListener(refreshListener);
+            webBrowser.getEngine().getLoadWorker().workDoneProperty().addListener(refreshListener);
         });
-        
+
         long timeDifference;
         TimerWarningPanel timerPanel = null;
         lastRefreshTime = Calendar.getInstance().getTimeInMillis();
@@ -78,11 +85,11 @@ public class BrowserTimerThread extends Thread {
             }
 
         }
-        
+
         Platform.runLater(() -> {
-            webBrowser.getEngine().locationProperty().addListener(refreshListener);
+            webBrowser.getEngine().getLoadWorker().workDoneProperty().addListener(refreshListener);
         });
-        
+
     }
 
     public double limitDoublePercision(double d, int decimals) {
