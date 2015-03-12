@@ -5,6 +5,7 @@
 package app;
 
 import app.alarms.AlarmsEditPanel;
+import app.browser.ConfURLHandlerClass;
 import app.browser.ExtendedWebBrowser;
 import app.popup.TabbedPaneMouseAdapter;
 import app.options.OptionsEditPanel;
