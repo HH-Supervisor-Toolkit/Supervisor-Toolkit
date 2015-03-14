@@ -6,6 +6,9 @@
 package app.browser;
 
 import app.main;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
@@ -20,12 +23,17 @@ import javafx.scene.web.PopupFeatures;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
 
 /**
  *
  * @author haywoosd
  */
 public class JWebBrowserPanel extends javax.swing.JPanel {
+
+    private final String[] fileSuffixes = {"doc", "docx", "rft", "txt", "pps",
+        "ppt", "pptx", "png", "bmp", "tif", "jpg", "xls", "xlsx", "7z", "rar", "zip"};
 
     private final JFXPanel fxWebViewPanel = new JFXPanel();
     private WebEngine engine;
@@ -41,9 +49,13 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
             webViewContainer.add(fxWebViewPanel);
 
             try {
+
                 fxWebViewPanel.wait();
+
             } catch (InterruptedException ex) {
+
                 Logger.getLogger(JWebBrowserPanel.class.getName()).log(Level.SEVERE, null, ex);
+
             }
 
         }
@@ -184,11 +196,23 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
                 engine = view.getEngine();
 
                 engine.setCreatePopupHandler((PopupFeatures param) -> {
+
                     Stage stage = new Stage();
                     WebView popupView = new WebView();
 
                     popupView.getEngine().locationProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
                         if (newValue.startsWith("conf:sip")) {
+                            stage.close();
+                        }
+                        if (contains(fileSuffixes, newValue.substring(newValue.lastIndexOf(".") + 1, newValue.length()))) {
+                            System.out.println("The browser has detected a file to download");
+
+                            downloadFile(newValue);
+                            
+                            Platform.runLater(() -> {
+                                popupView.getEngine().getLoadWorker().cancel();
+                            });
+
                             stage.close();
                         }
                     });
@@ -199,6 +223,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
                     stage.show();
 
                     return popupView.getEngine();
+
                 });
 
                 fxWebViewPanel.setScene(new Scene(view));
@@ -226,6 +251,34 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         } catch (MalformedURLException exception) {
             return null;
         }
+    }
+
+    private void downloadFile(String url) {
+        SwingUtilities.invokeLater(() -> {
+
+            JFileChooser chooser = new JFileChooser();
+            
+            chooser.setSelectedFile(new File(url.substring(url.lastIndexOf("/"))));
+            int dialogResult = chooser.showSaveDialog(main.frame);
+            
+            if(dialogResult == JFileChooser.APPROVE_OPTION){
+                BufferedInputStream inStream;
+                FileOutputStream outStream;
+                
+            }
+            
+        });
+    }
+
+    private boolean contains(String[] suffixList, String suffix) {
+
+        for (String suffixItem : suffixList) {
+            if (suffixItem.equals(suffix)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public WebEngine getEngine() {
