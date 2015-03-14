@@ -190,6 +190,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_printButtonActionPerformed
 
     private void createScene() {
+        
         Platform.runLater(() -> {
             synchronized (fxWebViewPanel) {
                 WebView view = new WebView();
@@ -230,7 +231,6 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
                 fxWebViewPanel.notify();
             }
         });
-
     }
 
     public void loadURL(final String url) {
