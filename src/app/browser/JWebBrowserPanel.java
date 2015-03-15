@@ -8,9 +8,13 @@ package app.browser;
 import app.main;
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
@@ -22,9 +26,9 @@ import javafx.scene.Scene;
 import javafx.scene.web.PopupFeatures;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-import javax.swing.JFileChooser;
-import javax.swing.SwingUtilities;
 
 /**
  *
@@ -190,7 +194,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_printButtonActionPerformed
 
     private void createScene() {
-        
+
         Platform.runLater(() -> {
             synchronized (fxWebViewPanel) {
                 WebView view = new WebView();
@@ -202,19 +206,15 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
                     WebView popupView = new WebView();
 
                     popupView.getEngine().locationProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+
                         if (newValue.startsWith("conf:sip")) {
                             stage.close();
-                        }
-                        if (contains(fileSuffixes, newValue.substring(newValue.lastIndexOf(".") + 1, newValue.length()))) {
+
+                        } else if (contains(fileSuffixes, newValue.substring(newValue.lastIndexOf(".") + 1)) && popupView.getEngine().getLoadWorker().getProgress() != -1) {
                             System.out.println("The browser has detected a file to download");
 
-                            downloadFile(newValue);
-                            
-                            Platform.runLater(() -> {
-                                popupView.getEngine().getLoadWorker().cancel();
-                            });
-
                             stage.close();
+                            downloadFile(newValue);
                         }
                     });
 
@@ -254,26 +254,50 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
     }
 
     private void downloadFile(String url) {
-        SwingUtilities.invokeLater(() -> {
+        try {
+            String fileName = URLDecoder.decode(url, "UTF-8").substring(url.lastIndexOf("/") + 1);
 
-            JFileChooser chooser = new JFileChooser();
-            
-            chooser.setSelectedFile(new File(url.substring(url.lastIndexOf("/"))));
-            int dialogResult = chooser.showSaveDialog(main.frame);
-            
-            if(dialogResult == JFileChooser.APPROVE_OPTION){
-                BufferedInputStream inStream;
-                FileOutputStream outStream;
-                
+            String fileType = url.substring(url.lastIndexOf(".") + 1);
+
+            FileChooser chooser = new FileChooser();
+            ExtensionFilter fileTypeFilter = new ExtensionFilter(fileType.toUpperCase(), "*." + fileType);
+
+            chooser.setTitle("Choose Save Location");
+            chooser.setInitialFileName(fileName);
+            chooser.getExtensionFilters().add(fileTypeFilter);
+
+            File saveResult = chooser.showSaveDialog(null);
+
+            if (saveResult != null) {
+
+                try (BufferedInputStream inStream = new BufferedInputStream(new URL(url).openStream());
+                        FileOutputStream outStream = new FileOutputStream(saveResult)) {
+
+                    byte data[] = new byte[1024];
+                    int count;
+
+                    while ((count = inStream.read(data, 0, 1024)) != -1) {
+                        outStream.write(data, 0, count);
+                    }
+
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(JWebBrowserPanel.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (MalformedURLException ex) {
+                    Logger.getLogger(JWebBrowserPanel.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(JWebBrowserPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             
-        });
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(JWebBrowserPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private boolean contains(String[] suffixList, String suffix) {
 
         for (String suffixItem : suffixList) {
-            if (suffixItem.equals(suffix)) {
+            if (suffixItem.equalsIgnoreCase(suffix)) {
                 return true;
             }
         }

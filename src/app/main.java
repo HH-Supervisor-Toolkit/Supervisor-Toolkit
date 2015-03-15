@@ -58,34 +58,34 @@ public class main {
 
     @SuppressWarnings("InfiniteRecursion")
     public static JComponent createContent(String[] address) {
-        
+
         webBrowsers = new ExtendedWebBrowser[address.length / 2];
         webBrowserPane = new JTabbedPane();
-        
+
         try {
-            
+
             for (int i = 1; i < address.length; i = i + 2) {
-                
+
                 webBrowsers[(i - 1) / 2] = new ExtendedWebBrowser();
                 System.out.println("Navagating to " + address[i]);
-                
+
                 webBrowsers[(i - 1) / 2].loadURL(address[i]);
                 addTabWithOptions(webBrowserPane, webBrowsers[(i - 1) / 2], address[i - 1]);
 
             }
-            
+
         } catch (StringIndexOutOfBoundsException ex1) {
-            
+
             RepairOptions();
             return createContent(ReadOptions());
-            
+
         }
-        
+
         optionsEdit = new OptionsEditPanel(false);
         webBrowserPane.addTab("Options", optionsEdit);
         webBrowserPane.addTab("Alarms", new AlarmsEditPanel());
         webBrowserPane.addMouseListener(new TabbedPaneMouseAdapter(webBrowserPane));
-        
+
         return webBrowserPane;
     }
 
@@ -93,15 +93,15 @@ public class main {
     public static void main(final String[] args) {
 
         System.setProperty("https.protocols", "SSLv3,TLSv1");
-        
+
         URL.setURLStreamHandlerFactory((String protocol) -> {
-            
+
             if (protocol.equals("conf")) {
                 return new ConfURLHandlerClass();
             } else {
                 return null;
             }
-            
+
         });
 
         boolean bears = false;
@@ -130,7 +130,6 @@ public class main {
 
         try {
             String iconPath;
-
             if (bears) {
                 iconPath = "img/bear.png";
             } else {
@@ -139,6 +138,7 @@ public class main {
 
             InputStream iconStream = main.class.getResourceAsStream(iconPath);
             icon = ImageIO.read(iconStream);
+
             frame.setIconImage(icon);
 
         } catch (IOException ex) {
@@ -147,12 +147,14 @@ public class main {
 
         frame.add(createContent(ReadOptions()), BorderLayout.CENTER);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        frame.addWindowListener(new WindowAdapter() {
 
+        frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent we) {
+
                 String ObjButtons[] = {"Yes", "No"};
                 int PromptResult = JOptionPane.showOptionDialog(frame, "Are you sure you want to exit?", "Supervisor Toolkit", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, ObjButtons, ObjButtons[1]);
+
                 if (PromptResult == JOptionPane.YES_OPTION) {
                     System.exit(0);
                 }
@@ -164,54 +166,49 @@ public class main {
     }
 
     static String[] ReadOptions() {
-        
+
         ArrayList<String> LineList = new ArrayList();
         String workingLine;
-        
+
         try {
-            
+
             System.out.println("Attempting to read options file");
             File optionsFile = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Options.txt");
-            
+
             if (!optionsFile.exists() || optionsFile.length() == 0) {
-                
+
                 System.out.println("Options file not found attemping to create default");
-                
+
                 if (!optionsFile.getParentFile().exists()) {
-                    
+
                     System.out.println("SuperToolkit directory not found attempting to create it");
                     optionsFile.getParentFile().mkdirs();
-                    
+
                 }
-                
+
                 optionsFile.createNewFile();
                 writeOptions(Default);
-                
+
             }
-            
+
             Scanner scan = new Scanner(optionsFile);
-            
+
             if (!scan.hasNext()) {
-                
                 RepairOptions();
                 return ReadOptions();
-                
             }
-            
+
             do {
-                
                 LineList.add(scan.nextLine());
-                
             } while (scan.hasNext());
-            
+
         } catch (FileNotFoundException ex) {
             Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return LineList.toArray(new String[1]);
-        
     }
 
     public static void infoBox(String infoMessage, String location) {
@@ -235,22 +232,22 @@ public class main {
     public static void RepairOptions() {
         System.out.println("Options file not formatted correctly. Opening repair window");
         infoBox("Options file is not formatted correctly please repair it manually.", "Bad Startup");
-        
+
         JDialog diag = new JDialog();
-        
+
         diag.setTitle("Options Manual Repair");
         diag.add(new OptionsEditPanel(true), BorderLayout.CENTER);
-        
+
         diag.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
-        
+
         diag.setSize(900, 600);
         diag.setLocationByPlatform(true);
-        
+
         diag.setIconImage(icon);
-        
+
         diag.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         diag.setVisible(true);
-        
+
         System.out.println("Options revision submitted");
     }
 
@@ -266,25 +263,25 @@ public class main {
         webBrowserPane.add(tabTitle, webBrowser);
 
         for (String parsedOption : parsedOptions) {
-            
+
             if (parsedOption.contains("t:")) {
-                
+
                 System.out.println("Adding a timer to " + tabTitle + " from options for " + parsedOption.substring(2).trim() + " minute(s)");
                 BrowserTimerThread browserTimer = new BrowserTimerThread(Integer.parseInt(parsedOption.substring(2).trim()), webBrowser);
                 webBrowser.addBrowserTimer(browserTimer);
-                
+
             } else if (parsedOption.contains("B")) {
-                
+
                 System.out.println("Enabling auto backup for " + tabTitle);
                 webBrowser.enableBackup();
-                
+
             } else if (parsedOption.contains("S")) {
-                
+
                 System.out.println("Enabling status monitor for " + tabTitle);
                 webBrowser.enableMonitor();
-                
+
             }
-            
+
         }
 
     }
@@ -292,32 +289,32 @@ public class main {
     public static void ModifyOptions(boolean removing, String prefix, String fullOption, ExtendedWebBrowser webBrowser) {
         int index = 0;
         int componentCount = webBrowserPane.getTabCount();
-        
+
         for (int i = 0; i < componentCount; i++) {
             if (webBrowserPane.getComponentAt(i).equals(webBrowser)) {
-                
+
                 index = i;
                 break;
-                
+
             }
         }
-        
+
         String[] optionsText = optionsEdit.getOptionsText();
-        
+
         if (removing) {
-            
+
             System.out.println("Removing timer option switch from tab " + index);
             optionsText[index * 2] = optionsText[index * 2].replaceAll("-" + prefix + "[^-]*", "");
-            
+
         } else {
-            
+
             System.out.println("Adding timer option switch to tab " + index);
             optionsText[index * 2] = optionsText[index * 2].trim() + " -" + fullOption;
-            
+
         }
-        
+
         optionsEdit.setOptionsText(optionsText);
         writeOptions(optionsText);
-        
+
     }
 }
