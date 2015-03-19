@@ -180,17 +180,16 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_backButtonActionPerformed
 
     private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
+        Platform.runLater(() -> {
+            PrinterJob job = PrinterJob.createPrinterJob();
+            
+            if (job.showPrintDialog(null)) {
+                System.out.println("Sending pring job to " + job.getPrinter().getName());
 
-        PrinterJob job = PrinterJob.createPrinterJob();
-
-        if (job.showPrintDialog(null)) {
-
-            System.out.println("Sending pring job to " + job.getPrinter().getName());
-            engine.print(job);
-            job.endJob();
-
-        }
-
+                engine.print(job);
+                job.endJob();
+            }
+        });
     }//GEN-LAST:event_printButtonActionPerformed
 
     private void createScene() {
@@ -288,7 +287,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
                     Logger.getLogger(JWebBrowserPanel.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            
+
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(JWebBrowserPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
