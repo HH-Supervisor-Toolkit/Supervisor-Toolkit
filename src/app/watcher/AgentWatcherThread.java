@@ -96,19 +96,19 @@ public class AgentWatcherThread extends Thread {
                         for (int i = 1; i < TutorCount; i++) {
                             String tempName = (String) webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].innerHTML");
                             String listedName = tempName.substring(tempName.lastIndexOf("&nbsp;") + 6, tempName.length());
-                            if (watchedAgents.contains(listedName)) {
-                                try {
-                                    webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].click()");
-                                    System.out.println("Watcher is activating to start listening to " + listedName);
-                                    hasActivated = true;
-                                    break;
-                                } catch (netscape.javascript.JSException e) {
-                                }
+                            if (watchedAgents.contains(listedName) && webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].onclick") != null) {
+                                
+                                webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].click()");
+                                System.out.println("Watcher is activating to start listening to " + listedName);
+                                hasActivated = true;
+                                break;
                             }
                         }
+                        
                         synchronized (syncObject) {
                             syncObject.notify();
                         }
+                        
                     });
 
                 } catch (NullPointerException e) {
