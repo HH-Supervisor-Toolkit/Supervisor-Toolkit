@@ -159,7 +159,7 @@ public class StatusMonitorThread extends Thread {
                         }
                     }
                     errorNoticeGiven = false;
-                } catch (NullPointerException | netscape.javascript.JSException e) {
+                } catch (netscape.javascript.JSException e) {
                     if (!errorNoticeGiven) {
                         System.out.println("Failed to get number of tutors for status monitor. Perhaps not on the right webpage?");
                         errorNoticeGiven = true;

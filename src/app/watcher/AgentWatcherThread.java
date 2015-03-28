@@ -76,49 +76,64 @@ public class AgentWatcherThread extends Thread {
                     boolean resumeWatcher = panel.getResult();
 
                     if (!resumeWatcher) {
+
                         watchedAgents.clear();
+
                         running = false;
                         hasActivated = false;
+
                         break;
                     } else {
+
                         hasActivated = false;
+
                     }
 
                 }
 
                 final Object syncObject = new Object();
 
-                try {
-                    Platform.runLater(() -> {
+                Platform.runLater(() -> {
 
+                    try {
                         int TutorCount = ((Integer) webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows.length"));
 
                         for (int i = 1; i < TutorCount; i++) {
                             String tempName = (String) webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].innerHTML");
+
                             String listedName = tempName.substring(tempName.lastIndexOf("&nbsp;") + 6, tempName.length());
+
                             if (watchedAgents.contains(listedName) && webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].onclick") != null) {
-                                
+
                                 webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].click()");
                                 System.out.println("Watcher is activating to start listening to " + listedName);
                                 hasActivated = true;
+
                                 break;
                             }
                         }
-                        
+
+                    } catch (netscape.javascript.JSException e) {
+
+                        System.out.println("The tab with the watcher has left the real-time agent page. The watcher thread will now shutdown.");
+                        running = false;
+
+                    } finally {
+
                         synchronized (syncObject) {
                             syncObject.notify();
                         }
-                        
-                    });
+                    }
 
-                } catch (NullPointerException e) {
-                    System.out.println("The tab with the watcher has left the real-time agent page. The watcher thread will now shutdown.");
-                    running = false;
-                }
+                });
+
                 synchronized (syncObject) {
+
                     try {
+
                         syncObject.wait();
                     } catch (InterruptedException ex) {
+
                         Logger.getLogger(AgentWatcherThread.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
@@ -135,11 +150,16 @@ public class AgentWatcherThread extends Thread {
     }
 
     public void addWatchedAgent(String watch) {
+
         if (!watchedAgents.contains(watch)) {
+
             watchedAgents.add(watch);
             System.out.println("Adding " + watch + " to the watcher thread.");
+
         } else {
+
             System.out.println(watch + " is already being watched. He/She will not be added to the watch thread.");
+
         }
     }
 
