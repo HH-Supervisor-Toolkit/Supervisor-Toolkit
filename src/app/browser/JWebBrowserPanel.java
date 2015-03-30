@@ -180,16 +180,21 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_backButtonActionPerformed
 
     private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
-        Platform.runLater(() -> {
-            PrinterJob job = PrinterJob.createPrinterJob();
+        new Thread() {
             
-            if (job.showPrintDialog(null)) {
-                System.out.println("Sending pring job to " + job.getPrinter().getName());
+            @Override
+            public void run() {
+                PrinterJob job = PrinterJob.createPrinterJob();
 
-                engine.print(job);
-                job.endJob();
+                if (job.showPrintDialog(null)) {
+                    System.out.println("Sending pring job to " + job.getPrinter().getName());
+
+                    engine.print(job);
+                    job.endJob();
+                }
             }
-        });
+            
+        }.start();
     }//GEN-LAST:event_printButtonActionPerformed
 
     private void createScene() {
@@ -253,6 +258,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
     }
 
     private void downloadFile(String url) {
+        
         try {
             String fileName = URLDecoder.decode(url, "UTF-8").substring(url.lastIndexOf("/") + 1);
 

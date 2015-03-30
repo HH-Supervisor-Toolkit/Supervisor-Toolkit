@@ -83,6 +83,7 @@ public class AgentWatcherThread extends Thread {
                         hasActivated = false;
 
                         break;
+
                     } else {
 
                         hasActivated = false;
@@ -107,6 +108,7 @@ public class AgentWatcherThread extends Thread {
 
                                 webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].click()");
                                 System.out.println("Watcher is activating to start listening to " + listedName);
+                                
                                 hasActivated = true;
 
                                 break;
@@ -123,6 +125,7 @@ public class AgentWatcherThread extends Thread {
                         synchronized (syncObject) {
                             syncObject.notify();
                         }
+                        
                     }
 
                 });
@@ -164,16 +167,22 @@ public class AgentWatcherThread extends Thread {
     }
 
     public void removeWatchedAgent(String watch) {
+        
         int arrayLength = watchedAgents.size();
+        
         for (int i = 0; i < arrayLength; i++) {
+            
             if (watchedAgents.get(i).equals(watch)) {
                 watchedAgents.remove(i);
                 break;
             }
+            
         }
+        
         if (watchedAgents.isEmpty()) {
             running = false;
         }
+        
     }
 
     public String[] getWatched() {
