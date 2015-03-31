@@ -9,6 +9,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.concurrent.CountDownLatch;
 import javax.swing.SwingUtilities;
 
 /**
@@ -24,8 +25,10 @@ public class AutoBackupSelectPanel extends javax.swing.JPanel {
     private File selectedFile;
     private final File backupFile;
     private final File[] longTermFileList;
+    private final CountDownLatch latch;
 
-    public AutoBackupSelectPanel(File backupFile, File longTermBackups) {
+    public AutoBackupSelectPanel(File backupFile, File longTermBackups, CountDownLatch latch) {
+        this.latch = latch;
         this.backupFile = backupFile;
         longTermFileList = longTermBackups.listFiles();
 
@@ -118,9 +121,7 @@ public class AutoBackupSelectPanel extends javax.swing.JPanel {
             selectedFile = longTermFileList[fileSelectBox.getSelectedIndex()];
         }
         
-        synchronized(backupFile){
-            backupFile.notify();
-        }
+        latch.countDown();
         
         SwingUtilities.getRoot(this).setVisible(false);
     }//GEN-LAST:event_selectButtonActionPerformed

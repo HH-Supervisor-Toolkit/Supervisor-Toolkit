@@ -9,6 +9,7 @@ import app.JNI.EnumAllWindowNames;
 import app.browser.ExtendedWebBrowser;
 import app.main;
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
@@ -49,12 +50,12 @@ public class AgentWatcherThread extends Thread {
 
                 if (hasActivated) {
 
-                    final Object syncObject = new Object();
+                    final CountDownLatch latch = new CountDownLatch(1);
 
                     System.out.println("Asking user if he/she wants to resume the watcher");
 
                     JDialog diag = new JDialog(main.frame);
-                    AgentWatcherResumePanel panel = new AgentWatcherResumePanel(syncObject);
+                    AgentWatcherResumePanel panel = new AgentWatcherResumePanel(latch);
                     diag.add(panel);
                     diag.setTitle("Resume Watcher?");
                     diag.pack();
@@ -65,12 +66,10 @@ public class AgentWatcherThread extends Thread {
                     diag.setAlwaysOnTop(true);
                     diag.setAlwaysOnTop(false);
 
-                    synchronized (syncObject) {
-                        try {
-                            syncObject.wait();
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(AgentWatcherThread.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+                    try {
+                        latch.await();
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(AgentWatcherThread.class.getName()).log(Level.SEVERE, null, ex);
                     }
 
                     boolean resumeWatcher = panel.getResult();
@@ -92,14 +91,15 @@ public class AgentWatcherThread extends Thread {
 
                 }
 
-                final Object syncObject = new Object();
+                final CountDownLatch latch = new CountDownLatch(1);
 
                 Platform.runLater(() -> {
-
                     try {
+
                         int TutorCount = ((Integer) webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows.length"));
 
                         for (int i = 1; i < TutorCount; i++) {
+
                             String tempName = (String) webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].innerHTML");
 
                             String listedName = tempName.substring(tempName.lastIndexOf("&nbsp;") + 6, tempName.length());
@@ -108,7 +108,7 @@ public class AgentWatcherThread extends Thread {
 
                                 webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].children[2].click()");
                                 System.out.println("Watcher is activating to start listening to " + listedName);
-                                
+
                                 hasActivated = true;
 
                                 break;
@@ -122,24 +122,18 @@ public class AgentWatcherThread extends Thread {
 
                     } finally {
 
-                        synchronized (syncObject) {
-                            syncObject.notify();
-                        }
-                        
+                        latch.countDown();
+
                     }
 
                 });
 
-                synchronized (syncObject) {
-
-                    try {
-
-                        syncObject.wait();
-                    } catch (InterruptedException ex) {
-
-                        Logger.getLogger(AgentWatcherThread.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                try {
+                    latch.await();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(AgentWatcherThread.class.getName()).log(Level.SEVERE, null, ex);
                 }
+
             }
 
             try {
@@ -167,22 +161,22 @@ public class AgentWatcherThread extends Thread {
     }
 
     public void removeWatchedAgent(String watch) {
-        
+
         int arrayLength = watchedAgents.size();
-        
+
         for (int i = 0; i < arrayLength; i++) {
-            
+
             if (watchedAgents.get(i).equals(watch)) {
                 watchedAgents.remove(i);
                 break;
             }
-            
+
         }
-        
+
         if (watchedAgents.isEmpty()) {
             running = false;
         }
-        
+
     }
 
     public String[] getWatched() {

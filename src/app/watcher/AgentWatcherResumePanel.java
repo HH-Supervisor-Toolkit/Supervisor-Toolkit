@@ -5,6 +5,7 @@
  */
 package app.watcher;
 
+import java.util.concurrent.CountDownLatch;
 import javax.swing.SwingUtilities;
 
 /**
@@ -14,14 +15,14 @@ import javax.swing.SwingUtilities;
 public class AgentWatcherResumePanel extends javax.swing.JPanel {
 
     boolean returnValue;
-    private final Object syncObject;
+    private final CountDownLatch latch;
     
     /**
      * Creates new form AgentWatcherResumePanel
-     * @param syncObject
+     * @param latch
      */
-    public AgentWatcherResumePanel(Object syncObject) {
-        this.syncObject = syncObject;
+    public AgentWatcherResumePanel(CountDownLatch latch) {
+        this.latch = latch;
         initComponents();
     }
     
@@ -102,9 +103,7 @@ public class AgentWatcherResumePanel extends javax.swing.JPanel {
     private void yesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yesButtonActionPerformed
         returnValue = true;
         
-        synchronized(syncObject){
-            syncObject.notify();
-        }
+        latch.countDown();
         
         SwingUtilities.getRoot(this).setVisible(false);
     }//GEN-LAST:event_yesButtonActionPerformed
@@ -112,9 +111,7 @@ public class AgentWatcherResumePanel extends javax.swing.JPanel {
     private void noButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_noButtonActionPerformed
         returnValue = false;
         
-        synchronized(syncObject){
-            syncObject.notify();
-        }
+        latch.countDown();
         
         SwingUtilities.getRoot(this).setVisible(false);
     }//GEN-LAST:event_noButtonActionPerformed

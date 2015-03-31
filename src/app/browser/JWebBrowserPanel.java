@@ -15,6 +15,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
@@ -46,21 +47,20 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
      * Creates new form JWebBrowserPanel
      */
     public JWebBrowserPanel() {
-        synchronized (fxWebViewPanel) {
 
-            createScene();
-            initComponents();
-            webViewContainer.add(fxWebViewPanel);
+        CountDownLatch latch = new CountDownLatch(1);
 
-            try {
+        createScene(latch);
+        initComponents();
+        webViewContainer.add(fxWebViewPanel);
 
-                fxWebViewPanel.wait();
+        try {
 
-            } catch (InterruptedException ex) {
+            latch.await();
 
-                Logger.getLogger(JWebBrowserPanel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
 
-            }
+            Logger.getLogger(JWebBrowserPanel.class.getName()).log(Level.SEVERE, null, ex);
 
         }
 
@@ -181,7 +181,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
 
     private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
         new Thread() {
-            
+
             @Override
             public void run() {
                 PrinterJob job = PrinterJob.createPrinterJob();
@@ -193,47 +193,46 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
                     job.endJob();
                 }
             }
-            
+
         }.start();
     }//GEN-LAST:event_printButtonActionPerformed
 
-    private void createScene() {
+    private void createScene(CountDownLatch latch) {
 
         Platform.runLater(() -> {
-            synchronized (fxWebViewPanel) {
-                WebView view = new WebView();
-                engine = view.getEngine();
+            WebView view = new WebView();
+            engine = view.getEngine();
 
-                engine.setCreatePopupHandler((PopupFeatures param) -> {
+            engine.setCreatePopupHandler((PopupFeatures param) -> {
 
-                    Stage stage = new Stage();
-                    WebView popupView = new WebView();
+                Stage stage = new Stage();
+                WebView popupView = new WebView();
 
-                    popupView.getEngine().locationProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+                popupView.getEngine().locationProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
 
-                        if (newValue.startsWith("conf:sip")) {
-                            stage.close();
+                    if (newValue.startsWith("conf:sip")) {
+                        stage.close();
 
-                        } else if (contains(fileSuffixes, newValue.substring(newValue.lastIndexOf(".") + 1)) && popupView.getEngine().getLoadWorker().getProgress() != -1) {
-                            System.out.println("The browser has detected a file to download");
+                    } else if (contains(fileSuffixes, newValue.substring(newValue.lastIndexOf(".") + 1)) && popupView.getEngine().getLoadWorker().getProgress() != -1) {
+                        System.out.println("The browser has detected a file to download");
 
-                            stage.close();
-                            downloadFile(newValue);
-                        }
-                    });
-
-                    stage.setScene(new Scene(popupView));
-                    stage.setTitle("Supervisor Toolkit Popup");
-                    stage.getIcons().add(SwingFXUtils.toFXImage(main.icon, null));
-                    stage.show();
-
-                    return popupView.getEngine();
-
+                        stage.close();
+                        downloadFile(newValue);
+                    }
                 });
 
-                fxWebViewPanel.setScene(new Scene(view));
-                fxWebViewPanel.notify();
-            }
+                stage.setScene(new Scene(popupView));
+                stage.setTitle("Supervisor Toolkit Popup");
+                stage.getIcons().add(SwingFXUtils.toFXImage(main.icon, null));
+                stage.show();
+
+                return popupView.getEngine();
+
+            });
+
+            fxWebViewPanel.setScene(new Scene(view));
+            latch.countDown();
+
         });
     }
 
@@ -258,7 +257,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
     }
 
     private void downloadFile(String url) {
-        
+
         try {
             String fileName = URLDecoder.decode(url, "UTF-8").substring(url.lastIndexOf("/") + 1);
 

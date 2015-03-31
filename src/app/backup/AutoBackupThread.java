@@ -12,6 +12,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
@@ -67,6 +68,9 @@ public class AutoBackupThread extends Thread {
     @Override
     public void run() {
         try {
+
+            CountDownLatch latch = new CountDownLatch(1);
+
             Platform.runLater(() -> {
                 webBrowser.getEngine().getLoadWorker().workDoneProperty().addListener(new ChangeListener<Number>() {
 
@@ -75,7 +79,7 @@ public class AutoBackupThread extends Thread {
 
                         if (newValue.intValue() == 100) {
 
-                            Thread syncRelease = new Thread() {
+                             new Thread() {
                                 @Override
                                 public void run() {
                                     if ((backupFile.exists() || longTermBackups.list().length > 0) && webBrowser.getEngine().getLocation().equals(main.Default[1])) {
@@ -85,68 +89,65 @@ public class AutoBackupThread extends Thread {
 
                                         if (choice == JOptionPane.YES_OPTION) {
 
+                                            CountDownLatch latch = new CountDownLatch(1);
                                             JDialog diag = new JDialog(main.frame, "Select Backup");
-                                            AutoBackupSelectPanel selectPanel = new AutoBackupSelectPanel(backupFile, longTermBackups);
+                                            AutoBackupSelectPanel selectPanel = new AutoBackupSelectPanel(backupFile, longTermBackups, latch);
                                             diag.add(selectPanel);
                                             diag.pack();
                                             diag.setLocationRelativeTo(main.frame);
                                             diag.setResizable(false);
                                             diag.setVisible(true);
 
-                                            synchronized (backupFile) {
-                                                
-                                                try {
-                                                    backupFile.wait();
-                                                } catch (InterruptedException ex) {
-                                                    Logger.getLogger(AutoBackupThread.class.getName()).log(Level.SEVERE, null, ex);
-                                                }
+                                            try {
+                                                latch.await();
+                                            } catch (InterruptedException ex) {
+                                                Logger.getLogger(AutoBackupThread.class.getName()).log(Level.SEVERE, null, ex);
+                                            }
 
-                                                if (selectPanel.getSelectedFile() == null) {
+                                            if (selectPanel.getSelectedFile() == null) {
 
-                                                    storeLatestBackup();
+                                                storeLatestBackup();
+
+                                            } else {
+
+                                                if (backupFile.equals(selectPanel.getSelectedFile())) {
+
+                                                    System.out.println("Loading latest backup.");
+                                                    loadBackup(getFileStringContent(selectPanel.getSelectedFile()));
 
                                                 } else {
 
-                                                    if (backupFile.equals(selectPanel.getSelectedFile())) {
+                                                    System.out.println("Loading old backup. Will store latest backup if possible.");
+                                                    loadBackup(getFileStringContent(selectPanel.getSelectedFile()));
+                                                    storeLatestBackup();
 
-                                                        System.out.println("Loading latest backup.");
-                                                        loadBackup(getFileStringContent(selectPanel.getSelectedFile()));
-
-                                                    } else {
-
-                                                        System.out.println("Loading old backup. Will store latest backup if possible.");
-                                                        loadBackup(getFileStringContent(selectPanel.getSelectedFile()));
-                                                        storeLatestBackup();
-
-                                                    }
                                                 }
                                             }
+
                                         } else {
 
                                             storeLatestBackup();
 
                                         }
                                     }
-                                    synchronized (newLine) {
 
-                                        System.out.println("Giving notice that prompt has been responsed to.");
-                                        newLine.notify();
+                                    System.out.println("Giving notice that prompt has been responsed to.");
+                                    latch.countDown();
 
-                                    }
                                 }
-                            };
+                            }.start();
+                             
                             webBrowser.getEngine().getLoadWorker().workDoneProperty().removeListener(this);
-                            syncRelease.start();
                         }
                     }
 
                 });
             });
-            synchronized (newLine) {
-                System.out.println("Waiting to start backup thread until response to prompt is given.");
-                Thread.sleep(30000);
-                newLine.wait();
-            }
+
+            System.out.println("Waiting to start backup thread until response to prompt is given.");
+            Thread.sleep(30000);
+            latch.await();
+
             while (!terminated) {
                 saveBackup();
                 Thread.sleep(30000);
