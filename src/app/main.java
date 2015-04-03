@@ -32,6 +32,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 
 /**
@@ -61,7 +62,7 @@ public class main {
 
         webBrowsers = new ExtendedWebBrowser[address.length / 2];
         webBrowserPane = new JTabbedPane();
-
+        
         try {
 
             for (int i = 1; i < address.length; i = i + 2) {
@@ -89,7 +90,6 @@ public class main {
         return webBrowserPane;
     }
 
-    /* Standard main method to try that test as a standalone application. */
     public static void main(final String[] args) {
 
         System.setProperty("https.protocols", "SSLv3,TLSv1");
@@ -118,7 +118,12 @@ public class main {
         }
 
         try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
             Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
         }
