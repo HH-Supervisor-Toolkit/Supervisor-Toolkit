@@ -62,7 +62,7 @@ public class main {
 
         webBrowsers = new ExtendedWebBrowser[address.length / 2];
         webBrowserPane = new JTabbedPane();
-        
+
         try {
 
             for (int i = 1; i < address.length; i = i + 2) {
@@ -118,14 +118,13 @@ public class main {
         }
 
         try {
-            for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
+            
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+            
             Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
+            
         }
 
         frame = new JFrame("Supervisor Toolkit");
