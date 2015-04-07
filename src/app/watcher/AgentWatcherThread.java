@@ -55,30 +55,30 @@ public class AgentWatcherThread extends Thread {
                     System.out.println("Asking user if he/she wants to resume the watcher");
 
                     JDialog diag = new JDialog(main.frame);
-                    
+
                     AgentWatcherResumePanel panel = new AgentWatcherResumePanel(latch);
                     diag.add(panel);
-                    
+
                     diag.setTitle("Resume Watcher?");
                     diag.pack();
-                    
+
                     diag.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
                     diag.setResizable(false);
-                    
+
                     diag.setLocationRelativeTo(main.frame);
                     diag.setVisible(true);
-                    
+
                     diag.setAlwaysOnTop(true);
                     diag.setAlwaysOnTop(false);
 
                     try {
-                        
+
                         latch.await();
-                        
+
                     } catch (InterruptedException ex) {
-                        
+
                         Logger.getLogger(AgentWatcherThread.class.getName()).log(Level.SEVERE, null, ex);
-                        
+
                     }
 
                     boolean resumeWatcher = panel.getResult();
@@ -189,6 +189,6 @@ public class AgentWatcherThread extends Thread {
     }
 
     public String[] getWatched() {
-        return watchedAgents.toArray(new String[0]);
+        return (String[]) watchedAgents.toArray();
     }
 }

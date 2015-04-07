@@ -21,8 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.nio.file.Files;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -32,7 +31,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 
 /**
@@ -118,13 +116,13 @@ public class main {
         }
 
         try {
-            
+
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            
+
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-            
+
             Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
-            
+
         }
 
         frame = new JFrame("Supervisor Toolkit");
@@ -171,9 +169,6 @@ public class main {
 
     static String[] ReadOptions() {
 
-        ArrayList<String> LineList = new ArrayList();
-        String workingLine;
-
         try {
 
             System.out.println("Attempting to read options file");
@@ -195,16 +190,7 @@ public class main {
 
             }
 
-            Scanner scan = new Scanner(optionsFile);
-
-            if (!scan.hasNext()) {
-                RepairOptions();
-                return ReadOptions();
-            }
-
-            do {
-                LineList.add(scan.nextLine());
-            } while (scan.hasNext());
+            return (String[]) Files.readAllLines(optionsFile.toPath()).toArray();
 
         } catch (FileNotFoundException ex) {
             Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
@@ -212,7 +198,8 @@ public class main {
             Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        return LineList.toArray(new String[0]);
+        RepairOptions();
+        return ReadOptions();
     }
 
     public static void infoBox(String infoMessage, String location) {
