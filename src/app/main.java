@@ -212,7 +212,7 @@ public class main {
             Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        return LineList.toArray(new String[1]);
+        return LineList.toArray(new String[0]);
     }
 
     public static void infoBox(String infoMessage, String location) {
