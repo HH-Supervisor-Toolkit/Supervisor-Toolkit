@@ -115,6 +115,8 @@ public class EnumAllWindowNames {
 
             while (!file.delete());
             while (!dir.delete());
+            
+            System.out.println("Loaded cLib.dll and containing folder have been deleted");
 
         }
 
