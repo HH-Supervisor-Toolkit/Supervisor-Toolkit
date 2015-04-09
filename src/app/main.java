@@ -190,7 +190,7 @@ public class main {
 
             }
 
-            return (String[]) Files.readAllLines(optionsFile.toPath()).toArray();
+            return Files.readAllLines(optionsFile.toPath()).toArray(new String[0]);
 
         } catch (FileNotFoundException ex) {
             Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);

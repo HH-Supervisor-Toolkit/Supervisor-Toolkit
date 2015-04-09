@@ -189,6 +189,6 @@ public class AgentWatcherThread extends Thread {
     }
 
     public String[] getWatched() {
-        return (String[]) watchedAgents.toArray();
+        return watchedAgents.toArray(new String[0]);
     }
 }

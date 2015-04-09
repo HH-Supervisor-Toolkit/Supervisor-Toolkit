@@ -36,15 +36,17 @@ public class EnumAllWindowNames {
             System.out.println("cLib is not loaded. Loading it now.");
 
             try {
-                
+
                 copyJNILibrary();
                 loadedLibrary = true;
 
                 cls = cl.findClass("app.JNI.CLibrary");
                 ldl = (CLibraryInterface) cls.newInstance();
-                
+
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+                
                 Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
+                
             }
 
         }
@@ -52,14 +54,14 @@ public class EnumAllWindowNames {
         String[] names;
 
         try {
-            
+
             names = ldl.enumWindows();
-            
+
         } catch (NullPointerException e) {
-            
+
             System.out.println("An error occured while tring to enumWindows");
             names = null;
-            
+
         }
 
         return names;
@@ -69,9 +71,9 @@ public class EnumAllWindowNames {
     private static void copyJNILibrary() {
         try {
             File fileOut = new File(System.getProperty("user.home") + "\\AppData\\Local\\Temp\\SuperToolkit\\cLib.dll");
-            
+
             fileOut.getParentFile().mkdirs();
-            
+
             InputStream in = main.class.getResourceAsStream("/app/JNI/cLib.dll");
             FileOutputStream out = new FileOutputStream(fileOut);
 

@@ -9,12 +9,12 @@ package app.JNI;
  *
  * @author Sloan
  */
-public class CLibrary implements CLibraryInterface{
+public class CLibrary implements CLibraryInterface {
 
     static {
         System.load(System.getProperty("user.home") + "\\AppData\\Local\\Temp\\SuperToolkit\\cLib.dll");
     }
-    
+
     @Override
     public native String[] enumWindows();
 
