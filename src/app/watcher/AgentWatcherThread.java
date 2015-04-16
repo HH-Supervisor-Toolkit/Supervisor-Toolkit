@@ -32,21 +32,10 @@ public class AgentWatcherThread extends Thread {
 
     @Override
     public void run() {
+
         while (running) {
 
-            boolean inCall = false;
-            String[] windowNames = EnumAllWindowNames.getWindowTitles();
-
-            if (windowNames != null) {
-                for (String name : windowNames) {
-                    if (name.contains("[CE]")) {
-                        inCall = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!inCall) {
+            if (!inCall()) {
 
                 if (hasActivated) {
 
@@ -95,6 +84,10 @@ public class AgentWatcherThread extends Thread {
                     } else {
 
                         hasActivated = false;
+
+                        if (inCall()) {
+                            continue;
+                        }
 
                     }
 
@@ -190,5 +183,20 @@ public class AgentWatcherThread extends Thread {
 
     public String[] getWatched() {
         return watchedAgents.toArray(new String[0]);
+    }
+
+    private boolean inCall() {
+        String[] windowNames = EnumAllWindowNames.getWindowTitles();
+
+        if (windowNames != null) {
+
+            for (String name : windowNames) {
+
+                if (name.contains("[CE]")) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
