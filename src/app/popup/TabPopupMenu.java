@@ -6,18 +6,15 @@ package app.popup;
 
 import app.browser.ExtendedWebBrowser;
 import app.main;
-import app.monitor.StatusMonitorOptionsPanel;
+import app.monitor.StatusMonitorOptionsDialog;
 import app.timer.BrowserTimerThread;
-import app.watcher.WatcherSelectPanel;
-import java.awt.Dialog.ModalityType;
+import app.watcher.WatcherSelectDialog;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -91,29 +88,29 @@ public class TabPopupMenu extends JPopupMenu {
 
             if (webBrowser.isMonitorEnabled() || webBrowser.getEngine().getLocation().equals(main.Default[9])) {
                 monitorItem = new JCheckBoxMenuItem("Status Monitor");
+                
                 if (webBrowser.isMonitorEnabled()) {
                     monitorItem.setSelected(true);
                 }
+                
                 monitorItem.addActionListener((ActionEvent e) -> {
-                    JDialog monitorDialog = new JDialog(main.frame, "Status Monitor");
-                    monitorDialog.add(new StatusMonitorOptionsPanel(webBrowser));
-                    monitorDialog.pack();
+                    StatusMonitorOptionsDialog monitorDialog = new StatusMonitorOptionsDialog(main.frame, false, webBrowser);
                     monitorDialog.setLocationRelativeTo(main.frame);
-                    monitorDialog.setResizable(false);
                     monitorDialog.setVisible(true);
                 });
+                
                 add(monitorItem);
             }
 
             if (webBrowser.isWatcherEnabled() || webBrowser.getEngine().getLocation().equals(main.Default[9])) {
                 watcherItem = new JMenuItem("Watcher");
+                
                 watcherItem.addActionListener((ActionEvent e) -> {
-                    JDialog watcherFrame = new JDialog(main.frame, "Watcher Select", ModalityType.APPLICATION_MODAL);
-                    watcherFrame.add(new WatcherSelectPanel(webBrowser));
-                    watcherFrame.pack();
-                    watcherFrame.setLocationRelativeTo(main.frame);
-                    watcherFrame.setVisible(true);
+                    WatcherSelectDialog watcherDialog = new WatcherSelectDialog(main.frame, true, webBrowser);
+                    watcherDialog.setLocationRelativeTo(main.frame);
+                    watcherDialog.setVisible(true);
                 });
+                
                 add(watcherItem);
             }
 

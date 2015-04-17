@@ -1,29 +1,26 @@
 /*
- * To change this template, choose Tools | Templates
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 package app.alarms;
-
-import javax.swing.SwingUtilities;
 
 /**
  *
  * @author haywoosd
  */
-public class AlarmAlertPanel extends javax.swing.JPanel {
+public class AlarmAlertDialog extends javax.swing.JDialog {
+
     String messageText;
     int entryNumber;
     
-    /**
-     * Creates new form AlarmAlertFrame
-     * @param alarmName
-     * @param number
-     */
-    public AlarmAlertPanel(String alarmName, int number) {
+    public AlarmAlertDialog(java.awt.Frame parent, boolean modal, String alarmName, int number) {
+        super(parent, modal);
+        
         messageText = alarmName;
         entryNumber = number;
-        initComponents();
         
+        initComponents();
     }
 
     /**
@@ -43,6 +40,10 @@ public class AlarmAlertPanel extends javax.swing.JPanel {
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Alarm Warning");
+        setResizable(false);
 
         endButton.setText("End Alarm");
         endButton.addActionListener(new java.awt.event.ActionListener() {
@@ -115,8 +116,8 @@ public class AlarmAlertPanel extends javax.swing.JPanel {
                 .addGap(0, 0, 0))
         );
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
@@ -135,35 +136,38 @@ public class AlarmAlertPanel extends javax.swing.JPanel {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void endButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_endButtonActionPerformed
+        setVisible(false);
+    }//GEN-LAST:event_endButtonActionPerformed
+
     private void postponeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_postponeButtonActionPerformed
-        
+
         AlarmsAlertThread.timerMinutes.set(entryNumber, AlarmsAlertThread.timerMinutes.get(entryNumber) + Integer.parseInt(postponeSelect.getSelectedItem().toString()));
-        
+
         if (AlarmsAlertThread.timerMinutes.get(entryNumber) > 59){
-            
+
             int hoursIncrease;
             hoursIncrease = AlarmsAlertThread.timerMinutes.get(entryNumber)/60;
             AlarmsAlertThread.timerHours.set(entryNumber, AlarmsAlertThread.timerHours.get(entryNumber) + hoursIncrease);
-            
-                if (AlarmsAlertThread.timerHours.get(entryNumber) > 23){
-                    int modTimeAdjust;
-                    modTimeAdjust = AlarmsAlertThread.timerHours.get(entryNumber)/24;
-                    AlarmsAlertThread.timerHours.set(entryNumber, AlarmsAlertThread.timerHours.get(entryNumber) - 24*modTimeAdjust);
-                }
-                
+
+            if (AlarmsAlertThread.timerHours.get(entryNumber) > 23){
+                int modTimeAdjust;
+                modTimeAdjust = AlarmsAlertThread.timerHours.get(entryNumber)/24;
+                AlarmsAlertThread.timerHours.set(entryNumber, AlarmsAlertThread.timerHours.get(entryNumber) - 24*modTimeAdjust);
+            }
+
             AlarmsAlertThread.timerMinutes.set(entryNumber, AlarmsAlertThread.timerMinutes.get(entryNumber) - 60*hoursIncrease);
         }
-        
+
         System.out.println("New time for alarm is: " + AlarmsAlertThread.timerHours.get(entryNumber) + ":" + AlarmsAlertThread.timerMinutes.get(entryNumber));
-        
-        SwingUtilities.getRoot(this).setVisible(false);
+
+        setVisible(false);
     }//GEN-LAST:event_postponeButtonActionPerformed
 
-    private void endButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_endButtonActionPerformed
-        SwingUtilities.getRoot(this).setVisible(false);
-    }//GEN-LAST:event_endButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton endButton;

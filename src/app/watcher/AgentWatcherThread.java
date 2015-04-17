@@ -42,23 +42,17 @@ public class AgentWatcherThread extends Thread {
                     final CountDownLatch latch = new CountDownLatch(1);
 
                     System.out.println("Asking user if he/she wants to resume the watcher");
+                    
+                    AgentWatcherResumeDialog resumeDialog = new AgentWatcherResumeDialog(main.frame, false, latch);
 
-                    JDialog diag = new JDialog(main.frame);
 
-                    AgentWatcherResumePanel panel = new AgentWatcherResumePanel(latch);
-                    diag.add(panel);
+                    resumeDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
-                    diag.setTitle("Resume Watcher?");
-                    diag.pack();
+                    resumeDialog.setLocationRelativeTo(main.frame);
+                    resumeDialog.setVisible(true);
 
-                    diag.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-                    diag.setResizable(false);
-
-                    diag.setLocationRelativeTo(main.frame);
-                    diag.setVisible(true);
-
-                    diag.setAlwaysOnTop(true);
-                    diag.setAlwaysOnTop(false);
+                    resumeDialog.setAlwaysOnTop(true);
+                    resumeDialog.setAlwaysOnTop(false);
 
                     try {
 
@@ -70,7 +64,7 @@ public class AgentWatcherThread extends Thread {
 
                     }
 
-                    boolean resumeWatcher = panel.getResult();
+                    boolean resumeWatcher = resumeDialog.getResult();
 
                     if (!resumeWatcher) {
 

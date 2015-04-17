@@ -9,38 +9,41 @@ import app.browser.ExtendedWebBrowser;
 import java.util.Arrays;
 import java.util.List;
 import javafx.application.Platform;
-import javax.swing.SwingUtilities;
 
 /**
  *
  * @author haywoosd
  */
-public class WatcherSelectPanel extends javax.swing.JPanel {
+public class WatcherSelectDialog extends javax.swing.JDialog {
 
     private static ExtendedWebBrowser webBrowser;
-
-    /**
-     * Creates new form WatcherSelectPanel
-     *
-     * @param webBrowser
-     */
-    public WatcherSelectPanel(ExtendedWebBrowser webBrowser) {
-
-        WatcherSelectPanel.webBrowser = webBrowser;
-
+    
+    public WatcherSelectDialog(java.awt.Frame parent, boolean modal, ExtendedWebBrowser webBrowser) {
+        super(parent, modal);
         initComponents();
+        
+        WatcherSelectDialog.webBrowser = webBrowser;
+        
         Platform.runLater(() -> {
+            
             int TutorCount = ((Integer) webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows.length"));
+            
             System.out.println("There are " + TutorCount + " tutors online right now. Loaded them into the watcher selection screen.");
+            
             String[] tutorNameList = new String[TutorCount - 1];
+            
             for (int i = 1; i < TutorCount; i++) {
                 String tempName = (String) webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].innerHTML");
                 tutorNameList[i - 1] = tempName.substring(tempName.lastIndexOf("&nbsp;") + 6, tempName.length());
             }
+            
             Arrays.sort(tutorNameList);
             watchableList.setListData(tutorNameList);
+            
             if (webBrowser.isWatcherEnabled()) {
+                
                 String[] watchedList = webBrowser.getWatched();
+                
                 if (watchedList.length > 0) {
                     removeList.setListData(watchedList);
                 }
@@ -66,6 +69,10 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
         selectButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
         removeButton = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Watcher Select");
+        setResizable(false);
 
         jLabel1.setText("Who would you like to add a watcher for?");
 
@@ -96,8 +103,8 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
             }
         });
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
@@ -139,6 +146,8 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
                     .addComponent(removeButton))
                 .addContainerGap())
         );
+
+        pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void selectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectButtonActionPerformed
@@ -154,11 +163,11 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
             webBrowser.addWatched((String) watchAdd);
         });
 
-        SwingUtilities.getRoot(this).setVisible(false);
+        setVisible(false);
     }//GEN-LAST:event_selectButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
-        SwingUtilities.getRoot(this).setVisible(false);
+        setVisible(false);
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
@@ -169,11 +178,10 @@ public class WatcherSelectPanel extends javax.swing.JPanel {
                 webBrowser.removeWatched((String) watchRemove);
             });
 
-            SwingUtilities.getRoot(this).setVisible(false);
+            setVisible(false);
 
         }
     }//GEN-LAST:event_removeButtonActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;

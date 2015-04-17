@@ -3,36 +3,27 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package app.timer;
 
 import app.browser.ExtendedWebBrowser;
 import javafx.application.Platform;
-import javax.swing.JDialog;
-import javax.swing.SwingUtilities;
 
 /**
  *
- * @author Sloan
+ * @author haywoosd
  */
-public class TimerWarningPanel extends javax.swing.JPanel {
-    
-    ExtendedWebBrowser webBrowser;
-    JDialog dialog;
+public class TimerWarningDialog extends javax.swing.JDialog {
 
-    /**
-     * Creates new form TimerWarningPanel
-     * @param message
-     * @param ewb
-     */
-    public TimerWarningPanel(String message, ExtendedWebBrowser ewb) {
-        initComponents();
-        webBrowser = ewb;
-        messageLabel.setText(message);
-    }
+    ExtendedWebBrowser webBrowser;
+    String messageString;
     
-    public void updateMessage(String newMessage){
-        messageLabel.setText(newMessage);
+    public TimerWarningDialog(java.awt.Frame parent, boolean modal, String message, ExtendedWebBrowser ewb) {
+        super(parent, modal);
+                
+        webBrowser = ewb;
+        messageString = message;
+        
+        initComponents();
     }
 
     /**
@@ -48,7 +39,11 @@ public class TimerWarningPanel extends javax.swing.JPanel {
         okayButton = new javax.swing.JButton();
         reloadButton = new javax.swing.JButton();
 
-        messageLabel.setText("Test Text");
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Timer Warning");
+        setResizable(false);
+
+        messageLabel.setText(messageString);
 
         okayButton.setText("Okay");
         okayButton.addActionListener(new java.awt.event.ActionListener() {
@@ -64,19 +59,18 @@ public class TimerWarningPanel extends javax.swing.JPanel {
             }
         });
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(okayButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(reloadButton)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(messageLabel)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(okayButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(reloadButton))
+                    .addComponent(messageLabel))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -90,24 +84,29 @@ public class TimerWarningPanel extends javax.swing.JPanel {
                     .addComponent(reloadButton))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void okayButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okayButtonActionPerformed
-        SwingUtilities.getRoot(this).setVisible(false);
+        setVisible(false);
     }//GEN-LAST:event_okayButtonActionPerformed
 
     private void reloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadButtonActionPerformed
-       
+
         Platform.runLater(() -> {
-            
+
             webBrowser.getEngine().reload();
-            
+
         });
-        
-        SwingUtilities.getRoot(this).setVisible(false);
+
+        setVisible(false);
     }//GEN-LAST:event_reloadButtonActionPerformed
 
-
+    public void updateMessage(String newMessage){
+        messageLabel.setText(newMessage);
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel messageLabel;
     private javax.swing.JButton okayButton;

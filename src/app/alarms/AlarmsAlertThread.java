@@ -5,12 +5,10 @@
 package app.alarms;
 
 import app.main;
-import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 /**
@@ -31,12 +29,8 @@ public class AlarmsAlertThread extends Thread {
             for (int i = 0; i < timerHours.size(); i++) {
                 if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == timerHours.get(i)) {
                     if (Calendar.getInstance().get(Calendar.MINUTE) == timerMinutes.get(i)) {
-                        final JDialog messageDialog = new JDialog(main.frame, "Alarm Warning");
-                        AlarmAlertPanel messagePanel = new AlarmAlertPanel(timerNames.get(i), i);
-                        messageDialog.add(messagePanel, BorderLayout.CENTER);
-                        messageDialog.pack();
+                        AlarmAlertDialog messageDialog = new AlarmAlertDialog(main.frame, false, timerNames.get(i), i);
                         messageDialog.setLocationRelativeTo(main.frame);
-                        messageDialog.setResizable(false);
                         messageDialog.setVisible(true);
                         messageDialog.setAlwaysOnTop(true);
                         messageDialog.setAlwaysOnTop(false);

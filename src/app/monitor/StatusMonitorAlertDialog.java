@@ -11,25 +11,24 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.SwingUtilities;
 
 /**
  *
  * @author haywoosd
  */
-public class StatusMonitorAlertPanel extends javax.swing.JPanel {
+public class StatusMonitorAlertDialog extends javax.swing.JDialog {
 
-    /**
-     * Creates new form StatusMonitorAlertPanel
-     */
     String labelText;
     String name;
     ExtendedWebBrowser webBrowser;
-
-    public StatusMonitorAlertPanel(String name, String mode, ExtendedWebBrowser webBrowser) {
+    
+    public StatusMonitorAlertDialog(java.awt.Frame parent, boolean modal, String name, String mode, ExtendedWebBrowser webBrowser) {
+        super(parent, modal);
+        
         this.webBrowser = webBrowser;
         this.name = name;
         labelText = "User " + name + " has been on " + mode + " too long.";
+        
         initComponents();
     }
 
@@ -45,6 +44,9 @@ public class StatusMonitorAlertPanel extends javax.swing.JPanel {
         addSupervisorButton = new javax.swing.JButton();
         dismissButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Status Monitor");
 
         addSupervisorButton.setText("Add Supervisor");
         addSupervisorButton.setDefaultCapable(false);
@@ -65,8 +67,8 @@ public class StatusMonitorAlertPanel extends javax.swing.JPanel {
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel1.setText(labelText);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
@@ -90,6 +92,8 @@ public class StatusMonitorAlertPanel extends javax.swing.JPanel {
                     .addComponent(dismissButton))
                 .addContainerGap())
         );
+
+        pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void addSupervisorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addSupervisorButtonActionPerformed
@@ -100,15 +104,14 @@ public class StatusMonitorAlertPanel extends javax.swing.JPanel {
             write.close();
             webBrowser.updateMonitor();
         } catch (IOException ex) {
-            Logger.getLogger(StatusMonitorAlertPanel.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(StatusMonitorAlertDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
-        SwingUtilities.getRoot(this).setVisible(false);
+        setVisible(false);
     }//GEN-LAST:event_addSupervisorButtonActionPerformed
 
     private void dismissButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dismissButtonActionPerformed
-        SwingUtilities.getRoot(this).setVisible(false);
+        setVisible(false);
     }//GEN-LAST:event_dismissButtonActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addSupervisorButton;

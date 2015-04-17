@@ -15,7 +15,6 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
-import javax.swing.JDialog;
 
 /**
  *
@@ -66,7 +65,7 @@ public class StatusMonitorThread extends Thread {
                 }
                 
             } catch (FileNotFoundException ex) {
-                Logger.getLogger(StatusMonitorOptionsPanel.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(StatusMonitorThread.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
             try (PrintWriter write = new PrintWriter(file)) {
@@ -99,14 +98,13 @@ public class StatusMonitorThread extends Thread {
 
     private void giveAlert(String name, String mode) {
         System.out.println("Giving status alert for " + name + " for " + mode);
-        JDialog diag = new JDialog(main.frame, "Status Monitor");
-        diag.add(new StatusMonitorAlertPanel(name, mode, webBrowser));
-        diag.pack();
-        diag.setLocationRelativeTo(main.frame);
-        diag.setResizable(false);
-        diag.setVisible(true);
-        diag.setAlwaysOnTop(true);
-        diag.setAlwaysOnTop(false);
+        
+        StatusMonitorAlertDialog statusAlertDialog = new StatusMonitorAlertDialog(main.frame, false, name, mode, webBrowser);
+        statusAlertDialog.setLocationRelativeTo(main.frame);
+        statusAlertDialog.setVisible(true);
+        statusAlertDialog.setAlwaysOnTop(true);
+        statusAlertDialog.setAlwaysOnTop(false);
+        
         alertedUsers.add(name);
         alertedModes.add(mode);
     }
@@ -159,13 +157,16 @@ public class StatusMonitorThread extends Thread {
                         }
                     }
                     errorNoticeGiven = false;
+                    
                 } catch (netscape.javascript.JSException e) {
                     if (!errorNoticeGiven) {
                         System.out.println("Failed to get number of tutors for status monitor. Perhaps not on the right webpage?");
                         errorNoticeGiven = true;
                     }
                 }
+                
             });
+            
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException ex) {

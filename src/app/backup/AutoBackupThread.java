@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 /**
@@ -31,18 +30,20 @@ public class AutoBackupThread extends Thread {
     private final File longTermBackups;
     private final ExtendedWebBrowser webBrowser;
     private boolean terminated = false;
-    private final String newLine;
-    private final String customSplitString;
+    private final String newLine = System.getProperty("line.separator");
+    private final String customSplitString = "!!split!!";
     private final int maxBackups = 30;
+    public static final String[] emptyBackupStrings = {"", "", "2015", "", "", "", "", "", "false", "false", "false", "false", "false", "false", ""};
 
     public AutoBackupThread(ExtendedWebBrowser ewb) {
-        newLine = System.getProperty("line.separator");
-        customSplitString = "!!split!!";
+        
         backupFile = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Backup_Log.txt");
         longTermBackups = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Backups_Old");
+        
         if (!longTermBackups.isDirectory()) {
             longTermBackups.mkdir();
         }
+        
         webBrowser = ewb;
     }
 
@@ -79,7 +80,7 @@ public class AutoBackupThread extends Thread {
 
                         if (newValue.intValue() == 100) {
 
-                             new Thread() {
+                            new Thread() {
                                 @Override
                                 public void run() {
                                     if ((backupFile.exists() || longTermBackups.list().length > 0) && webBrowser.getEngine().getLocation().equals(main.Default[1])) {
@@ -90,13 +91,9 @@ public class AutoBackupThread extends Thread {
                                         if (choice == JOptionPane.YES_OPTION) {
 
                                             CountDownLatch latch = new CountDownLatch(1);
-                                            JDialog diag = new JDialog(main.frame, "Select Backup");
-                                            AutoBackupSelectPanel selectPanel = new AutoBackupSelectPanel(backupFile, longTermBackups, latch);
-                                            diag.add(selectPanel);
-                                            diag.pack();
-                                            diag.setLocationRelativeTo(main.frame);
-                                            diag.setResizable(false);
-                                            diag.setVisible(true);
+                                            AutoBackupSelectDialog selectDialog = new AutoBackupSelectDialog(main.frame, false, backupFile, longTermBackups, latch);
+                                            selectDialog.setLocationRelativeTo(main.frame);
+                                            selectDialog.setVisible(true);
 
                                             try {
                                                 latch.await();
@@ -104,21 +101,21 @@ public class AutoBackupThread extends Thread {
                                                 Logger.getLogger(AutoBackupThread.class.getName()).log(Level.SEVERE, null, ex);
                                             }
 
-                                            if (selectPanel.getSelectedFile() == null) {
+                                            if (selectDialog.getSelectedFile() == null) {
 
                                                 storeLatestBackup();
 
                                             } else {
 
-                                                if (backupFile.equals(selectPanel.getSelectedFile())) {
+                                                if (backupFile.equals(selectDialog.getSelectedFile())) {
 
                                                     System.out.println("Loading latest backup.");
-                                                    loadBackup(getFileStringContent(selectPanel.getSelectedFile()));
+                                                    loadBackup(getFileStringContent(selectDialog.getSelectedFile()));
 
                                                 } else {
 
                                                     System.out.println("Loading old backup. Will store latest backup if possible.");
-                                                    loadBackup(getFileStringContent(selectPanel.getSelectedFile()));
+                                                    loadBackup(getFileStringContent(selectDialog.getSelectedFile()));
                                                     storeLatestBackup();
 
                                                 }
@@ -136,7 +133,7 @@ public class AutoBackupThread extends Thread {
 
                                 }
                             }.start();
-                             
+
                             webBrowser.getEngine().getLoadWorker().workDoneProperty().removeListener(this);
                         }
                     }
@@ -217,7 +214,7 @@ public class AutoBackupThread extends Thread {
     private void saveBackup() {
         Platform.runLater(() -> {
             if (webBrowser.getEngine().getLocation().equals(main.Default[1])) {
-                System.out.println("Saving a backup of the Nightly log");
+
                 try {
                     String[] backupEntries = new String[15];
                     backupEntries[0] = (String) webBrowser.getEngine().executeScript("document.getElementById(\"entry.50106969_month\").value");
@@ -238,17 +235,25 @@ public class AutoBackupThread extends Thread {
                         backupEntries[12 + i] = webBrowser.getEngine().executeScript("document.getElementsByName(\"entry.1657790510\")[" + i + "].checked").toString();
                     }
                     backupEntries[14] = (String) webBrowser.getEngine().executeScript("document.getElementById(\"entry_398759739\").value");
-                    PrintWriter backupWriter = new PrintWriter(backupFile);
-                    for (String backupEntry : backupEntries) {
-                        if (backupEntry == null) {
-                            backupWriter.print("" + newLine + customSplitString + newLine);
-                        } else {
-                            backupWriter.print(backupEntry.replace("\n", newLine) + newLine + customSplitString + newLine);
+
+                    if (!Arrays.equals(backupEntries, emptyBackupStrings)) {
+
+                        System.out.println("Saving a backup of the Nightly log");
+
+                        try (PrintWriter backupWriter = new PrintWriter(backupFile)) {
+
+                            for (String backupEntry : backupEntries) {
+
+                                if (backupEntry == null) {
+                                    backupWriter.print("" + newLine + customSplitString + newLine);
+                                } else {
+                                    backupWriter.print(backupEntry.replace("\n", newLine) + newLine + customSplitString + newLine);
+                                }
+                            }
+                        } catch (FileNotFoundException ex) {
+                            Logger.getLogger(AutoBackupThread.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
-                    backupWriter.close();
-                } catch (FileNotFoundException ex) {
-                    Logger.getLogger(AutoBackupThread.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (NullPointerException ex) {
                     System.out.println("Failed to aquire data from nightly log site. Perhaps the page isn't loaded correctly");
                 }

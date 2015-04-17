@@ -13,22 +13,20 @@ import java.io.PrintWriter;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.SwingUtilities;
 
 /**
  *
  * @author haywoosd
  */
-public class StatusMonitorOptionsPanel extends javax.swing.JPanel {
+public class StatusMonitorOptionsDialog extends javax.swing.JDialog {
 
-    /**
-     * Creates new form StatusMonitorOptionsPanel
-     */
     String disableButtonText;
     String enableButtonText;
     ExtendedWebBrowser webBrowser;
-
-    public StatusMonitorOptionsPanel(ExtendedWebBrowser webBrowser1) {
+    
+    public StatusMonitorOptionsDialog(java.awt.Frame parent, boolean modal, ExtendedWebBrowser webBrowser1) {
+        super(parent, modal);
+        
         webBrowser = webBrowser1;
         if (webBrowser1.isMonitorEnabled()) {
             disableButtonText = "Disable";
@@ -37,53 +35,12 @@ public class StatusMonitorOptionsPanel extends javax.swing.JPanel {
             disableButtonText = "Cancel";
             enableButtonText = "Enable";
         }
+        
         initComponents();
+        
         loadSettings();
     }
 
-    private void saveSettings() {
-        File file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Monitor_Settings.txt");
-        try {
-            PrintWriter write = new PrintWriter(file);
-            write.println(ACWMinutes.getText() + ":" + ACWSeconds.getText());
-            write.println(AUXMinutes.getText() + ":" + AUXSeconds.getText());
-            write.println(WrapupMinutes.getText() + ":" + WrapupSeconds.getText());
-            for (String name : SupervisorsList.getText().split("\n")) {
-                write.println(name);
-            }
-            write.close();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(StatusMonitorOptionsPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    private void loadSettings() {
-        File file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Monitor_Settings.txt");
-        if (file.exists()) {
-            try {
-                Scanner read = new Scanner(file);
-                String temp = read.nextLine();
-                String tempArray[] = temp.split(":");
-                ACWMinutes.setText(tempArray[0]);
-                ACWSeconds.setText(tempArray[1]);
-                temp = read.nextLine();
-                tempArray = temp.split(":");
-                AUXMinutes.setText(tempArray[0]);
-                AUXSeconds.setText(tempArray[1]);
-                temp = read.nextLine();
-                tempArray = temp.split(":");
-                WrapupMinutes.setText(tempArray[0]);
-                WrapupSeconds.setText(tempArray[1]);
-                while (read.hasNextLine()) {
-                    SupervisorsList.append(read.nextLine() + "\n");
-                }
-
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(StatusMonitorOptionsPanel.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
-    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -115,6 +72,11 @@ public class StatusMonitorOptionsPanel extends javax.swing.JPanel {
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         SupervisorsList = new javax.swing.JTextArea();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Status Monitor");
+        setPreferredSize(new java.awt.Dimension(359, 229));
+        setResizable(false);
 
         disableButton.setText(disableButtonText);
         disableButton.addActionListener(new java.awt.event.ActionListener() {
@@ -249,8 +211,8 @@ public class StatusMonitorOptionsPanel extends javax.swing.JPanel {
 
         jTabbedPane1.addTab("Supervisors", jPanel2);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
@@ -271,7 +233,17 @@ public class StatusMonitorOptionsPanel extends javax.swing.JPanel {
                     .addComponent(enableButton))
                 .addContainerGap())
         );
+
+        pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void disableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disableButtonActionPerformed
+        if (webBrowser.isMonitorEnabled()) {
+            webBrowser.disableMonitor();
+            main.ModifyOptions(true, "S", null, webBrowser);
+        }
+        setVisible(false);
+    }//GEN-LAST:event_disableButtonActionPerformed
 
     private void enableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enableButtonActionPerformed
         if (webBrowser.isMonitorEnabled()) {
@@ -282,17 +254,51 @@ public class StatusMonitorOptionsPanel extends javax.swing.JPanel {
             webBrowser.enableMonitor();
             main.ModifyOptions(false, "S", "S", webBrowser);
         }
-        SwingUtilities.getRoot(this).setVisible(false);
+        setVisible(false);
     }//GEN-LAST:event_enableButtonActionPerformed
 
-    private void disableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disableButtonActionPerformed
-        if (webBrowser.isMonitorEnabled()) {
-            webBrowser.disableMonitor();
-            main.ModifyOptions(true, "S", null, webBrowser);
-        }
-        SwingUtilities.getRoot(this).setVisible(false);
-    }//GEN-LAST:event_disableButtonActionPerformed
+    private void loadSettings() {
+        File file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Monitor_Settings.txt");
+        if (file.exists()) {
+            try {
+                Scanner read = new Scanner(file);
+                String temp = read.nextLine();
+                String tempArray[] = temp.split(":");
+                ACWMinutes.setText(tempArray[0]);
+                ACWSeconds.setText(tempArray[1]);
+                temp = read.nextLine();
+                tempArray = temp.split(":");
+                AUXMinutes.setText(tempArray[0]);
+                AUXSeconds.setText(tempArray[1]);
+                temp = read.nextLine();
+                tempArray = temp.split(":");
+                WrapupMinutes.setText(tempArray[0]);
+                WrapupSeconds.setText(tempArray[1]);
+                while (read.hasNextLine()) {
+                    SupervisorsList.append(read.nextLine() + "\n");
+                }
 
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(StatusMonitorOptionsDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
+    private void saveSettings() {
+        File file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Monitor_Settings.txt");
+        try {
+            PrintWriter write = new PrintWriter(file);
+            write.println(ACWMinutes.getText() + ":" + ACWSeconds.getText());
+            write.println(AUXMinutes.getText() + ":" + AUXSeconds.getText());
+            write.println(WrapupMinutes.getText() + ":" + WrapupSeconds.getText());
+            for (String name : SupervisorsList.getText().split("\n")) {
+                write.println(name);
+            }
+            write.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(StatusMonitorOptionsDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField ACWMinutes;

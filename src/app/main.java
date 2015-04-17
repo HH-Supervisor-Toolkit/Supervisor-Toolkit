@@ -294,12 +294,12 @@ public class main {
 
         if (removing) {
 
-            System.out.println("Removing timer option switch from tab " + index);
+            System.out.println("Removing " + prefix + " option switch from tab " + webBrowser.getName());
             optionsText[index * 2] = optionsText[index * 2].replaceAll("-" + prefix + "[^-]*", "");
 
         } else {
 
-            System.out.println("Adding timer option switch to tab " + index);
+            System.out.println("Adding " + prefix + " option switch from tab " + webBrowser.getName());
             optionsText[index * 2] = optionsText[index * 2].trim() + " -" + fullOption;
 
         }

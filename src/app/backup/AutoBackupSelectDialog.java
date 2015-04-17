@@ -10,24 +10,22 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
-import javax.swing.SwingUtilities;
 
 /**
  *
  * @author haywoosd
  */
-public class AutoBackupSelectPanel extends javax.swing.JPanel {
+public class AutoBackupSelectDialog extends javax.swing.JDialog {
 
-    /**
-     * Creates new form AutoBackupSelectPanel
-     */
     private final String[] fileNames;
     private File selectedFile;
     private final File backupFile;
     private final File[] longTermFileList;
     private final CountDownLatch latch;
 
-    public AutoBackupSelectPanel(File backupFile, File longTermBackups, CountDownLatch latch) {
+    public AutoBackupSelectDialog(java.awt.Frame parent, boolean modal, File backupFile, File longTermBackups, CountDownLatch latch) {
+        super(parent, modal);
+
         this.latch = latch;
         this.backupFile = backupFile;
         longTermFileList = longTermBackups.listFiles();
@@ -36,7 +34,7 @@ public class AutoBackupSelectPanel extends javax.swing.JPanel {
 
         Arrays.sort(longTermFileList);
         Collections.reverse(Arrays.asList(longTermFileList));
-                
+
         if (backupFile.exists()) {
             fileNames = new String[longTermFileList.length + 1];
             fileNames[0] = sdf.format(backupFile.lastModified()) + " (Latest)";
@@ -52,7 +50,6 @@ public class AutoBackupSelectPanel extends javax.swing.JPanel {
             }
         }
 
-        
         initComponents();
     }
 
@@ -73,6 +70,10 @@ public class AutoBackupSelectPanel extends javax.swing.JPanel {
         fileSelectBox = new javax.swing.JComboBox(fileNames);
         selectButton = new javax.swing.JButton();
 
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Select Backup");
+        setResizable(false);
+
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel1.setText("Which backup would you like to load?");
 
@@ -83,8 +84,8 @@ public class AutoBackupSelectPanel extends javax.swing.JPanel {
             }
         });
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
@@ -108,6 +109,8 @@ public class AutoBackupSelectPanel extends javax.swing.JPanel {
                     .addComponent(fileSelectBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
+
+        pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void selectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectButtonActionPerformed
@@ -120,10 +123,10 @@ public class AutoBackupSelectPanel extends javax.swing.JPanel {
         } else {
             selectedFile = longTermFileList[fileSelectBox.getSelectedIndex()];
         }
-        
+
         latch.countDown();
-        
-        SwingUtilities.getRoot(this).setVisible(false);
+
+        setVisible(false);
     }//GEN-LAST:event_selectButtonActionPerformed
 
 

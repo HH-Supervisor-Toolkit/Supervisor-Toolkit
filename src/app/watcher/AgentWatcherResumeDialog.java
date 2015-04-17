@@ -6,28 +6,22 @@
 package app.watcher;
 
 import java.util.concurrent.CountDownLatch;
-import javax.swing.SwingUtilities;
 
 /**
  *
  * @author haywoosd
  */
-public class AgentWatcherResumePanel extends javax.swing.JPanel {
+public class AgentWatcherResumeDialog extends javax.swing.JDialog {
 
     boolean returnValue;
     private final CountDownLatch latch;
-    
-    /**
-     * Creates new form AgentWatcherResumePanel
-     * @param latch
-     */
-    public AgentWatcherResumePanel(CountDownLatch latch) {
+
+    public AgentWatcherResumeDialog(java.awt.Frame parent, boolean modal, CountDownLatch latch) {
+        super(parent, modal);
+
         this.latch = latch;
+
         initComponents();
-    }
-    
-    public boolean getResult(){
-        return returnValue;
     }
 
     /**
@@ -43,6 +37,10 @@ public class AgentWatcherResumePanel extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         yesButton = new javax.swing.JButton();
         noButton = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Resume Watcher?");
+        setResizable(false);
 
         jLabel1.setText("The Watcher was paused while you were on call.");
 
@@ -64,8 +62,8 @@ public class AgentWatcherResumePanel extends javax.swing.JPanel {
             }
         });
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
@@ -98,24 +96,29 @@ public class AgentWatcherResumePanel extends javax.swing.JPanel {
                     .addComponent(noButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void yesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yesButtonActionPerformed
         returnValue = true;
-        
+
         latch.countDown();
-        
-        SwingUtilities.getRoot(this).setVisible(false);
+
+        setVisible(false);
     }//GEN-LAST:event_yesButtonActionPerformed
 
     private void noButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_noButtonActionPerformed
         returnValue = false;
-        
+
         latch.countDown();
-        
-        SwingUtilities.getRoot(this).setVisible(false);
+
+        setVisible(false);
     }//GEN-LAST:event_noButtonActionPerformed
 
+    public boolean getResult() {
+        return returnValue;
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;

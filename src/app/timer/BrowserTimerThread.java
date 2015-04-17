@@ -53,7 +53,7 @@ public class BrowserTimerThread extends Thread {
         });
 
         long timeDifference;
-        TimerWarningPanel timerPanel = null;
+        TimerWarningDialog timerDialog = null;
         lastRefreshTime = Calendar.getInstance().getTimeInMillis();
         
         while (!terminated) {
@@ -64,20 +64,14 @@ public class BrowserTimerThread extends Thread {
                 
                 if (timeDifference < timerDuration * 65000) {
                     
-                    if (messageDialog != null && messageDialog.isVisible() && timerPanel != null) {
-                        timerPanel.updateMessage("Your timer for " + webBrowser.getName() + " is at " + limitDoublePercision((double) timeDifference / (60000), 2) + " of " + timerDuration + " minutes");
+                    if (messageDialog != null && messageDialog.isVisible() && timerDialog != null) {
+                        timerDialog.updateMessage("Your timer for " + webBrowser.getName() + " is at " + limitDoublePercision((double) timeDifference / (60000), 2) + " of " + timerDuration + " minutes");
                         messageDialog.pack();
                         
                     } else {
-                        messageDialog = new JDialog(main.frame, "Timer Warning");
                         
-                        timerPanel = new TimerWarningPanel("Your timer for " + webBrowser.getName() + " is at " + limitDoublePercision((double) timeDifference / (60000), 2) + " of " + timerDuration + " minutes", webBrowser);
-                        messageDialog.add(timerPanel, BorderLayout.CENTER);
-                        
-                        messageDialog.setLocationRelativeTo(main.frame);
-                        messageDialog.pack();
-                        messageDialog.setResizable(false);
-                        
+                        timerDialog = new TimerWarningDialog(main.frame, false, "Your timer for " + webBrowser.getName() + " is at " + limitDoublePercision((double) timeDifference / (60000), 2) + " of " + timerDuration + " minutes", webBrowser);                       
+                        messageDialog.setLocationRelativeTo(main.frame);                        
                         messageDialog.setVisible(true);
                         messageDialog.setAlwaysOnTop(true);
                         messageDialog.setAlwaysOnTop(false);
