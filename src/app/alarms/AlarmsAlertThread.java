@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package app.alarms;
 
 import app.main;
@@ -11,10 +7,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
 
-/**
- *
- * @author haywoosd
- */
 public class AlarmsAlertThread extends Thread {
 
     public static ArrayList<Integer> timerHours = new ArrayList<>();

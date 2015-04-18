@@ -1,17 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package app.timer;
 
 import app.browser.ExtendedWebBrowser;
 import javafx.application.Platform;
 
-/**
- *
- * @author haywoosd
- */
 public class TimerWarningDialog extends javax.swing.JDialog {
 
     ExtendedWebBrowser webBrowser;

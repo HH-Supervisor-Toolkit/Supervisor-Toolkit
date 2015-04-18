@@ -1,28 +1,11 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package app.alarms;
 
-/**
- *
- * @author haywoosd
- */
 public class AlarmsEntryPanel extends javax.swing.JPanel {
 
     private final String timeText;
     private final String nameText;
     private int entryNumber;
 
-    /**
-     * Creates new form AlarmsEntryPanel
-     *
-     * @param hour
-     * @param minute
-     * @param period
-     * @param name
-     * @param number
-     */
     public AlarmsEntryPanel(int hour, int minute, int period, String name, int number) {
         String hourText = String.valueOf(hour);
         String minuteText = String.valueOf(minute);

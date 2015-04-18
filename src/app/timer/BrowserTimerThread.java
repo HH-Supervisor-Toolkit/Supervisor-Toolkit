@@ -1,12 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package app.timer;
 
 import app.browser.ExtendedWebBrowser;
 import app.main;
-import java.awt.BorderLayout;
 import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,10 +10,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javax.swing.JDialog;
 
-/**
- *
- * @author haywoosd
- */
 public class BrowserTimerThread extends Thread {
 
     int timerDuration;

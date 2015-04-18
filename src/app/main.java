@@ -83,7 +83,7 @@ public class main {
         optionsEdit = new OptionsEditPanel(false);
         webBrowserPane.addTab("Options", optionsEdit);
         webBrowserPane.addTab("Alarms", new AlarmsEditPanel());
-        webBrowserPane.addMouseListener(new TabbedPaneMouseAdapter(webBrowserPane));
+        webBrowserPane.addMouseListener(new TabbedPaneMouseAdapter());
 
         return webBrowserPane;
     }

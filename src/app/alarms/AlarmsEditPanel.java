@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package app.alarms;
 
 import java.awt.KeyboardFocusManager;
@@ -14,10 +10,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author haywoosd
- */
 public class AlarmsEditPanel extends javax.swing.JPanel {
 
     private int entryNumber = 0;

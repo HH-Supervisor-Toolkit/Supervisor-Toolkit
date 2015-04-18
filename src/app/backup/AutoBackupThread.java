@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package app.backup;
 
 import app.browser.ExtendedWebBrowser;
@@ -20,10 +16,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javax.swing.JOptionPane;
 
-/**
- *
- * @author haywoosd
- */
 public class AutoBackupThread extends Thread {
 
     private final File backupFile;

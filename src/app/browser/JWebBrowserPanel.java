@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package app.browser;
 
 import app.main;
@@ -31,10 +26,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
-/**
- *
- * @author haywoosd
- */
 public class JWebBrowserPanel extends javax.swing.JPanel {
 
     private final String[] fileSuffixes = {"doc", "docx", "rft", "txt", "pps",
@@ -43,9 +34,6 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
     private final JFXPanel fxWebViewPanel = new JFXPanel();
     private WebEngine engine;
 
-    /**
-     * Creates new form JWebBrowserPanel
-     */
     public JWebBrowserPanel() {
 
         CountDownLatch latch = new CountDownLatch(1);

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package app.popup;
 
 import app.browser.ExtendedWebBrowser;
@@ -19,10 +15,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
-/**
- *
- * @author haywoosd
- */
 public class TabPopupMenu extends JPopupMenu {
 
     JCheckBoxMenuItem timerItem;
@@ -48,7 +40,7 @@ public class TabPopupMenu extends JPopupMenu {
 
             timerItem.addActionListener((ActionEvent e) -> {
                 if (webBrowser.isTimerEnabled()) {
-                    main.ModifyOptions(true, "t:", null, webBrowser);
+                    main.ModifyOptions(true, "t", null, webBrowser);
                     webBrowser.removeBrowserTimer();
                     System.out.println("A timer has been removed from " + webBrowser.getName());
                 } else {
@@ -57,12 +49,13 @@ public class TabPopupMenu extends JPopupMenu {
                         return;
                     }
                     System.out.println("A " + minutes + " minute timer has been added to " + webBrowser.getName());
-                    main.ModifyOptions(false, null, "t:" + minutes, webBrowser);
+                    main.ModifyOptions(false, "t", "t:" + minutes, webBrowser);
                     BrowserTimerThread timerListener = new BrowserTimerThread(minutes, webBrowser);
                     webBrowser.addBrowserTimer(timerListener);
                 }
 
             });
+            
             add(timerItem);
 
             if (webBrowser.isBackupEnabled() || webBrowser.getEngine().getLocation().equals(main.Default[1])) {
@@ -83,6 +76,7 @@ public class TabPopupMenu extends JPopupMenu {
                         System.out.println("Auto backup has been enabled for " + webBrowser.getName());
                     }
                 });
+                
                 add(backupItem);
             }
 
@@ -121,6 +115,7 @@ public class TabPopupMenu extends JPopupMenu {
                     webBrowser.getEngine().reload();
                 });
             });
+            
             add(refreshItem);
 
             latch.countDown();
@@ -136,11 +131,15 @@ public class TabPopupMenu extends JPopupMenu {
     }
 
     private int getTimerMinutes(ExtendedWebBrowser webBrowser) {
+        
         int minutes;
+        
         String timerDurationStr = JOptionPane.showInputDialog(webBrowser, "How many minutes should the timer be for?", "Timer Duration", JOptionPane.PLAIN_MESSAGE);
+        
         if (timerDurationStr == null) {
             return -1;
         }
+        
         try {
             minutes = Integer.parseInt(timerDurationStr);
             if (minutes < 1) {

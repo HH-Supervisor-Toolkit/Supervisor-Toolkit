@@ -1,23 +1,14 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package app.options;
 
 import app.main;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-/**
- *
- * @author Sloan
- */
 public class OptionsEditPanel extends javax.swing.JPanel {
 
     boolean broken;
@@ -51,10 +42,7 @@ public class OptionsEditPanel extends javax.swing.JPanel {
             optionsEditorArea.setText(optionsEditorArea.getText() + optionsText[i] + System.getProperty("line.separator"));
         }
     }
-
-    /**
-     * Creates new form OptionsEdit
-     */
+    
     public OptionsEditPanel(boolean broken2) {
         initComponents();
         broken = broken2;
