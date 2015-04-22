@@ -32,10 +32,10 @@ public class TabPopupMenu extends JPopupMenu {
         Platform.runLater(() -> {
 
             if (webBrowser.isTimerEnabled()) {
-                timerItem = new JCheckBoxMenuItem("Disable timer");
+                timerItem = new JCheckBoxMenuItem("Disable Timer");
                 timerItem.setSelected(true);
             } else {
-                timerItem = new JCheckBoxMenuItem("Enable timer");
+                timerItem = new JCheckBoxMenuItem("Enable Eimer");
             }
 
             timerItem.addActionListener((ActionEvent e) -> {
@@ -60,10 +60,10 @@ public class TabPopupMenu extends JPopupMenu {
 
             if (webBrowser.isBackupEnabled() || webBrowser.getEngine().getLocation().equals(main.Default[1])) {
                 if (webBrowser.isBackupEnabled()) {
-                    backupItem = new JCheckBoxMenuItem("Disable auto backup");
+                    backupItem = new JCheckBoxMenuItem("Disable Auto Backup");
                     backupItem.setSelected(true);
                 } else {
-                    backupItem = new JCheckBoxMenuItem("Enable auto backup");
+                    backupItem = new JCheckBoxMenuItem("Enable Auto Backup");
                 }
                 backupItem.addActionListener((ActionEvent e) -> {
                     if (webBrowser.isBackupEnabled()) {
