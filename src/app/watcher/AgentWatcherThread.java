@@ -33,12 +33,10 @@ public class AgentWatcherThread extends Thread {
                     final CountDownLatch latch = new CountDownLatch(1);
 
                     System.out.println("Asking user if he/she wants to resume the watcher");
-                    
+
                     AgentWatcherResumeDialog resumeDialog = new AgentWatcherResumeDialog(main.frame, false, latch);
 
-
                     resumeDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-
                     resumeDialog.setLocationRelativeTo(main.frame);
                     resumeDialog.setVisible(true);
 
@@ -55,9 +53,7 @@ public class AgentWatcherThread extends Thread {
 
                     }
 
-                    boolean resumeWatcher = resumeDialog.getResult();
-
-                    if (!resumeWatcher) {
+                    if (!resumeDialog.getResult()) {
 
                         watchedAgents.clear();
 
@@ -121,6 +117,8 @@ public class AgentWatcherThread extends Thread {
                     Logger.getLogger(AgentWatcherThread.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
+            } else {
+                hasActivated = true;
             }
 
             try {
