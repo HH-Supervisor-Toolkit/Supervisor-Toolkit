@@ -2,13 +2,11 @@ package app.timer;
 
 import app.browser.ExtendedWebBrowser;
 import app.main;
-import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javax.swing.JDialog;
 
 public class BrowserTimerThread extends Thread {
 
@@ -33,7 +31,7 @@ public class BrowserTimerThread extends Thread {
 
             if (newValue.intValue() == 100) {
                 System.out.println("A timer has seen a change of page");
-                lastRefreshTime = Calendar.getInstance().getTimeInMillis();
+                lastRefreshTime = System.currentTimeMillis();
             }
 
         };
@@ -44,11 +42,11 @@ public class BrowserTimerThread extends Thread {
 
         long timeDifference;
         TimerWarningDialog timerDialog = null;
-        lastRefreshTime = Calendar.getInstance().getTimeInMillis();
+        lastRefreshTime = System.currentTimeMillis();
 
         while (!terminated) {
 
-            timeDifference = Calendar.getInstance().getTimeInMillis() - lastRefreshTime;
+            timeDifference = System.currentTimeMillis() - lastRefreshTime;
 
             if (timeDifference > timerDuration * 35000 && timeDifference < timerDuration * 65000) {
 
