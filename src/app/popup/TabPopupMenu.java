@@ -1,5 +1,6 @@
 package app.popup;
 
+import app.backup.AutoBackupDialog;
 import app.browser.ExtendedWebBrowser;
 import app.main;
 import app.monitor.StatusMonitorOptionsDialog;
@@ -35,19 +36,22 @@ public class TabPopupMenu extends JPopupMenu {
                 timerItem = new JCheckBoxMenuItem("Disable Timer");
                 timerItem.setSelected(true);
             } else {
-                timerItem = new JCheckBoxMenuItem("Enable Eimer");
+                timerItem = new JCheckBoxMenuItem("Enable Timer");
             }
 
             timerItem.addActionListener((ActionEvent e) -> {
+                
                 if (webBrowser.isTimerEnabled()) {
                     main.ModifyOptions(true, "t", null, webBrowser);
                     webBrowser.removeBrowserTimer();
                     System.out.println("A timer has been removed from " + webBrowser.getName());
                 } else {
                     int minutes = getTimerMinutes(webBrowser);
+                    
                     if (minutes == -1) {
                         return;
                     }
+                    
                     System.out.println("A " + minutes + " minute timer has been added to " + webBrowser.getName());
                     main.ModifyOptions(false, "t", "t:" + minutes, webBrowser);
                     BrowserTimerThread timerListener = new BrowserTimerThread(minutes, webBrowser);
@@ -55,56 +59,51 @@ public class TabPopupMenu extends JPopupMenu {
                 }
 
             });
-            
+
             add(timerItem);
 
             if (webBrowser.isBackupEnabled() || webBrowser.getEngine().getLocation().equals(main.Default[1])) {
+
+                backupItem = new JCheckBoxMenuItem("Backups");
+
                 if (webBrowser.isBackupEnabled()) {
-                    backupItem = new JCheckBoxMenuItem("Disable Auto Backup");
                     backupItem.setSelected(true);
-                } else {
-                    backupItem = new JCheckBoxMenuItem("Enable Auto Backup");
                 }
+
                 backupItem.addActionListener((ActionEvent e) -> {
-                    if (webBrowser.isBackupEnabled()) {
-                        main.ModifyOptions(true, "B", null, webBrowser);
-                        webBrowser.disableBackup();
-                        System.out.println("Auto backup has been disabled for " + webBrowser.getName());
-                    } else {
-                        main.ModifyOptions(false, null, "B", webBrowser);
-                        webBrowser.enableBackup();
-                        System.out.println("Auto backup has been enabled for " + webBrowser.getName());
-                    }
+                    AutoBackupDialog backupDialog = new AutoBackupDialog(main.frame, false, webBrowser);
+                    backupDialog.setLocationRelativeTo(main.frame);
+                    backupDialog.setVisible(true);
                 });
-                
+
                 add(backupItem);
             }
 
             if (webBrowser.isMonitorEnabled() || webBrowser.getEngine().getLocation().equals(main.Default[9])) {
                 monitorItem = new JCheckBoxMenuItem("Status Monitor");
-                
+
                 if (webBrowser.isMonitorEnabled()) {
                     monitorItem.setSelected(true);
                 }
-                
+
                 monitorItem.addActionListener((ActionEvent e) -> {
                     StatusMonitorOptionsDialog monitorDialog = new StatusMonitorOptionsDialog(main.frame, false, webBrowser);
                     monitorDialog.setLocationRelativeTo(main.frame);
                     monitorDialog.setVisible(true);
                 });
-                
+
                 add(monitorItem);
             }
 
             if (webBrowser.isWatcherEnabled() || webBrowser.getEngine().getLocation().equals(main.Default[9])) {
                 watcherItem = new JMenuItem("Watcher");
-                
+
                 watcherItem.addActionListener((ActionEvent e) -> {
                     WatcherSelectDialog watcherDialog = new WatcherSelectDialog(main.frame, true, webBrowser);
                     watcherDialog.setLocationRelativeTo(main.frame);
                     watcherDialog.setVisible(true);
                 });
-                
+
                 add(watcherItem);
             }
 
@@ -115,7 +114,7 @@ public class TabPopupMenu extends JPopupMenu {
                     webBrowser.getEngine().reload();
                 });
             });
-            
+
             add(refreshItem);
 
             latch.countDown();
@@ -131,15 +130,15 @@ public class TabPopupMenu extends JPopupMenu {
     }
 
     private int getTimerMinutes(ExtendedWebBrowser webBrowser) {
-        
+
         int minutes;
-        
+
         String timerDurationStr = JOptionPane.showInputDialog(webBrowser, "How many minutes should the timer be for?", "Timer Duration", JOptionPane.PLAIN_MESSAGE);
-        
+
         if (timerDurationStr == null) {
             return -1;
         }
-        
+
         try {
             minutes = Integer.parseInt(timerDurationStr);
             if (minutes < 1) {
