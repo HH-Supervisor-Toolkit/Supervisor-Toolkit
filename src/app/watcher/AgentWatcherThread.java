@@ -175,7 +175,7 @@ public class AgentWatcherThread extends Thread {
 
             for (String name : windowNames) {
 
-                if (name.contains("[CE]")) {
+                if (name.contains("[CE]") || name.contains("+1")) {
                     return true;
                 }
             }
