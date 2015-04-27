@@ -51,6 +51,7 @@ public class BrowserTimerThread extends Thread {
             if (timeDifference > timerDuration * 35000 && timeDifference < timerDuration * 65000) {
 
                 if (timerDialog != null && timerDialog.isVisible()) {
+                    
                     timerDialog.updateMessage("Your timer for " + webBrowser.getName() + " is at " + limitDoublePercision((double) timeDifference / (60000), 2) + " of " + timerDuration + " minutes");
                     timerDialog.pack();
 
