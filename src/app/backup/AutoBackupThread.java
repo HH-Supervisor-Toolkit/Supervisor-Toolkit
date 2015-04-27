@@ -14,8 +14,8 @@ import javafx.beans.value.ObservableValue;
 
 public class AutoBackupThread extends Thread {
 
-    private final File backupFile = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Backup_Log.txt");
-    private final File longTermBackups = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Backups_Old");
+    private static final File backupFile = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Backup_Log.txt");
+    private static final File longTermBackups = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Backups_Old");
 
     private final ExtendedWebBrowser webBrowser;
 
@@ -25,7 +25,7 @@ public class AutoBackupThread extends Thread {
     public static final String newLine = System.getProperty("line.separator");
     public static final String customSplitString = "!!split!!";
 
-    private final int maxBackups = 30;
+    private static final int maxBackups = 30;
 
     public static final String[] emptyBackupStrings = {"", "", "2015", "", "", "", "", "", "false", "false", "false", "false", "false", "false", ""};
 
@@ -129,7 +129,7 @@ public class AutoBackupThread extends Thread {
         terminated = true;
     }
 
-    public void storeLatestBackup() {
+    public static void storeLatestBackup() {
         if (backupFile.exists()) {
 
             System.out.println("Moving backup file to long term storage with new file name: " + "Backup_Log_" + +backupFile.lastModified() + ".txt");
