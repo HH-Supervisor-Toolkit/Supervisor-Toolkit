@@ -237,14 +237,12 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_addButtonActionPerformed
 
     private void nameSelectFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_nameSelectFocusGained
-        System.out.println("Alarm name text field gained focus.");
         if (nameSelect.getText().equals("Alarm Name")) {
             nameSelect.setText("");
         }
     }//GEN-LAST:event_nameSelectFocusGained
 
     private void nameSelectFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_nameSelectFocusLost
-        System.out.println("Alarm name text field lost focus.");
         if (nameSelect.getText().trim().equals("")) {
             nameSelect.setText("Alarm Name");
             KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
