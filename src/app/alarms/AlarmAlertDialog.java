@@ -3,13 +3,13 @@ package app.alarms;
 public class AlarmAlertDialog extends javax.swing.JDialog {
 
     String messageText;
-    int entryNumber;
+    AlarmTask alarmTask;
     
-    public AlarmAlertDialog(java.awt.Frame parent, boolean modal, String alarmName, int number) {
+    public AlarmAlertDialog(java.awt.Frame parent, boolean modal, String alarmName, AlarmTask task) {
         super(parent, modal);
         
         messageText = alarmName;
-        entryNumber = number;
+        alarmTask = task;
         
         initComponents();
     }
@@ -132,30 +132,12 @@ public class AlarmAlertDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void endButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_endButtonActionPerformed
+        alarmTask.dismissAlarm();
         setVisible(false);
     }//GEN-LAST:event_endButtonActionPerformed
 
     private void postponeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_postponeButtonActionPerformed
-
-        AlarmsAlertThread.timerMinutes.set(entryNumber, AlarmsAlertThread.timerMinutes.get(entryNumber) + Integer.parseInt(postponeSelect.getSelectedItem().toString()));
-
-        if (AlarmsAlertThread.timerMinutes.get(entryNumber) > 59){
-
-            int hoursIncrease;
-            hoursIncrease = AlarmsAlertThread.timerMinutes.get(entryNumber)/60;
-            AlarmsAlertThread.timerHours.set(entryNumber, AlarmsAlertThread.timerHours.get(entryNumber) + hoursIncrease);
-
-            if (AlarmsAlertThread.timerHours.get(entryNumber) > 23){
-                int modTimeAdjust;
-                modTimeAdjust = AlarmsAlertThread.timerHours.get(entryNumber)/24;
-                AlarmsAlertThread.timerHours.set(entryNumber, AlarmsAlertThread.timerHours.get(entryNumber) - 24*modTimeAdjust);
-            }
-
-            AlarmsAlertThread.timerMinutes.set(entryNumber, AlarmsAlertThread.timerMinutes.get(entryNumber) - 60*hoursIncrease);
-        }
-
-        System.out.println("New time for alarm is: " + AlarmsAlertThread.timerHours.get(entryNumber) + ":" + AlarmsAlertThread.timerMinutes.get(entryNumber));
-
+        alarmTask.snoozeAlarm(Integer.parseInt(postponeSelect.getSelectedItem().toString()));
         setVisible(false);
     }//GEN-LAST:event_postponeButtonActionPerformed
 

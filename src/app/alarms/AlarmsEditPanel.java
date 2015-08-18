@@ -1,43 +1,46 @@
 package app.alarms;
 
 import java.awt.KeyboardFocusManager;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class AlarmsEditPanel extends javax.swing.JPanel {
 
     private int entryNumber = 0;
-    public static AlarmsAlertThread alertThread;
-    File alarmsFile;
-    String newLine = System.getProperty("line.separator");
-
+    String alarmsFile = System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Alarms.txt";
+    
     private void loadAlarms() {
-        alarmsFile = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Alarms.txt");
+
         try {
-            if (!alarmsFile.exists()) {
+
+            if (!Files.exists(Paths.get(alarmsFile))) {
+
                 System.out.println("Alarms file not found attemping to create default");
-                alarmsFile.createNewFile();
+                Files.createFile(Paths.get(alarmsFile));
             } else {
-                FileInputStream input = new FileInputStream(alarmsFile);
-                byte[] data = new byte[(int) alarmsFile.length()];
-                input.read(data);
-                String content = new String(data, "UTF-8");
-                String[] splitContent = content.split(newLine, -1);
-                for (int i = 0; i < splitContent.length - 1; i += 4) {
-                    int hour = Integer.parseInt(splitContent[i]);
-                    int minute = Integer.parseInt(splitContent[i + 1]);
-                    int period = Integer.parseInt(splitContent[i + 2]);
-                    String name = splitContent[i + 3];
+
+                List<String> fileLines = Files.readAllLines(Paths.get(alarmsFile));
+
+                for (int i = 0; i < fileLines.size() - 1; i += 4) {
+
+                    int hour = Integer.parseInt(fileLines.get(i));
+                    int minute = Integer.parseInt(fileLines.get(i + 1));
+                    int period = Integer.parseInt(fileLines.get(i + 2));
+                    String name = fileLines.get(i + 3);
+
                     System.out.println("Adding new alarm from file. " + name);
                     addEntry(hour, minute, period, name);
                 }
-                input.close();
             }
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(AlarmsEditPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -49,68 +52,68 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
     }
 
     private void writeAlarm(int hour, int minute, int period, String name) {
-        try {
-            FileWriter write = new FileWriter(alarmsFile, true);
-            write.write(Integer.toString(hour) + newLine);
-            write.write(Integer.toString(minute) + newLine);
-            write.write(Integer.toString(period) + newLine);
-            write.write(name + newLine);
-            write.close();
+
+        try (PrintWriter writer = new PrintWriter(new FileWriter(alarmsFile, true))) {
+
+            writer.println(Integer.toString(hour));
+            writer.println(Integer.toString(minute));
+            writer.println(Integer.toString(period));
+            writer.println(name);
+
         } catch (IOException ex) {
+
             Logger.getLogger(AlarmsEditPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     private void addEntry(int hour, int minute, int period, String name) {
-        AlarmsAlertThread.timerMinutes.add(minute);
-        AlarmsAlertThread.timerNames.add(name);
-        if (period < 1) {
-            AlarmsAlertThread.timerHours.add(hour);
-        } else {
-            if (hour == 12) {
-                AlarmsAlertThread.timerHours.add(0);
-            } else {
-                AlarmsAlertThread.timerHours.add(hour + 12);
-            }
+        
+        GregorianCalendar alarmTime = new GregorianCalendar();
+        
+        alarmTime.set(Calendar.HOUR, hour);
+        alarmTime.set(Calendar.MINUTE, minute);
+        alarmTime.set(Calendar.SECOND, 0);
+        alarmTime.set(Calendar.AM_PM, period);
+        
+        if(alarmTime.before(GregorianCalendar.getInstance())){
+            alarmTime.add(Calendar.DATE, 1);
         }
+        
+        AlarmTask alarmTask = new AlarmTask(name, entryNumber);
+        AlarmTask.schedule(alarmTask, alarmTime.getTime());
+        
         AlarmsEntryPanel alarmEntry = new AlarmsEntryPanel(hour, minute, period, name, entryNumber);
         System.out.println("Adding new alarm entry: " + name);
+
         entryContainerPanel.add(alarmEntry);
         entryContainerPanel.validate();
         entryContainerScrollPane.validate();
+
         entryNumber++;
-        if (alertThread == null || !alertThread.isAlive()) {
-            System.out.println("Starting the alarms alert thread");
-            alertThread = new AlarmsAlertThread();
-            alertThread.start();
-        }
     }
 
     public void removeEntry(int number) {
         System.out.println("Removing alarm entry: " + number);
-        AlarmsAlertThread.timerHours.remove(number);
-        AlarmsAlertThread.timerMinutes.remove(number);
-        AlarmsAlertThread.timerNames.remove(number);
+
+        AlarmTask.unschedule(number);
+        
         try {
-            FileInputStream input = new FileInputStream(alarmsFile);
-            byte[] data = new byte[(int) alarmsFile.length()];
-            input.read(data);
-            input.close();
-            String[] splitContent = new String(data, "UTF-8").split(newLine, -1);
-            FileWriter alarmsWriter = new FileWriter(alarmsFile);
-            for (int i = 0; i < (splitContent.length - 1) / 4; i++) {
-                if (i != number) {
-                    alarmsWriter.write(splitContent[i * 4] + newLine);
-                    alarmsWriter.write(splitContent[i * 4 + 1] + newLine);
-                    alarmsWriter.write(splitContent[i * 4 + 2] + newLine);
-                    alarmsWriter.write(splitContent[i * 4 + 3] + newLine);
+
+            List<String> fileLines = Files.readAllLines(Paths.get(alarmsFile));
+
+            try (PrintWriter writer = new PrintWriter(new FileWriter(alarmsFile))) {
+
+                for (int i = 0; i < (fileLines.size() - 1) / 4; i++) {
+
+                    if (i != number) {
+
+                        writer.println(fileLines.get(i * 4));
+                        writer.println(fileLines.get(i * 4 + 1));
+                        writer.println(fileLines.get(i * 4 + 2));
+                        writer.println(fileLines.get(i * 4 + 3));
+                    }
                 }
             }
-            if ((splitContent.length - 1) / 4 < 2) {
-                System.out.println("Stopping the alarms alert thread");
-                AlarmsEditPanel.alertThread.terminate();
-            }
-            alarmsWriter.close();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(AlarmsEntryPanel.class.getName()).log(Level.SEVERE, null, ex);
         } catch (UnsupportedEncodingException ex) {
@@ -118,11 +121,14 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
         } catch (IOException ex) {
             Logger.getLogger(AlarmsEntryPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
         entryContainerPanel.remove(number);
+        
         for (int i = number; i < entryContainerPanel.getComponentCount(); i++) {
-            System.out.println("Setting entry " + i + " to be " + i);
+            System.out.println("Setting entry " + (i + 1) + " to be " + i);
             ((AlarmsEntryPanel) entryContainerPanel.getComponent(i)).setEntryNumber(i);
         }
+        
         entryNumber--;
     }
 
@@ -130,6 +136,8 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
         initComponents();
         loadAlarms();
     }
+
+   
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -231,8 +239,10 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         System.out.println("Manually adding an alarm entry");
+
         addEntry(hourSelect.getSelectedIndex() + 1, minuteSelect.getSelectedIndex(), periodSelect.getSelectedIndex(), nameSelect.getText());
         writeAlarm(hourSelect.getSelectedIndex() + 1, minuteSelect.getSelectedIndex(), periodSelect.getSelectedIndex(), nameSelect.getText());
+
         nameSelect.setText("Alarm Name");
     }//GEN-LAST:event_addButtonActionPerformed
 
@@ -244,6 +254,7 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
 
     private void nameSelectFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_nameSelectFocusLost
         if (nameSelect.getText().trim().equals("")) {
+
             nameSelect.setText("Alarm Name");
             KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
         }

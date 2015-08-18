@@ -7,24 +7,29 @@ public class AlarmsEntryPanel extends javax.swing.JPanel {
     private int entryNumber;
 
     public AlarmsEntryPanel(int hour, int minute, int period, String name, int number) {
+
         String hourText = String.valueOf(hour);
         String minuteText = String.valueOf(minute);
         String periodText;
+
         if (minuteText.length() < 2) {
             minuteText = "0" + minuteText;
         }
+
         if (period < 1) {
             periodText = "AM";
         } else {
             periodText = "PM";
         }
+
         nameText = name;
         timeText = hourText + ":" + minuteText + " " + periodText;
         entryNumber = number;
+
         initComponents();
     }
-    
-    public void setEntryNumber(int number){
+
+    public void setEntryNumber(int number) {
         entryNumber = number;
     }
 
@@ -87,7 +92,7 @@ public class AlarmsEntryPanel extends javax.swing.JPanel {
 
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
         setVisible(false);
-        ((AlarmsEditPanel)getParent().getParent().getParent().getParent()).removeEntry(entryNumber);
+        ((AlarmsEditPanel) getParent().getParent().getParent().getParent()).removeEntry(entryNumber);
     }//GEN-LAST:event_removeButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
