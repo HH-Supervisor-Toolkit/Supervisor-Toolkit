@@ -14,7 +14,7 @@ public class AgentWatcherThread extends Thread {
 
     public final ArrayList<String> watchedAgents = new ArrayList<>();
     private final ExtendedWebBrowser webBrowser;
-    private boolean running = true;
+
     private boolean hasActivated = false;
 
     public AgentWatcherThread(ExtendedWebBrowser webBrowser1) {
@@ -24,7 +24,7 @@ public class AgentWatcherThread extends Thread {
     @Override
     public void run() {
 
-        while (running) {
+        while (!Thread.interrupted()) {
 
             if (!inCall()) {
 
@@ -46,22 +46,19 @@ public class AgentWatcherThread extends Thread {
                     try {
 
                         latch.await();
-
                     } catch (InterruptedException ex) {
 
                         Logger.getLogger(AgentWatcherThread.class.getName()).log(Level.SEVERE, null, ex);
-
                     }
 
                     if (!resumeDialog.getResult()) {
 
                         watchedAgents.clear();
 
-                        running = false;
+                        Thread.currentThread().interrupt();
                         hasActivated = false;
 
                         break;
-
                     } else {
 
                         hasActivated = false;
@@ -69,7 +66,6 @@ public class AgentWatcherThread extends Thread {
                         if (inCall()) {
                             continue;
                         }
-
                     }
 
                 }
@@ -77,6 +73,7 @@ public class AgentWatcherThread extends Thread {
                 final CountDownLatch latch = new CountDownLatch(1);
 
                 Platform.runLater(() -> {
+                    
                     try {
 
                         int TutorCount = ((Integer) webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows.length"));
@@ -101,33 +98,34 @@ public class AgentWatcherThread extends Thread {
                     } catch (netscape.javascript.JSException e) {
 
                         System.out.println("The tab with the watcher has left the real-time agent page. The watcher thread will now shutdown.");
-                        running = false;
-
+                        Thread.currentThread().interrupt();
                     } finally {
 
                         latch.countDown();
-
                     }
-
                 });
 
                 try {
+                    
                     latch.await();
                 } catch (InterruptedException ex) {
+                    
                     Logger.getLogger(AgentWatcherThread.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
             } else {
+                
                 hasActivated = true;
             }
 
             try {
+                
                 Thread.sleep(2000);
             } catch (InterruptedException ex) {
+                
                 Logger.getLogger(AgentWatcherThread.class.getName()).log(Level.SEVERE, null, ex);
             }
-
         }
+        
         System.out.println("The watcher thread is shuting down.");
     }
 
@@ -137,11 +135,9 @@ public class AgentWatcherThread extends Thread {
 
             watchedAgents.add(watch);
             System.out.println("Adding " + watch + " to the watcher thread.");
-
         } else {
 
             System.out.println(watch + " is already being watched. He/She will not be added to the watch thread.");
-
         }
     }
 
@@ -159,9 +155,8 @@ public class AgentWatcherThread extends Thread {
         }
 
         if (watchedAgents.isEmpty()) {
-            running = false;
+            Thread.currentThread().interrupt();
         }
-
     }
 
     public String[] getWatched() {

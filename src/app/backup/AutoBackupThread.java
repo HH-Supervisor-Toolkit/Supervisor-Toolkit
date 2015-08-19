@@ -19,7 +19,6 @@ public class AutoBackupThread extends Thread {
 
     private final ExtendedWebBrowser webBrowser;
 
-    private boolean terminated = false;
     private boolean hasStored = false;
 
     public static final String newLine = System.getProperty("line.separator");
@@ -60,7 +59,7 @@ public class AutoBackupThread extends Thread {
 
             latch.await();
 
-            while (!terminated) {
+            while (!Thread.interrupted()) {
                 Thread.sleep(30000);
                 saveBackup();
             }
@@ -123,10 +122,6 @@ public class AutoBackupThread extends Thread {
                 }
             }
         });
-    }
-
-    public void terminate() {
-        terminated = true;
     }
 
     public static void storeLatestBackup() {

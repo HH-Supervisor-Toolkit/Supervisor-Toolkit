@@ -14,57 +14,55 @@ import javafx.application.Platform;
 public class StatusMonitorThread extends Thread {
 
     ExtendedWebBrowser webBrowser;
-    boolean enabled = true;
+
+    boolean errorNoticeGiven = false;
+
     int ACWTime;
     int AUXTime;
     int WrapupTime;
+
     ArrayList<String> supervisorList = new ArrayList<>();
     ArrayList<String> alertedUsers = new ArrayList<>();
     ArrayList<String> alertedModes = new ArrayList<>();
-    boolean errorNoticeGiven = false;
 
     public StatusMonitorThread(ExtendedWebBrowser webBrowser1) {
         webBrowser = webBrowser1;
         loadOptions();
     }
 
-    public void terminate() {
-        enabled = false;
-    }
-
     public final void loadOptions() {
         File file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Monitor_Settings.txt");
         if (file.exists()) {
-            try (Scanner read = new Scanner(file)){
-                
+            try (Scanner read = new Scanner(file)) {
+
                 String temp = read.nextLine();
                 String tempArray[] = temp.split(":");
                 ACWTime = Integer.parseInt(tempArray[0]) * 60 + Integer.parseInt(tempArray[1]);
-                
+
                 temp = read.nextLine();
                 tempArray = temp.split(":");
                 AUXTime = Integer.parseInt(tempArray[0]) * 60 + Integer.parseInt(tempArray[1]);
-                
+
                 temp = read.nextLine();
                 tempArray = temp.split(":");
                 WrapupTime = Integer.parseInt(tempArray[0]) * 60 + Integer.parseInt(tempArray[1]);
-                
+
                 supervisorList.clear();
-                
+
                 while (read.hasNextLine()) {
                     supervisorList.add(read.nextLine());
                 }
-                
+
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(StatusMonitorThread.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
             try (PrintWriter write = new PrintWriter(file)) {
-                
+
                 write.println("01:00");
                 write.println("15:00");
                 write.println("01:00");
-                
+
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(StatusMonitorThread.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -89,20 +87,20 @@ public class StatusMonitorThread extends Thread {
 
     private void giveAlert(String name, String mode) {
         System.out.println("Giving status alert for " + name + " for " + mode);
-        
+
         StatusMonitorAlertDialog statusAlertDialog = new StatusMonitorAlertDialog(main.frame, false, name, mode, webBrowser);
         statusAlertDialog.setLocationRelativeTo(main.frame);
         statusAlertDialog.setVisible(true);
         statusAlertDialog.setAlwaysOnTop(true);
         statusAlertDialog.setAlwaysOnTop(false);
-        
+
         alertedUsers.add(name);
         alertedModes.add(mode);
     }
 
     @Override
     public void run() {
-        while (enabled) {
+        while (!Thread.interrupted()) {
             Platform.runLater(() -> {
                 try {
                     int tutorCount = ((Integer) webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows.length"));
@@ -148,16 +146,16 @@ public class StatusMonitorThread extends Thread {
                         }
                     }
                     errorNoticeGiven = false;
-                    
+
                 } catch (netscape.javascript.JSException e) {
                     if (!errorNoticeGiven) {
                         System.out.println("Failed to get number of tutors for status monitor. Perhaps not on the right webpage?");
                         errorNoticeGiven = true;
                     }
                 }
-                
+
             });
-            
+
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException ex) {

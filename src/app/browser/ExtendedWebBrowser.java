@@ -41,7 +41,7 @@ public class ExtendedWebBrowser extends JWebBrowserPanel {
     }
 
     public void disableBackup() {
-        backupThread.terminate();
+        backupThread.interrupt();
         hasBackup = false;
     }
 
@@ -86,7 +86,7 @@ public class ExtendedWebBrowser extends JWebBrowserPanel {
 
     public void disableMonitor() {
         hasMonitor = false;
-        statusMonitor.terminate();
+        statusMonitor.interrupt();
     }
 
     public void updateMonitor(){
