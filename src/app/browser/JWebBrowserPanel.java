@@ -26,6 +26,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
+//This class is the base web browser. It contains all the code needed to create a basic web browser not specific to the supervisor toolkit.
 public class JWebBrowserPanel extends javax.swing.JPanel {
 
     //A list of all file types that should be downloadable.
@@ -154,7 +155,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_forwardButtonActionPerformed
 
-    //Called when the refresh icon is clicked. Refreshes the page.
+    //Called when the refresh icon is clicked. Reloads the page.
     private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
         Platform.runLater(() -> {
             engine.reload();
@@ -169,6 +170,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_backButtonActionPerformed
 
     //Called when the print button is clicked. Opens the print dialog, but using a thread helps prevent the risk of locking the toolkit if the print fails.
+    //It seams like the print only works after two print jobs have been started. This may need more work.
     private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
         new Thread() {
 
@@ -200,7 +202,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
                 Stage stage = new Stage();
                 WebView popupView = new WebView();
 
-                //This is how we handle obeservations and download differently.
+                //This is how we handle obeservations and download differently. We close the popup window if they are a special type.
                 popupView.getEngine().locationProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
                     
                     if (newValue.startsWith("conf:sip")) {

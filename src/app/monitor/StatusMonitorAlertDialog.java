@@ -4,9 +4,11 @@ import app.browser.ExtendedWebBrowser;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+//This class is the dialog displayed when the status monitor triggers an alert. It will either be dismissed and nothing else happens or it will add the alert target to the supervisor list.
 public class StatusMonitorAlertDialog extends javax.swing.JDialog {
 
     String labelText;
@@ -87,19 +89,21 @@ public class StatusMonitorAlertDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    //Called when the add supervisor button is clicked. Adds the user to the list of supervisors and updates the monitor settings.
     private void addSupervisorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addSupervisorButtonActionPerformed
-        try {
-            File file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Monitor_Settings.txt");
-            FileWriter write = new FileWriter(file, true);
-            write.write(name + System.getProperty("line.separator"));
-            write.close();
-            webBrowser.updateMonitor();
+        File file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Monitor_Settings.txt");
+        
+        try (PrintWriter write = new PrintWriter(new FileWriter(file, true))) {
+            write.println(name);
+            webBrowser.updateMonitor(); 
         } catch (IOException ex) {
             Logger.getLogger(StatusMonitorAlertDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
         setVisible(false);
     }//GEN-LAST:event_addSupervisorButtonActionPerformed
 
+    //Called when the dismiss button is clicked. Simply closes the dialog, but the monitor thread will not aleart on a user twice unless their status had changed in-between.
     private void dismissButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dismissButtonActionPerformed
         setVisible(false);
     }//GEN-LAST:event_dismissButtonActionPerformed

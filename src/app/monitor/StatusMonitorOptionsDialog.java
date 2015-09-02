@@ -9,6 +9,7 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+//This class is the dialog that displays the status monitor settings. Allow the user to enable/disable the monitor and update the settings.
 public class StatusMonitorOptionsDialog extends javax.swing.JDialog {
 
     String disableButtonText;
@@ -28,7 +29,6 @@ public class StatusMonitorOptionsDialog extends javax.swing.JDialog {
         }
         
         initComponents();
-        
         loadSettings();
     }
 
@@ -228,6 +228,7 @@ public class StatusMonitorOptionsDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    //Called when the disable button is clicked. Disables the monitor and modifies the options switches.
     private void disableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disableButtonActionPerformed
         
         if (webBrowser.isMonitorEnabled()) {
@@ -238,6 +239,7 @@ public class StatusMonitorOptionsDialog extends javax.swing.JDialog {
         setVisible(false);
     }//GEN-LAST:event_disableButtonActionPerformed
 
+    //Called when the enable button is clicked. Saves the monitor settings then enables if necessary. Also modifies the switches.
     private void enableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enableButtonActionPerformed
         
         if (webBrowser.isMonitorEnabled()) {
@@ -252,6 +254,7 @@ public class StatusMonitorOptionsDialog extends javax.swing.JDialog {
         setVisible(false);
     }//GEN-LAST:event_enableButtonActionPerformed
 
+    //Reades the settings file and adjusts the text fields on this dialog to match the existing settings.
     private void loadSettings() {
         File file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Monitor_Settings.txt");
         
@@ -284,6 +287,7 @@ public class StatusMonitorOptionsDialog extends javax.swing.JDialog {
         }
     }
     
+    //Saves the settings from this dialogs fields to the Monitor_Settings.txt file.
     private void saveSettings() {
         File file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Monitor_Settings.txt");
        

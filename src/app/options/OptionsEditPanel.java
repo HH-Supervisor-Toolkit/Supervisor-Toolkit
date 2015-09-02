@@ -9,21 +9,26 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+//This class is the panel that displays the tab options and their url locations. Also allows for editing the options or resetting them. This is also show if the options need repaired.
 public class OptionsEditPanel extends javax.swing.JPanel {
 
+    //If this panel is being shown as the repair dialog we need silghtly different behavior. Therefore we will keep track of this with a boolean.
     boolean broken;
 
+    //Reads the options from the Options.txt file and fills the EditPane with them.
     private void FillEditPane() {
         try {
             File file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Options.txt");
             Scanner scan = new Scanner(file);
+            
             System.out.println("Attempting to fill options pane");
+            
             String workingLine;
-            optionsEditorArea.setText(null);
+            optionsEditorArea.setText("");
             
             do {
                 workingLine = scan.nextLine();
-                optionsEditorArea.setText(optionsEditorArea.getText() + workingLine + System.getProperty("line.separator"));
+                optionsEditorArea.append(workingLine +"\n");
             }while ((scan.hasNext()));
             
             System.out.println("Options pane sucessfully filled");
@@ -32,19 +37,23 @@ public class OptionsEditPanel extends javax.swing.JPanel {
         }
     }
 
+    //Returns the contents of the edit pane as a String[]
     public String[] getOptionsText() {
         return optionsEditorArea.getText().split(System.getProperty("line.separator"));
     }
 
+    //Sets the contents of the edit pane to match the given String[]
     public void setOptionsText(String[] optionsText) {
         optionsEditorArea.setText("");
-        for (int i = 0; i < optionsText.length; i++) {
-            optionsEditorArea.setText(optionsEditorArea.getText() + optionsText[i] + System.getProperty("line.separator"));
+        
+        for (String optionsTextElement : optionsText) {
+            optionsEditorArea.append(optionsTextElement + "\n");
         }
     }
     
     public OptionsEditPanel(boolean broken2) {
         initComponents();
+        
         broken = broken2;
         FillEditPane();
     }
@@ -133,33 +142,40 @@ public class OptionsEditPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    //Called when the cancel button is clicked. Will restore the edit pane to match the unchanged settings, or it will close the options repair frame.
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         if (!broken) {
-
             int choice = JOptionPane.showConfirmDialog(null, "Are you sure you want to revert any changes?", "Confirm cancel", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            
             if (choice == JOptionPane.YES_OPTION) {
                 FillEditPane();
-            }
+            }  
         } else {
             int choice = JOptionPane.showConfirmDialog(null, "Are you sure you want cancel. This will close the program?", "Confirm cancel", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            
             if (choice == JOptionPane.YES_OPTION) {
                 System.exit(0);
             }
         }
     }//GEN-LAST:event_cancelButtonActionPerformed
 
+    //Called when the apply button is clicked. Will save the changed options and hide the repair frame if it is shown.
     private void applyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyButtonActionPerformed
         int choice = JOptionPane.showConfirmDialog(null, "Are you sure you want save these changes?", "Confirm apply", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        
         if (choice == JOptionPane.YES_OPTION) {
-            main.writeOptions(optionsEditorArea.getText().split(System.getProperty("line.separator")));
+            main.writeOptions(optionsEditorArea.getText().split("\n"));
+            
             if (broken) {
                 SwingUtilities.getRoot(this).setVisible(false);
             }
         }
     }//GEN-LAST:event_applyButtonActionPerformed
 
+    //Called when the reset button is clicked. Will restore the Default options and save them.
     private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
         int choice = JOptionPane.showConfirmDialog(null, "Are you sure you want to reset to default options?", "Confirm reset", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        
         if (choice == JOptionPane.YES_OPTION) {
             main.writeOptions(main.Default);
             FillEditPane();
