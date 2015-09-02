@@ -8,7 +8,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
-public class BrowserTimerThread extends Thread {
+public class BrowserTimer {
 
     int timerDuration;
     long lastRefreshTime = System.currentTimeMillis();
@@ -19,7 +19,7 @@ public class BrowserTimerThread extends Thread {
     TimerAlertTask timerAlertTask = new TimerAlertTask();
     ChangeListener<Number> refreshListener = null;
 
-    public BrowserTimerThread(int minutes, ExtendedWebBrowser webBrowser2) {
+    public BrowserTimer(int minutes, ExtendedWebBrowser webBrowser2) {
         timerDuration = minutes;
         webBrowser = webBrowser2;
     }
@@ -33,11 +33,10 @@ public class BrowserTimerThread extends Thread {
         });
     }
 
-    @Override
-    public void run() {
+    public void start() {
 
         refreshListener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
-
+            
             if (newValue.intValue() == 100) {
                 System.out.println("A timer has seen a change of page");
                 lastRefreshTime = System.currentTimeMillis();
@@ -46,7 +45,6 @@ public class BrowserTimerThread extends Thread {
                 timerAlertTask = new TimerAlertTask();
                 alertTimer.scheduleAtFixedRate(timerAlertTask, timerDuration * 40000, timerDuration * 10000);
             }
-
         };
 
         alertTimer.scheduleAtFixedRate(timerAlertTask, timerDuration * 40000, timerDuration * 10000);
@@ -69,12 +67,10 @@ public class BrowserTimerThread extends Thread {
             long timeDifference = System.currentTimeMillis() - lastRefreshTime;
 
             if (timerDialog != null && timerDialog.isVisible()) {
-
                 timerDialog.updateMessage("Your timer for " + webBrowser.getName() + " is at " + limitDoublePercision((double) timeDifference / (60000), 2) + " of " + timerDuration + " minutes");
                 timerDialog.pack();
 
             } else {
-
                 timerDialog = new TimerWarningDialog(main.frame, false, "Your timer for " + webBrowser.getName() + " is at " + limitDoublePercision((double) timeDifference / (60000), 2) + " of " + timerDuration + " minutes", webBrowser);
 
                 timerDialog.setLocationRelativeTo(main.frame);

@@ -1,14 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package app.JNI;
 
-/**
- *
- * @author Sloan
- */
+//This interface is required so that CLibrary can extend it. By having CLibrary extend CLibraryInterface we can cast to it from the new instance of the CLibrary 
+//created from the CustomClassLoader in EnumAllWindowNames.
 public interface CLibraryInterface {
     public String[] enumWindows();
 }

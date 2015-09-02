@@ -1,11 +1,12 @@
 package app;
 
+import app.JNI.EnumAllWindowNames;
 import app.alarms.AlarmsEditPanel;
 import app.browser.ConfURLHandlerClass;
 import app.browser.ExtendedWebBrowser;
 import app.popup.TabbedPaneMouseAdapter;
 import app.options.OptionsEditPanel;
-import app.timer.BrowserTimerThread;
+import app.timer.BrowserTimer;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.event.WindowAdapter;
@@ -18,6 +19,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -31,13 +33,14 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 public class main {
 
+    //Contains all default tab names, links, and option switches. There must be a tab name for each link or else an exception will be thrown when reading the options.
     public final static String[] Default = {"[Nightly Log] -B", "https://docs.google.com/forms/d/172-Elqzog2MgLSMe9WvCHkuxHsJAb5IaFJZKq74KxPw/viewform",
         "[Equipment Problem Report]", "https://docs.google.com/forms/d/1X8K1XeWBykPRnnxn5TWaLGUcc68Yn3JiejvpSgwiJTc/viewform",
         "[Incident Report]", "https://docs.google.com/forms/d/1Zy4Hd4FxPlpSAOZMigRfUVywnL78-pBm5HP5E69TasE/viewform",
         "[Textbook Request Form]", "https://docs.google.com/forms/d/1wW0GEoEqkOlpTIPP__2kRSWbD1RskTBo4wtBaO738BM/viewform",
-        "[Real-Time Agent] -S", "http://geomantce-cra.rose-hulman.edu:8080/ACEReport/",
+        "[Real-Time Agent] -S", "http://geomantce-hv.rose-hulman.edu/ACEAdmin/",
         "[Phone Surveys] -t:30", "https://prod11gbss8.rose-hulman.edu/BanSS/rhit_hwhl.P_QuestionPage",
-        "[Attendance Page]", "http://askrose.org/askrose-login",
+        "[Attendance Page]", "http://dev2.askrose.org/askrose-login",
         "[JotForms]", "http://www.jotform.com/login"
     };
 
@@ -47,22 +50,22 @@ public class main {
     static public OptionsEditPanel optionsEdit;
     static JTabbedPane webBrowserPane;
 
+    //This method take care of creating all the content that is displayed in the main frame. It is passed a string array read from the options file or form the Default string array if no options exist.
     @SuppressWarnings("InfiniteRecursion")
     public static JComponent createContent(String[] address) {
 
         webBrowsers = new ExtendedWebBrowser[address.length / 2];
         webBrowserPane = new JTabbedPane();
 
+        //If the options file is corrupt or incorrectly formatted this will fail and the repair window will be shown. Once the repair window is closed createContent is tried again.
         try {
 
             for (int i = 1; i < address.length; i = i + 2) {
-
                 webBrowsers[(i - 1) / 2] = new ExtendedWebBrowser();
                 System.out.println("Navagating to " + address[i]);
 
                 webBrowsers[(i - 1) / 2].loadURL(address[i]);
                 addTabWithOptions(webBrowserPane, webBrowsers[(i - 1) / 2], address[i - 1]);
-
             }
 
         } catch (StringIndexOutOfBoundsException ex1) {
@@ -72,6 +75,7 @@ public class main {
 
         }
 
+        //optionsEdit is a class variable because it will be reference again when options switches are changed. These changes come from any tab and not just the OptionsEditPanel itself.
         optionsEdit = new OptionsEditPanel(false);
         webBrowserPane.addTab("Options", optionsEdit);
         webBrowserPane.addTab("Alarms", new AlarmsEditPanel());
@@ -81,20 +85,21 @@ public class main {
     }
 
     public static void main(final String[] args) {
-
+        
+        //Both SSLv3 and TLSv1 must be allowed because Rose's sites are out of date.
         System.setProperty("https.protocols", "SSLv3,TLSv1");
 
+        //This is how we add special handeling to urls prefixed with conf. Conf is what lync uses to initiate group calls e.g. observations.
         URL.setURLStreamHandlerFactory((String protocol) -> {
-
             if (protocol.equals("conf")) {
                 return new ConfURLHandlerClass();
             } else {
                 return null;
             }
-
         });
 
-        boolean bears = false;
+        //How we detect if the user wants bears.
+        String iconPath = "img/icon.png";
         for (String arg : args) {
             if (arg.equals("don'tfeedthebears")
                     || arg.equals("don'tfeedthebear")
@@ -102,34 +107,24 @@ public class main {
                     || arg.equals("bears")
                     || arg.equals("dontfeedthebears")
                     || arg.equals("dontfeedthebear")) {
-                bears = true;
+                iconPath = "img/bear.png";
                 break;
             }
         }
 
+        //Make the toolkit fit Window's default theme.
         try {
-
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-
             Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
-
         }
 
         frame = new JFrame("Supervisor Toolkit");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(900, 600);
         frame.setLocationByPlatform(true);
 
+        //Load the chosen icon. Icons should be located in app.img.
         try {
-            String iconPath;
-            if (bears) {
-                iconPath = "img/bear.png";
-            } else {
-                iconPath = "img/icon.png";
-            }
-
             InputStream iconStream = main.class.getResourceAsStream(iconPath);
             icon = ImageIO.read(iconStream);
 
@@ -142,6 +137,7 @@ public class main {
         frame.add(createContent(ReadOptions()), BorderLayout.CENTER);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
+        //We're handeling the main frame closing in a custom way. This way we can prompt the user if they click close by accident.
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent we) {
@@ -156,13 +152,11 @@ public class main {
         });
 
         frame.setVisible(true);
-
     }
 
+    //This funciton will read from the options file and return its contents in the form of a String[]. If no file/directory is found one will be created and the default options written to it.
     static String[] ReadOptions() {
-
         try {
-
             System.out.println("Attempting to read options file");
             File optionsFile = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Options.txt");
 
@@ -171,15 +165,12 @@ public class main {
                 System.out.println("Options file not found attemping to create default");
 
                 if (!optionsFile.getParentFile().exists()) {
-
                     System.out.println("SuperToolkit directory not found attempting to create it");
                     optionsFile.getParentFile().mkdirs();
-
                 }
 
                 optionsFile.createNewFile();
                 writeOptions(Default);
-
             }
 
             return Files.readAllLines(optionsFile.toPath()).toArray(new String[0]);
@@ -190,31 +181,30 @@ public class main {
             Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        //If the options file couldn't be read for some reason we'll offer the user to repair the options themself.
         RepairOptions();
         return ReadOptions();
     }
 
-    public static void infoBox(String infoMessage, String location) {
-        JOptionPane.showMessageDialog(null, infoMessage, location, JOptionPane.INFORMATION_MESSAGE);
-    }
-
+    //Write the given String[] to the Options file. Each array element is given a seperate line.
     public static void writeOptions(String[] writeContents) {
         File file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Options.txt");
-        PrintWriter write;
-        try {
-            write = new PrintWriter(file);
+
+        try (PrintWriter write = new PrintWriter(file)) {
+
             for (String writeContent : writeContents) {
                 write.println(writeContent);
             }
-            write.close();
+
         } catch (FileNotFoundException ex) {
             Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
+    //If the options are broken a dialog containing an OptionsEditPanel will be shown. This is a modal Window blocking until closed. The exit button does nothing so the user has to make changes or cancel.
     public static void RepairOptions() {
         System.out.println("Options file not formatted correctly. Opening repair window");
-        infoBox("Options file is not formatted correctly please repair it manually.", "Bad Startup");
+        JOptionPane.showMessageDialog(null, "Options file is not formatted correctly please repair it manually.", "Bad Startup", JOptionPane.INFORMATION_MESSAGE);
 
         JDialog diag = new JDialog();
 
@@ -234,6 +224,7 @@ public class main {
         System.out.println("Options revision submitted");
     }
 
+    //Used to parse the switches assigned to the given tab and apply them to the ExtendedWebBrowser element.
     public static void addTabWithOptions(JTabbedPane webBrowserPane, ExtendedWebBrowser webBrowser, String title) {
 
         int tabTitleEndPos = title.lastIndexOf("]");
@@ -247,57 +238,54 @@ public class main {
 
         for (String parsedOption : parsedOptions) {
 
-            if (parsedOption.contains("t:")) {
-
-                System.out.println("Adding a timer to " + tabTitle + " from options for " + parsedOption.substring(2).trim() + " minute(s)");
-                BrowserTimerThread browserTimer = new BrowserTimerThread(Integer.parseInt(parsedOption.substring(2).trim()), webBrowser);
-                webBrowser.addBrowserTimer(browserTimer);
-
-            } else if (parsedOption.contains("B")) {
-
-                System.out.println("Enabling auto backup for " + tabTitle);
-                webBrowser.enableBackup();
-
-            } else if (parsedOption.contains("S")) {
-
-                System.out.println("Enabling status monitor for " + tabTitle);
-                webBrowser.enableMonitor();
-
+            switch (parsedOption) {
+                case "t:":
+                    System.out.println("Adding a timer to " + tabTitle + " from options for " + parsedOption.substring(2).trim() + " minute(s)");
+                    BrowserTimer browserTimer = new BrowserTimer(Integer.parseInt(parsedOption.substring(2).trim()), webBrowser);
+                    webBrowser.addBrowserTimer(browserTimer);
+                    break;
+                case "B":
+                    System.out.println("Enabling auto backup for " + tabTitle);
+                    webBrowser.enableBackup();
+                    break;
+                case "S":
+                    System.out.println("Enabling status monitor for " + tabTitle);
+                    webBrowser.enableMonitor();
+                    break;
             }
-
         }
-
     }
 
-    public static void ModifyOptions(boolean removing, String prefix, String fullOption, ExtendedWebBrowser webBrowser) {
+    //Used to edit the add/remove option switches from the OptionsEditPanel and the options file. All future option switches should use "prefix:extra_data".
+    public static void ModifyOptions(boolean removing, String option, ExtendedWebBrowser webBrowser) {
+        
         int index = 0;
         int componentCount = webBrowserPane.getTabCount();
-
+        
+        //We can determine which lines in the options file and OptionsEditPanel to modify based on the index of the ExtendedWebBrowser contained in the JTabbedPane
         for (int i = 0; i < componentCount; i++) {
             if (webBrowserPane.getComponentAt(i).equals(webBrowser)) {
-
                 index = i;
                 break;
-
             }
         }
 
         String[] optionsText = optionsEdit.getOptionsText();
-
+        
+        int prefixEndPos = option.indexOf(":");
+        if (prefixEndPos == -1) prefixEndPos = option.length();
+        String prefix = option.substring(0, prefixEndPos);
+        
+        //Regix expressions are beautiful monsters.
         if (removing) {
-
             System.out.println("Removing " + prefix + " option switch from tab " + webBrowser.getName());
             optionsText[index * 2] = optionsText[index * 2].replaceAll("-" + prefix + "[^-]*", "");
-
         } else {
-
             System.out.println("Adding " + prefix + " option switch from tab " + webBrowser.getName());
-            optionsText[index * 2] = optionsText[index * 2].trim() + " -" + fullOption;
-
+            optionsText[index * 2] = optionsText[index * 2].trim() + " -" + option;
         }
 
         optionsEdit.setOptionsText(optionsText);
         writeOptions(optionsText);
-
     }
 }

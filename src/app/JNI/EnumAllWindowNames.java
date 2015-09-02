@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package app.JNI;
 
 import app.main;
@@ -18,10 +13,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author haywoosd
- */
+//This class can be called to get a String[] containing all open window titles. It implements a CustomClassLoader that allows us to unload the cLib.dll and delete it before shutdown.
 public class EnumAllWindowNames {
 
     private static boolean loadedLibrary = false;
@@ -29,6 +21,7 @@ public class EnumAllWindowNames {
     private static Class cls;
     private static CLibraryInterface ldl;
 
+    //This is what is actually called to get the String[] of all open window titles.
     public static String[] getWindowTitles() {
 
         if (!loadedLibrary) {
@@ -36,7 +29,6 @@ public class EnumAllWindowNames {
             System.out.println("cLib is not loaded. Loading it now.");
 
             try {
-
                 copyJNILibrary();
                 loadedLibrary = true;
 
@@ -44,38 +36,30 @@ public class EnumAllWindowNames {
                 ldl = (CLibraryInterface) cls.newInstance();
 
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
-                
                 Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
-                
             }
-
         }
 
         String[] names;
 
         try {
-
             names = ldl.enumWindows();
-
         } catch (NullPointerException e) {
-
             System.out.println("An error occured while tring to enumWindows");
             names = null;
-
         }
 
         return names;
-
     }
 
+    //Copies the cLib.dll packaged with the JAR and puts into the SuperToolkit folder. All dlls must be outside of the JAR to be loaded.
     private static void copyJNILibrary() {
-        try {
-            File fileOut = new File(System.getProperty("user.home") + "\\AppData\\Local\\Temp\\SuperToolkit\\cLib.dll");
 
-            fileOut.getParentFile().mkdirs();
+        File fileOut = new File(System.getProperty("user.home") + "\\AppData\\Local\\Temp\\SuperToolkit\\cLib.dll");
+        fileOut.getParentFile().mkdirs();
 
-            InputStream in = main.class.getResourceAsStream("/app/JNI/cLib.dll");
-            FileOutputStream out = new FileOutputStream(fileOut);
+        try (InputStream in = main.class.getResourceAsStream("/app/JNI/clib.dll");
+                FileOutputStream out = new FileOutputStream(fileOut)) {
 
             int i;
 
@@ -95,9 +79,9 @@ public class EnumAllWindowNames {
         } catch (IOException ex) {
             Logger.getLogger(EnumAllWindowNames.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
 
+    //The thread that will be run at the time of shutdown that will delete the cLib.dll if it was copied to SuperToolkit
     private static class RemoveLibraryHook extends Thread {
 
         @Override
@@ -115,13 +99,12 @@ public class EnumAllWindowNames {
 
             while (!file.delete());
             while (!dir.delete());
-            
-            System.out.println("Loaded cLib.dll and containing folder have been deleted");
-            
-        }
 
+            System.out.println("Loaded cLib.dll and containing folder have been deleted");
+        }
     }
 
+    //This is borrowed completely from someone else. I'm not going to pretend that I understand even half of it.
     public static class CustomClassLoader extends ClassLoader {
 
         /**

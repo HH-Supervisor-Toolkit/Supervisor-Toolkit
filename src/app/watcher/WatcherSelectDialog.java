@@ -145,9 +145,7 @@ public class WatcherSelectDialog extends javax.swing.JDialog {
         List watchAddList = watchableList.getSelectedValuesList();
 
         if (!webBrowser.isWatcherEnabled()) {
-
             webBrowser.enableWatcher();
-
         }
 
         watchAddList.stream().forEach((watchAdd) -> {

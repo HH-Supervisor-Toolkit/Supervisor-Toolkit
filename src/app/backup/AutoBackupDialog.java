@@ -12,10 +12,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 
+//This class is the dialog that is displayed when the user selects "Dialog" from the tab right-click menu.
 public class AutoBackupDialog extends javax.swing.JDialog {
 
     private final String[] fileNames;
 
+    //The latest backup is stored in the Backup_Log.txt file. All older backups are in the "Backups_Old" folder.
     private final File backupFile = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Backup_Log.txt");
     private final File[] longTermBackupList = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Backups_Old").listFiles();
 
@@ -31,6 +33,7 @@ public class AutoBackupDialog extends javax.swing.JDialog {
         Arrays.sort(longTermBackupList);
         Collections.reverse(Arrays.asList(longTermBackupList));
 
+        //If there is a backup stored in the Backup_Log.txt file it will be given the (Latest) suffix. 
         if (backupFile.exists()) {
 
             fileNames = new String[longTermBackupList.length + 1];
@@ -52,9 +55,7 @@ public class AutoBackupDialog extends javax.swing.JDialog {
                 tempName = longTermBackupList[i].getName();
                 fileNames[i] = sdf.format(Long.parseLong(tempName.substring(11, tempName.length() - 4)));
             }
-
         }
-
         initComponents();
     }
 
@@ -127,14 +128,14 @@ public class AutoBackupDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    //Called when the load button is clicked. Loads the selected backup. If the selected backup is not the latest backup the latest backup is stored in the "Backups_Old" folder.
     private void loadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadButtonActionPerformed
         if (fileNames.length > 0) {
-
+            
             if (backupFile.exists()) {
-
+                
                 if (fileSelectBox.getSelectedIndex() == 0) {
                     System.out.println("Loading latest backup");
-                    
                     loadBackup(backupFile);
                 } else {
                     System.out.println("Loading old backup: " + longTermBackupList[fileSelectBox.getSelectedIndex() - 1].getName());
@@ -143,36 +144,37 @@ public class AutoBackupDialog extends javax.swing.JDialog {
                     AutoBackupThread.storeLatestBackup();
                     loadBackup(longTermBackupList[fileSelectBox.getSelectedIndex() - 1]);
                 }
-
+                
             } else {
                 System.out.println("Loading old backup: " + longTermBackupList[fileSelectBox.getSelectedIndex()].getName());
-                
                 loadBackup(longTermBackupList[fileSelectBox.getSelectedIndex()]);
             }
         }
         setVisible(false);
     }//GEN-LAST:event_loadButtonActionPerformed
 
+    //Called when the enable/disable button is clicked. Will stop/start the backup thread and adjust the option switches.
     private void enableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enableButtonActionPerformed
 
         if (webBrowser.isBackupEnabled()) {
-            main.ModifyOptions(true, "B", null, webBrowser);
+            main.ModifyOptions(true, "B", webBrowser);
             webBrowser.disableBackup();
             System.out.println("Auto backup has been disabled for " + webBrowser.getName());
         } else {
-            main.ModifyOptions(false, "B", "B", webBrowser);
+            main.ModifyOptions(false, "B", webBrowser);
             webBrowser.enableBackup();
             System.out.println("Auto backup has been enabled for " + webBrowser.getName());
         }
+        
         setVisible(false);
     }//GEN-LAST:event_enableButtonActionPerformed
 
+    //Takes the given file and puts each entry seperated by customSplitString into a String[]. Then loads each element of the String[] into it's respective field on the Nightly Log page.
+    //The names of each entry is hard coded and will need updating if the page ever changes. There's probably a better way to do this. It might involve JavaScript.
     private void loadBackup(File file) {
-
+        
         Platform.runLater(() -> {
-
             try {
-
                 String[] backupEntries = new String(Files.readAllBytes(file.toPath()), "UTF-8").split(AutoBackupThread.newLine + AutoBackupThread.customSplitString + AutoBackupThread.newLine, -1);
 
                 for (int i = 0; i < backupEntries.length; i++) {
@@ -202,11 +204,10 @@ public class AutoBackupDialog extends javax.swing.JDialog {
                 }
 
                 webBrowser.getEngine().executeScript("document.getElementById(\"entry_398759739\").value = \"" + backupEntries[14] + "\"");
-
+                
             } catch (IOException ex) {
                 Logger.getLogger(AutoBackupDialog.class.getName()).log(Level.SEVERE, null, ex);
             }
-
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables

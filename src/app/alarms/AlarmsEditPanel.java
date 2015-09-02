@@ -14,25 +14,26 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+//This class is the panel that displays all active alarms and allows for new alarms to be created.
 public class AlarmsEditPanel extends javax.swing.JPanel {
 
+    //entryNumber is used to keep track of how many alarms exist. It is passed to each AlarmEntryPanel created so they can return the value to AlarmsEditPanel if they are removed.
     private int entryNumber = 0;
     String alarmsFile = System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Alarms.txt";
     
+    //Used to get all alarms from the alarms file and then schedule their respective AlarmTasks.
     private void loadAlarms() {
 
         try {
-
-            if (!Files.exists(Paths.get(alarmsFile))) {
-
+            if (!Files.exists(Paths.get(alarmsFile))) {       
+               
                 System.out.println("Alarms file not found attemping to create default");
                 Files.createFile(Paths.get(alarmsFile));
+                
             } else {
-
                 List<String> fileLines = Files.readAllLines(Paths.get(alarmsFile));
 
                 for (int i = 0; i < fileLines.size() - 1; i += 4) {
-
                     int hour = Integer.parseInt(fileLines.get(i));
                     int minute = Integer.parseInt(fileLines.get(i + 1));
                     int period = Integer.parseInt(fileLines.get(i + 2));
@@ -51,6 +52,7 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
         }
     }
 
+    //Save a newly created alarm to the alarms file. All alarms should be created with the hour, minute, period (AM/PM), and name each getting their own line.
     private void writeAlarm(int hour, int minute, int period, String name) {
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(alarmsFile, true))) {
@@ -61,13 +63,14 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
             writer.println(name);
 
         } catch (IOException ex) {
-
             Logger.getLogger(AlarmsEditPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
+    //Adds an entry displaying the new alarm and schedules the associated AlarmTask.
     private void addEntry(int hour, int minute, int period, String name) {
         
+        //A new instance of GregorianCalendar will initially be set for the time of its creation.
         GregorianCalendar alarmTime = new GregorianCalendar();
         
         alarmTime.set(Calendar.HOUR, hour);
@@ -75,6 +78,7 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
         alarmTime.set(Calendar.SECOND, 0);
         alarmTime.set(Calendar.AM_PM, period);
         
+        //If the alarm's time has already happened today reschedule it for tomorrow
         if(alarmTime.before(GregorianCalendar.getInstance())){
             alarmTime.add(Calendar.DATE, 1);
         }
@@ -85,6 +89,7 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
         AlarmsEntryPanel alarmEntry = new AlarmsEntryPanel(hour, minute, period, name, entryNumber);
         System.out.println("Adding new alarm entry: " + name);
 
+        //Validate calls are required to correctly adjust the scroll sliders.
         entryContainerPanel.add(alarmEntry);
         entryContainerPanel.validate();
         entryContainerScrollPane.validate();
@@ -92,13 +97,14 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
         entryNumber++;
     }
 
+    //Used to remove any existing alarms and unschedule their respective AlarmTasks.
     public void removeEntry(int number) {
+        
         System.out.println("Removing alarm entry: " + number);
-
         AlarmTask.unschedule(number);
         
+        //We need to rewrite the AlarmsFile to not include the removed alarm.
         try {
-
             List<String> fileLines = Files.readAllLines(Paths.get(alarmsFile));
 
             try (PrintWriter writer = new PrintWriter(new FileWriter(alarmsFile))) {
@@ -124,6 +130,7 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
         
         entryContainerPanel.remove(number);
         
+        //Each component after the removed one needs their number decremented by one.
         for (int i = number; i < entryContainerPanel.getComponentCount(); i++) {
             System.out.println("Setting entry " + (i + 1) + " to be " + i);
             ((AlarmsEntryPanel) entryContainerPanel.getComponent(i)).setEntryNumber(i);
@@ -136,8 +143,6 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
         initComponents();
         loadAlarms();
     }
-
-   
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -237,6 +242,7 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    //Called when the add button is clicked. Used to add a new alarm to AlarmEditPanel and schedule a new AlarmTask.
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         System.out.println("Manually adding an alarm entry");
 
@@ -246,15 +252,16 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
         nameSelect.setText("Alarm Name");
     }//GEN-LAST:event_addButtonActionPerformed
 
+    //Called when focus is gained by the name text box. Deletes the default text.
     private void nameSelectFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_nameSelectFocusGained
         if (nameSelect.getText().equals("Alarm Name")) {
             nameSelect.setText("");
         }
     }//GEN-LAST:event_nameSelectFocusGained
 
+    //Called when focus is lost by the name text box. Replaces the name text box with the default text if it is blank.
     private void nameSelectFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_nameSelectFocusLost
         if (nameSelect.getText().trim().equals("")) {
-
             nameSelect.setText("Alarm Name");
             KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
         }

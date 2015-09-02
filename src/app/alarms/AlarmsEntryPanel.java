@@ -1,5 +1,6 @@
 package app.alarms;
 
+//This class is the JPanel that displays the individual alarm entry.
 public class AlarmsEntryPanel extends javax.swing.JPanel {
 
     private final String timeText;
@@ -10,16 +11,10 @@ public class AlarmsEntryPanel extends javax.swing.JPanel {
 
         String hourText = String.valueOf(hour);
         String minuteText = String.valueOf(minute);
-        String periodText;
+        String periodText = period < 1 ? "AM" : "PM";
 
         if (minuteText.length() < 2) {
             minuteText = "0" + minuteText;
-        }
-
-        if (period < 1) {
-            periodText = "AM";
-        } else {
-            periodText = "PM";
         }
 
         nameText = name;
@@ -90,6 +85,7 @@ public class AlarmsEntryPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    //Called when the remove button is clicked. Removes the JPanel and unschedules the AlarmTask.
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
         setVisible(false);
         ((AlarmsEditPanel) getParent().getParent().getParent().getParent()).removeEntry(entryNumber);

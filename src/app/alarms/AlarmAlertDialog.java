@@ -1,5 +1,6 @@
 package app.alarms;
 
+//This class is the dialog that is displayed when an alarm should be triggered. The choice to dismiss to snooze is passed on the the AlarmTask that this class is constructed with.
 public class AlarmAlertDialog extends javax.swing.JDialog {
 
     String messageText;
@@ -125,17 +126,17 @@ public class AlarmAlertDialog extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    //Called when the end button is clicked. Used to dismiss the alarm.
     private void endButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_endButtonActionPerformed
         alarmTask.dismissAlarm();
         setVisible(false);
     }//GEN-LAST:event_endButtonActionPerformed
 
+    //Called when the postpose button is clicked. Used to reschedule the alarm for a selected number of minutes in the future.
     private void postponeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_postponeButtonActionPerformed
         alarmTask.snoozeAlarm(Integer.parseInt(postponeSelect.getSelectedItem().toString()));
         setVisible(false);
     }//GEN-LAST:event_postponeButtonActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton endButton;

@@ -28,14 +28,17 @@ import javafx.stage.Stage;
 
 public class JWebBrowserPanel extends javax.swing.JPanel {
 
+    //A list of all file types that should be downloadable.
     private final String[] fileSuffixes = {"doc", "docx", "rft", "txt", "pps",
         "ppt", "pptx", "png", "bmp", "tif", "jpg", "xls", "xlsx", "7z", "rar", "zip"};
 
+    //We use a JFXPanel so we can display a JavaFX element in a Swing element. The toolkit started as Swing before using JavaFX's web browser, so this is a cop-out to rewriting everthing.
     private final JFXPanel fxWebViewPanel = new JFXPanel();
     private WebEngine engine;
 
     public JWebBrowserPanel() {
 
+        //This latch makes sure that JWebBrowserPanel doesn't return from its constructor until the JavaFX components are done being created.
         CountDownLatch latch = new CountDownLatch(1);
 
         createScene(latch);
@@ -43,15 +46,10 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         webViewContainer.add(fxWebViewPanel);
 
         try {
-
             latch.await();
-
         } catch (InterruptedException ex) {
-
             Logger.getLogger(JWebBrowserPanel.class.getName()).log(Level.SEVERE, null, ex);
-
         }
-
     }
 
     /**
@@ -149,24 +147,28 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    //Called when the forward arrow is clicked. Navigates to the next page in the browsing history.
     private void forwardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_forwardButtonActionPerformed
         Platform.runLater(() -> {
             engine.executeScript("history.forward()");
         });
     }//GEN-LAST:event_forwardButtonActionPerformed
 
+    //Called when the refresh icon is clicked. Refreshes the page.
     private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
         Platform.runLater(() -> {
             engine.reload();
         });
     }//GEN-LAST:event_refreshButtonActionPerformed
 
+    //Called when the back arrow is clicked. Navigates to the previous page. 
     private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
         Platform.runLater(() -> {
             engine.executeScript("history.back()");
         });
     }//GEN-LAST:event_backButtonActionPerformed
 
+    //Called when the print button is clicked. Opens the print dialog, but using a thread helps prevent the risk of locking the toolkit if the print fails.
     private void printButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printButtonActionPerformed
         new Thread() {
 
@@ -185,19 +187,22 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         }.start();
     }//GEN-LAST:event_printButtonActionPerformed
 
+    //This is used to create all of the JavaFX components because that all must be done in the JavaFX thread. This means most of this code is preformed asynchronously.
     private void createScene(CountDownLatch latch) {
-
+        
         Platform.runLater(() -> {
             WebView view = new WebView();
             engine = view.getEngine();
 
+            //We must handle links that would creat a popup window. Currently only starting observations and downloading files must behave differently.
             engine.setCreatePopupHandler((PopupFeatures param) -> {
 
                 Stage stage = new Stage();
                 WebView popupView = new WebView();
 
+                //This is how we handle obeservations and download differently.
                 popupView.getEngine().locationProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-
+                    
                     if (newValue.startsWith("conf:sip")) {
                         stage.close();
 
@@ -215,15 +220,14 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
                 stage.show();
 
                 return popupView.getEngine();
-
             });
 
             fxWebViewPanel.setScene(new Scene(view));
             latch.countDown();
-
         });
     }
 
+    //Used to load a webpage, but with some more intelligent URL handling.
     public void loadURL(final String url) {
         Platform.runLater(() -> {
             String tmp = toURL(url);
@@ -236,6 +240,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         });
     }
 
+    //Used to make sure the provided URL is in the correct format.
     private static String toURL(String str) {
         try {
             return new URL(str).toExternalForm();
@@ -244,9 +249,11 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         }
     }
 
+    //If the web browser navigated to a downloadable file this is how we download that file.
     private void downloadFile(String url) {
 
         try {
+            //This makes sure that the original file name from the URL is the default suggestion. We have to take into account how URLs are encoded.
             String fileName = URLDecoder.decode(url, "UTF-8").substring(url.lastIndexOf("/") + 1);
 
             String fileType = url.substring(url.lastIndexOf(".") + 1);
@@ -260,6 +267,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
 
             File saveResult = chooser.showSaveDialog(null);
 
+            //If the user chose a save location and didn't cancel. We'll now download the file and save it to there.
             if (saveResult != null) {
 
                 try (BufferedInputStream inStream = new BufferedInputStream(new URL(url).openStream());
@@ -286,6 +294,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         }
     }
 
+    //Just some shortcut code to determine if the given String matches an element of the String[]. Matching here is case insensitive.
     private boolean contains(String[] suffixList, String suffix) {
 
         for (String suffixItem : suffixList) {
@@ -297,6 +306,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         return false;
     }
 
+    //Allows other classes to access the WebEngine of the web browser.
     public WebEngine getEngine() {
         return engine;
     }

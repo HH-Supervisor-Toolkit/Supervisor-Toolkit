@@ -4,7 +4,7 @@ import app.backup.AutoBackupDialog;
 import app.browser.ExtendedWebBrowser;
 import app.main;
 import app.monitor.StatusMonitorOptionsDialog;
-import app.timer.BrowserTimerThread;
+import app.timer.BrowserTimer;
 import app.watcher.WatcherSelectDialog;
 import java.awt.event.ActionEvent;
 import java.util.concurrent.CountDownLatch;
@@ -40,21 +40,21 @@ public class TabPopupMenu extends JPopupMenu {
             }
 
             timerItem.addActionListener((ActionEvent e) -> {
-                
+
                 if (webBrowser.isTimerEnabled()) {
-                    main.ModifyOptions(true, "t", null, webBrowser);
+                    main.ModifyOptions(true, "t", webBrowser);
                     webBrowser.removeBrowserTimer();
                     System.out.println("A timer has been removed from " + webBrowser.getName());
                 } else {
                     int minutes = getTimerMinutes(webBrowser);
-                    
+
                     if (minutes == -1) {
                         return;
                     }
-                    
+
                     System.out.println("A " + minutes + " minute timer has been added to " + webBrowser.getName());
-                    main.ModifyOptions(false, "t", "t:" + minutes, webBrowser);
-                    BrowserTimerThread timerListener = new BrowserTimerThread(minutes, webBrowser);
+                    main.ModifyOptions(false, "t:" + minutes, webBrowser);
+                    BrowserTimer timerListener = new BrowserTimer(minutes, webBrowser);
                     webBrowser.addBrowserTimer(timerListener);
                 }
 
