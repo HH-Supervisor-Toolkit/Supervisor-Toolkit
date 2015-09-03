@@ -39,7 +39,7 @@ public class OptionsEditPanel extends javax.swing.JPanel {
 
     //Returns the contents of the edit pane as a String[]
     public String[] getOptionsText() {
-        return optionsEditorArea.getText().split(System.getProperty("line.separator"));
+        return optionsEditorArea.getText().split("\n");
     }
 
     //Sets the contents of the edit pane to match the given String[]

@@ -1,6 +1,5 @@
 package app;
 
-import app.JNI.EnumAllWindowNames;
 import app.alarms.AlarmsEditPanel;
 import app.browser.ConfURLHandlerClass;
 import app.browser.ExtendedWebBrowser;
@@ -19,7 +18,6 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -38,7 +36,7 @@ public class main {
         "[Equipment Problem Report]", "https://docs.google.com/forms/d/1X8K1XeWBykPRnnxn5TWaLGUcc68Yn3JiejvpSgwiJTc/viewform",
         "[Incident Report]", "https://docs.google.com/forms/d/1Zy4Hd4FxPlpSAOZMigRfUVywnL78-pBm5HP5E69TasE/viewform",
         "[Textbook Request Form]", "https://docs.google.com/forms/d/1wW0GEoEqkOlpTIPP__2kRSWbD1RskTBo4wtBaO738BM/viewform",
-        "[Real-Time Agent] -S", "http://geomantce-hv.rose-hulman.edu/ACEAdmin/",
+        "[Real-Time Agent] -S", "http://geomantce-hv.rose-hulman.edu:8080/ACEReport/",
         "[Phone Surveys] -t:30", "https://prod11gbss8.rose-hulman.edu/BanSS/rhit_hwhl.P_QuestionPage",
         "[Attendance Page]", "http://dev2.askrose.org/askrose-login",
         "[JotForms]", "http://www.jotform.com/login"
@@ -120,9 +118,8 @@ public class main {
         }
 
         frame = new JFrame("Supervisor Toolkit");
-        frame.setSize(900, 600);
         frame.setLocationByPlatform(true);
-
+        
         //Load the chosen icon. Icons should be located in app.img.
         try {
             InputStream iconStream = main.class.getResourceAsStream(iconPath);
@@ -151,6 +148,7 @@ public class main {
             }
         });
 
+        frame.pack();
         frame.setVisible(true);
     }
 

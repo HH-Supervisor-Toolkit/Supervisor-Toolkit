@@ -177,6 +177,8 @@ public class AutoBackupDialog extends javax.swing.JDialog {
             try {
                 String[] backupEntries = new String(Files.readAllBytes(file.toPath()), "UTF-8").split(AutoBackupThread.newLine + AutoBackupThread.customSplitString + AutoBackupThread.newLine, -1);
 
+                //When we saved the backup we replaced Javascript's new line (\n) with the operating systems version of a new line. We now swap them the other way.
+                //We also replace any " with escaped versions so the Javascript doensn't think they are denoting Strings.
                 for (int i = 0; i < backupEntries.length; i++) {
                     backupEntries[i] = backupEntries[i].replace(AutoBackupThread.newLine, "\\n");
                     backupEntries[i] = backupEntries[i].replace("\"", "\\\"");
