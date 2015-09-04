@@ -83,7 +83,7 @@ public class main {
     }
 
     public static void main(final String[] args) {
-        
+                
         //Both SSLv3 and TLSv1 must be allowed because Rose's sites are out of date.
         System.setProperty("https.protocols", "SSLv3,TLSv1");
 
