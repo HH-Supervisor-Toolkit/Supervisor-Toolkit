@@ -1,5 +1,6 @@
 package app;
 
+import app.JNI.EnumAllWindowNames;
 import app.alarms.AlarmsEditPanel;
 import app.browser.ConfURLHandlerClass;
 import app.browser.ExtendedWebBrowser;
@@ -83,7 +84,7 @@ public class main {
     }
 
     public static void main(final String[] args) {
-                
+
         //Both SSLv3 and TLSv1 must be allowed because Rose's sites are out of date.
         System.setProperty("https.protocols", "SSLv3,TLSv1");
 
@@ -119,7 +120,7 @@ public class main {
 
         frame = new JFrame("Supervisor Toolkit");
         frame.setLocationByPlatform(true);
-        
+
         //Load the chosen icon. Icons should be located in app.img.
         try {
             InputStream iconStream = main.class.getResourceAsStream(iconPath);
@@ -256,10 +257,10 @@ public class main {
 
     //Used to edit the add/remove option switches from the OptionsEditPanel and the options file. All future option switches should use "prefix:extra_data".
     public static void ModifyOptions(boolean removing, String option, ExtendedWebBrowser webBrowser) {
-        
+
         int index = 0;
         int componentCount = webBrowserPane.getTabCount();
-        
+
         //We can determine which lines in the options file and OptionsEditPanel to modify based on the index of the ExtendedWebBrowser contained in the JTabbedPane
         for (int i = 0; i < componentCount; i++) {
             if (webBrowserPane.getComponentAt(i).equals(webBrowser)) {
@@ -269,11 +270,16 @@ public class main {
         }
 
         String[] optionsText = optionsEdit.getOptionsText();
-        
+
         int prefixEndPos = option.indexOf(":");
-        if (prefixEndPos == -1) prefixEndPos = option.length();
-        String prefix = option.substring(0, prefixEndPos);
         
+        //If the option switch doesn't have a colon then we should consider the whole switch to be a prefix.
+        if (prefixEndPos == -1) {
+            prefixEndPos = option.length();
+        }
+
+        String prefix = option.substring(0, prefixEndPos);
+
         //Regix expressions are beautiful monsters.
         if (removing) {
             System.out.println("Removing " + prefix + " option switch from tab " + webBrowser.getName());
