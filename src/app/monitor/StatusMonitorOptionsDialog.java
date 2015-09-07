@@ -12,23 +12,23 @@ import java.util.logging.Logger;
 //This class is the dialog that displays the status monitor settings. Allow the user to enable/disable the monitor and update the settings.
 public class StatusMonitorOptionsDialog extends javax.swing.JDialog {
 
-    String disableButtonText;
-    String enableButtonText;
     ExtendedWebBrowser webBrowser;
-    
+
     public StatusMonitorOptionsDialog(java.awt.Frame parent, boolean modal, ExtendedWebBrowser webBrowser1) {
         super(parent, modal);
-        
+
         webBrowser = webBrowser1;
-        if (webBrowser1.isMonitorEnabled()) {
-            disableButtonText = "Disable";
-            enableButtonText = "Apply";
-        } else {
-            disableButtonText = "Cancel";
-            enableButtonText = "Enable";
-        }
-        
+
         initComponents();
+
+        if (webBrowser.isMonitorEnabled()) {
+            disableButton.setText("Disable");
+            enableButton.setText("Apply");
+        } else {
+            disableButton.setText("Cancel");
+            enableButton.setText("Enable");
+        }
+
         loadSettings();
     }
 
@@ -68,14 +68,14 @@ public class StatusMonitorOptionsDialog extends javax.swing.JDialog {
         setTitle("Status Monitor");
         setResizable(false);
 
-        disableButton.setText(disableButtonText);
+        disableButton.setText("Disable/Cancel");
         disableButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 disableButtonActionPerformed(evt);
             }
         });
 
-        enableButton.setText(enableButtonText);
+        enableButton.setText("Enable/Apply");
         enableButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 enableButtonActionPerformed(evt);
@@ -229,18 +229,18 @@ public class StatusMonitorOptionsDialog extends javax.swing.JDialog {
 
     //Called when the disable button is clicked. Disables the monitor and modifies the options switches.
     private void disableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_disableButtonActionPerformed
-        
+
         if (webBrowser.isMonitorEnabled()) {
             webBrowser.disableMonitor();
             main.ModifyOptions(true, "S", webBrowser);
         }
-        
+
         setVisible(false);
     }//GEN-LAST:event_disableButtonActionPerformed
 
     //Called when the enable button is clicked. Saves the monitor settings then enables if necessary. Also modifies the switches.
     private void enableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enableButtonActionPerformed
-        
+
         if (webBrowser.isMonitorEnabled()) {
             saveSettings();
             webBrowser.updateMonitor();
@@ -249,35 +249,40 @@ public class StatusMonitorOptionsDialog extends javax.swing.JDialog {
             webBrowser.enableMonitor();
             main.ModifyOptions(false, "S", webBrowser);
         }
-        
+
         setVisible(false);
     }//GEN-LAST:event_enableButtonActionPerformed
 
     //Reades the settings file and adjusts the text fields on this dialog to match the existing settings.
     private void loadSettings() {
         File file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Monitor_Settings.txt");
-        
+
         if (file.exists()) {
             try {
                 Scanner read = new Scanner(file);
-                
+
                 String temp = read.nextLine();
                 String tempArray[] = temp.split(":");
                 ACWMinutes.setText(tempArray[0]);
                 ACWSeconds.setText(tempArray[1]);
-                
+
                 temp = read.nextLine();
                 tempArray = temp.split(":");
                 AUXMinutes.setText(tempArray[0]);
                 AUXSeconds.setText(tempArray[1]);
-                
+
                 temp = read.nextLine();
                 tempArray = temp.split(":");
                 WrapupMinutes.setText(tempArray[0]);
                 WrapupSeconds.setText(tempArray[1]);
-                
+
                 while (read.hasNextLine()) {
-                    SupervisorsList.append(read.nextLine() + "\n");
+                    String nextLine = read.nextLine();
+
+                    //In case some blank lines have snuck onto the end of the file we filter them out.
+                    if (!"".equals(nextLine.trim())) {
+                        SupervisorsList.append(nextLine + "\n");
+                    }
                 }
 
             } catch (FileNotFoundException ex) {
@@ -285,19 +290,23 @@ public class StatusMonitorOptionsDialog extends javax.swing.JDialog {
             }
         }
     }
-    
+
     //Saves the settings from this dialogs fields to the Monitor_Settings.txt file.
     private void saveSettings() {
         File file = new File(System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Monitor_Settings.txt");
-       
-        try (PrintWriter write = new PrintWriter(file)){
-            
+
+        try (PrintWriter write = new PrintWriter(file)) {
+
             write.println(ACWMinutes.getText() + ":" + ACWSeconds.getText());
             write.println(AUXMinutes.getText() + ":" + AUXSeconds.getText());
             write.println(WrapupMinutes.getText() + ":" + WrapupSeconds.getText());
-            
+
             for (String name : SupervisorsList.getText().split("\n")) {
-                write.println(name);
+
+                //Filter out blank lines at the end of the page.
+                if (!"".equals(name.trim())) {
+                    write.println(name);
+                }
             }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(StatusMonitorOptionsDialog.class.getName()).log(Level.SEVERE, null, ex);

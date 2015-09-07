@@ -52,9 +52,7 @@
   <SubComponents>
     <Component class="javax.swing.JButton" name="disableButton">
       <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="disableButtonText" type="code"/>
-        </Property>
+        <Property name="text" type="java.lang.String" value="Disable/Cancel"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="disableButtonActionPerformed"/>
@@ -62,9 +60,7 @@
     </Component>
     <Component class="javax.swing.JButton" name="enableButton">
       <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="enableButtonText" type="code"/>
-        </Property>
+        <Property name="text" type="java.lang.String" value="Enable/Apply"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="enableButtonActionPerformed"/>

@@ -1,17 +1,17 @@
 package app.watcher;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+//This allows the user to decide if they are ready for the watcher to start working again, or if they want to watcher to shutdown.
 public class AgentWatcherResumeDialog extends javax.swing.JDialog {
 
-    boolean returnValue;
-    private final CountDownLatch latch;
+    private boolean returnValue;
+    private final CountDownLatch latch = new CountDownLatch(1);
 
-    public AgentWatcherResumeDialog(java.awt.Frame parent, boolean modal, CountDownLatch latch) {
+    public AgentWatcherResumeDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
-
-        this.latch = latch;
-
         initComponents();
     }
 
@@ -91,23 +91,34 @@ public class AgentWatcherResumeDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    //Called if the Yes button is clicked. Will return true from the dialog.
     private void yesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_yesButtonActionPerformed
         returnValue = true;
-
-        latch.countDown();
-
+        
         setVisible(false);
+        latch.countDown();
     }//GEN-LAST:event_yesButtonActionPerformed
 
+    //Called if the No button is clicked. Will return false from the dialog.
     private void noButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_noButtonActionPerformed
         returnValue = false;
-
-        latch.countDown();
-
+        
         setVisible(false);
+        latch.countDown();
     }//GEN-LAST:event_noButtonActionPerformed
 
-    public boolean getResult() {
+    //This function allows the dialog to be displayed and returns the result of the prompt.
+    public boolean showDialog(){
+        setVisible(true);
+        setAlwaysOnTop(true);
+        setAlwaysOnTop(false);
+        
+        try {
+            latch.await();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(AgentWatcherResumeDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         return returnValue;
     }
 

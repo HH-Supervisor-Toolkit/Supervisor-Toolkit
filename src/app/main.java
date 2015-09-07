@@ -237,25 +237,21 @@ public class main {
 
         for (String parsedOption : parsedOptions) {
 
-            switch (parsedOption) {
-                case "t:":
-                    System.out.println("Adding a timer to " + tabTitle + " from options for " + parsedOption.substring(2).trim() + " minute(s)");
-                    BrowserTimer browserTimer = new BrowserTimer(Integer.parseInt(parsedOption.substring(2).trim()), webBrowser);
-                    webBrowser.addBrowserTimer(browserTimer);
-                    break;
-                case "B":
-                    System.out.println("Enabling auto backup for " + tabTitle);
-                    webBrowser.enableBackup();
-                    break;
-                case "S":
-                    System.out.println("Enabling status monitor for " + tabTitle);
-                    webBrowser.enableMonitor();
-                    break;
+            if (parsedOption.contains("t:")) {
+                System.out.println("Adding a timer to " + tabTitle + " from options for " + parsedOption.substring(2).trim() + " minute(s)");
+                BrowserTimer browserTimer = new BrowserTimer(Integer.parseInt(parsedOption.substring(2).trim()), webBrowser);
+                webBrowser.addBrowserTimer(browserTimer);
+            } else if (parsedOption.contains("B")) {
+                System.out.println("Enabling auto backup for " + tabTitle);
+                webBrowser.enableBackup();
+            } else if (parsedOption.contains("S")) {
+                System.out.println("Enabling status monitor for " + tabTitle);
+                webBrowser.enableMonitor();
             }
         }
     }
 
-    //Used to edit the add/remove option switches from the OptionsEditPanel and the options file. All future option switches should use "prefix:extra_data".
+//Used to edit the add/remove option switches from the OptionsEditPanel and the options file. All future option switches should use "prefix:extra_data".
     public static void ModifyOptions(boolean removing, String option, ExtendedWebBrowser webBrowser) {
 
         int index = 0;
@@ -272,7 +268,7 @@ public class main {
         String[] optionsText = optionsEdit.getOptionsText();
 
         int prefixEndPos = option.indexOf(":");
-        
+
         //If the option switch doesn't have a colon then we should consider the whole switch to be a prefix.
         if (prefixEndPos == -1) {
             prefixEndPos = option.length();

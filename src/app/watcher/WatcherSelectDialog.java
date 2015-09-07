@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import javafx.application.Platform;
 
+//This class is the dialog that is displayed when the user selects the Watcher options in the right-click popup menu.
+//This dialog allows the user to modify which users he/she wants to listen to.
 public class WatcherSelectDialog extends javax.swing.JDialog {
 
     private static ExtendedWebBrowser webBrowser;
@@ -15,15 +17,15 @@ public class WatcherSelectDialog extends javax.swing.JDialog {
         
         WatcherSelectDialog.webBrowser = webBrowser;
         
+        //This will populate the dialog with all the agents currently online.
         Platform.runLater(() -> {
-            
             int TutorCount = ((Integer) webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows.length"));
+            String[] tutorNameList = new String[TutorCount - 1];
             
             System.out.println("There are " + TutorCount + " tutors online right now. Loaded them into the watcher selection screen.");
             
-            String[] tutorNameList = new String[TutorCount - 1];
-            
             for (int i = 1; i < TutorCount; i++) {
+                //Like always we have to filter out the fluff that is attached to the agent's name in real-time agent.
                 String tempName = (String) webBrowser.getEngine().executeScript("frames[0].document.getElementById(\"tagents\").rows[" + i + "].children[0].innerHTML");
                 tutorNameList[i - 1] = tempName.substring(tempName.lastIndexOf("&nbsp;") + 6, tempName.length());
             }
@@ -31,6 +33,7 @@ public class WatcherSelectDialog extends javax.swing.JDialog {
             Arrays.sort(tutorNameList);
             watchableList.setListData(tutorNameList);
             
+            //If the watcher is already active we also get the list of tutors we are listening too. These are added to the list of removable tutors.
             if (webBrowser.isWatcherEnabled()) {
                 
                 String[] watchedList = webBrowser.getWatched();
@@ -141,34 +144,36 @@ public class WatcherSelectDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    //Called when the Select button is clicked. This gets all the agents selected to be added to the watched list and adds them.
     private void selectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectButtonActionPerformed
-        List watchAddList = watchableList.getSelectedValuesList();
+        List<String> watchAddList = watchableList.getSelectedValuesList();
 
         if (!webBrowser.isWatcherEnabled()) {
             webBrowser.enableWatcher();
         }
 
-        watchAddList.stream().forEach((watchAdd) -> {
-            webBrowser.addWatched((String) watchAdd);
+        watchAddList.stream().forEach((String watchAdd) -> {
+            webBrowser.addWatched(watchAdd);
         });
 
         setVisible(false);
     }//GEN-LAST:event_selectButtonActionPerformed
 
+    //Called when the Cancel button is clicked. Hides the dialog.
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         setVisible(false);
     }//GEN-LAST:event_cancelButtonActionPerformed
 
+    //Called when the Remove button is clicked. This gets all the agents selected to be removed from the watched list and removes them.
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
         if (webBrowser.isWatcherEnabled()) {
-            List watchRemoveList = removeList.getSelectedValuesList();
+            List<String> watchRemoveList = removeList.getSelectedValuesList();
 
-            watchRemoveList.stream().forEach((watchRemove) -> {
-                webBrowser.removeWatched((String) watchRemove);
+            watchRemoveList.stream().forEach((String watchRemove) -> {
+                webBrowser.removeWatched(watchRemove);
             });
 
             setVisible(false);
-
         }
     }//GEN-LAST:event_removeButtonActionPerformed
 

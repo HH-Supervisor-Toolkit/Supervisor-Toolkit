@@ -3,18 +3,17 @@ package app.timer;
 import app.browser.ExtendedWebBrowser;
 import javafx.application.Platform;
 
+//This class is the dialog that is displayed when an alert from the refresh timer should be given.
 public class TimerWarningDialog extends javax.swing.JDialog {
 
-    ExtendedWebBrowser webBrowser;
-    String messageString;
+    private final ExtendedWebBrowser webBrowser;
     
-    public TimerWarningDialog(java.awt.Frame parent, boolean modal, String message, ExtendedWebBrowser ewb) {
-        super(parent, modal);
-                
+    public TimerWarningDialog(java.awt.Frame parent, boolean modal, int timerDuration, long timeDifference, ExtendedWebBrowser ewb) {
+        super(parent, modal);       
         webBrowser = ewb;
-        messageString = message;
         
         initComponents();
+        updateMessage(timerDuration, timeDifference);
     }
 
     /**
@@ -34,7 +33,7 @@ public class TimerWarningDialog extends javax.swing.JDialog {
         setTitle("Timer Warning");
         setResizable(false);
 
-        messageLabel.setText(messageString);
+        messageLabel.setText("[Message]");
 
         okayButton.setText("Okay");
         okayButton.addActionListener(new java.awt.event.ActionListener() {
@@ -56,14 +55,16 @@ public class TimerWarningDialog extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(okayButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(reloadButton)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(okayButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(reloadButton))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(messageLabel)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(messageLabel)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -80,23 +81,24 @@ public class TimerWarningDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    //Called when the okay button is clicked. Simply hides the dialog and won't prevent further alerts.
     private void okayButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okayButtonActionPerformed
         setVisible(false);
     }//GEN-LAST:event_okayButtonActionPerformed
 
+    //Called when the reload button is clicekd. Will reload the page and then hide the dialog.
     private void reloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadButtonActionPerformed
 
         Platform.runLater(() -> {
-
             webBrowser.getEngine().reload();
-
         });
 
         setVisible(false);
     }//GEN-LAST:event_reloadButtonActionPerformed
 
-    public void updateMessage(String newMessage){
-        messageLabel.setText(newMessage);
+    //This function allow for the alert message to be updated outside of the class.
+    public final void updateMessage(int timerDuration, long timeDifference){
+        messageLabel.setText("Your timer for " + webBrowser.getName() + " is at " + String.format("%.2f", (double) timeDifference / (60000)) + " of " + timerDuration + " minutes");
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
