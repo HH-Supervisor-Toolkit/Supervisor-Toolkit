@@ -1,6 +1,5 @@
 package app;
 
-import app.JNI.EnumAllWindowNames;
 import app.alarms.AlarmsEditPanel;
 import app.browser.ConfURLHandlerClass;
 import app.browser.ExtendedWebBrowser;
