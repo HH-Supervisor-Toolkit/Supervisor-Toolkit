@@ -82,7 +82,13 @@ public class AgentWatcherThread extends Thread {
                                 
                                 hasActivated = true;
 
-                                //Once we have started listening to someone we need to stop checking if others are on call.
+                                //Once we have started listening to someone we need to stop checking if others are on call. First we wait a little bit to give Skype a chance to connect.
+                                try {
+                                    Thread.sleep(10000);
+                                } catch (InterruptedException ex) {
+                                    Logger.getLogger(AgentWatcherThread.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                                
                                 break;
                             }
                         }
