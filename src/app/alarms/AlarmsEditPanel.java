@@ -1,6 +1,8 @@
 package app.alarms;
 
-import java.awt.KeyboardFocusManager;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.FocusTraversalPolicy;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,6 +15,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JTabbedPane;
 
 //This class is the panel that displays all active alarms and allows for new alarms to be created.
 public class AlarmsEditPanel extends javax.swing.JPanel {
@@ -20,16 +23,21 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
     //entryNumber is used to keep track of how many alarms exist. It is passed to each AlarmEntryPanel created so they can return the value to AlarmsEditPanel if they are removed.
     private int entryNumber = 0;
     String alarmsFile = System.getProperty("user.home") + "\\AppData\\Roaming\\SuperToolkit\\Alarms.txt";
-    
+
+    public AlarmsEditPanel() {
+        initComponents();
+        loadAlarms();
+    }
+
     //Used to get all alarms from the alarms file and then schedule their respective AlarmTasks.
     private void loadAlarms() {
 
         try {
-            if (!Files.exists(Paths.get(alarmsFile))) {       
-               
+            if (!Files.exists(Paths.get(alarmsFile))) {
+
                 System.out.println("Alarms file not found attemping to create default");
                 Files.createFile(Paths.get(alarmsFile));
-                
+
             } else {
                 List<String> fileLines = Files.readAllLines(Paths.get(alarmsFile));
 
@@ -69,23 +77,23 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
 
     //Adds an entry displaying the new alarm and schedules the associated AlarmTask.
     private void addEntry(int hour, int minute, int period, String name) {
-        
+
         //A new instance of GregorianCalendar will initially be set for the time of its creation.
         GregorianCalendar alarmTime = new GregorianCalendar();
-        
+
         alarmTime.set(Calendar.HOUR, hour);
         alarmTime.set(Calendar.MINUTE, minute);
         alarmTime.set(Calendar.SECOND, 0);
         alarmTime.set(Calendar.AM_PM, period);
-        
+
         //If the alarm's time has already happened today reschedule it for tomorrow
-        if(alarmTime.before(GregorianCalendar.getInstance())){
+        if (alarmTime.before(GregorianCalendar.getInstance())) {
             alarmTime.add(Calendar.DATE, 1);
         }
-        
+
         AlarmTask alarmTask = new AlarmTask(name, entryNumber);
         AlarmTask.schedule(alarmTask, alarmTime.getTime());
-        
+
         AlarmsEntryPanel alarmEntry = new AlarmsEntryPanel(hour, minute, period, name, entryNumber);
         System.out.println("Adding new alarm entry: " + name);
 
@@ -99,10 +107,10 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
 
     //Used to remove any existing alarms and unschedule their respective AlarmTasks.
     public void removeEntry(int number) {
-        
+
         System.out.println("Removing alarm entry: " + number);
         AlarmTask.unschedule(number);
-        
+
         //We need to rewrite the AlarmsFile to not include the removed alarm.
         try {
             List<String> fileLines = Files.readAllLines(Paths.get(alarmsFile));
@@ -127,21 +135,16 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
         } catch (IOException ex) {
             Logger.getLogger(AlarmsEntryPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         entryContainerPanel.remove(number);
-        
+
         //Each component after the removed one needs their number decremented by one.
         for (int i = number; i < entryContainerPanel.getComponentCount(); i++) {
             System.out.println("Setting entry " + (i + 1) + " to be " + i);
             ((AlarmsEntryPanel) entryContainerPanel.getComponent(i)).setEntryNumber(i);
         }
-        
-        entryNumber--;
-    }
 
-    public AlarmsEditPanel() {
-        initComponents();
-        loadAlarms();
+        entryNumber--;
     }
 
     /**
@@ -156,12 +159,15 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         hourSelect = new javax.swing.JComboBox();
         minuteSelect = new javax.swing.JComboBox();
+        nameSelect = new javax.swing.JTextField();
         periodSelect = new javax.swing.JComboBox();
         addButton = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         entryContainerScrollPane = new javax.swing.JScrollPane();
         entryContainerPanel = new javax.swing.JPanel();
-        nameSelect = new javax.swing.JTextField();
+
+        setFocusCycleRoot(true);
+        setFocusTraversalPolicy(new CustomFocusTraversalPolicy());
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         jLabel1.setText("Alarms");
@@ -169,6 +175,17 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
         hourSelect.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
 
         minuteSelect.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60" }));
+
+        nameSelect.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        nameSelect.setText("Alarm Name");
+        nameSelect.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                nameSelectFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                nameSelectFocusLost(evt);
+            }
+        });
 
         periodSelect.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "AM", "PM" }));
 
@@ -186,18 +203,6 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
         entryContainerPanel.setLayout(new javax.swing.BoxLayout(entryContainerPanel, javax.swing.BoxLayout.PAGE_AXIS));
         entryContainerScrollPane.setViewportView(entryContainerPanel);
 
-        nameSelect.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        nameSelect.setText("Alarm Name");
-        nameSelect.setToolTipText("");
-        nameSelect.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                nameSelectFocusGained(evt);
-            }
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                nameSelectFocusLost(evt);
-            }
-        });
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -207,7 +212,7 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(nameSelect)
+                        .addComponent(nameSelect, javax.swing.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(hourSelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -263,9 +268,56 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
     private void nameSelectFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_nameSelectFocusLost
         if (nameSelect.getText().trim().equals("")) {
             nameSelect.setText("Alarm Name");
-            KeyboardFocusManager.getCurrentKeyboardFocusManager().clearGlobalFocusOwner();
+
+            JTabbedPane parent = (JTabbedPane) getParent();
         }
     }//GEN-LAST:event_nameSelectFocusLost
+
+    //This class is used to control the order in which focus is passed within this panel. 
+    //This is used to keep nameSelect from being first and then clearing the default text when the alarm tab is switched to.
+    private class CustomFocusTraversalPolicy extends FocusTraversalPolicy {
+
+        private final Component[] compList = {hourSelect, minuteSelect, periodSelect, addButton, nameSelect};
+
+        //All overridden methods are simply implications of the FocusTraversalPolicy interface.
+        @Override
+        public Component getComponentAfter(Container cntnr, Component cmpnt) {
+            return compList[(findComp(cmpnt) + 1) % compList.length];
+        }
+
+        @Override
+        public Component getComponentBefore(Container cntnr, Component cmpnt) {
+            return compList[(findComp(cmpnt) - 1) % compList.length];
+        }
+
+        @Override
+        public Component getFirstComponent(Container cntnr) {
+            return compList[0];
+        }
+
+        @Override
+        public Component getLastComponent(Container cntnr) {
+            return compList[compList.length - 1];
+        }
+
+        @Override
+        public Component getDefaultComponent(Container cntnr) {
+            return compList[0];
+        }
+
+        //A shortcut method to find index of a component within compList. If the provided component isn't within compList then 0 is returned.
+        private int findComp(Component cmpnt) {
+
+            for (int i = 0; i < compList.length; i++) {
+                if (compList[i] == cmpnt) {
+                    return i;
+                }
+            }
+
+            return 0;
+        }
+
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;

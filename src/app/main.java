@@ -87,7 +87,7 @@ public class main {
         //Both SSLv3 and TLSv1 must be allowed because Rose's sites are out of date.
         System.setProperty("https.protocols", "SSLv3,TLSv1");
 
-        //This is how we add special handeling to urls prefixed with conf. Conf is what lync uses to initiate group calls e.g. observations.
+        //This is how we add special handeling to urls prefixed with conf. Conf is what Skype for business uses to initiate group calls e.g. observations.
         URL.setURLStreamHandlerFactory((String protocol) -> {
             if (protocol.equals("conf")) {
                 return new ConfURLHandlerClass();
