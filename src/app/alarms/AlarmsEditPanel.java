@@ -1,8 +1,10 @@
 package app.alarms;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FocusTraversalPolicy;
+import java.awt.KeyboardFocusManager;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,7 +17,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JTabbedPane;
+import javax.swing.FocusManager;
 
 //This class is the panel that displays all active alarms and allows for new alarms to be created.
 public class AlarmsEditPanel extends javax.swing.JPanel {
@@ -176,6 +178,7 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
 
         minuteSelect.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60" }));
 
+        nameSelect.setForeground(java.awt.Color.lightGray);
         nameSelect.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         nameSelect.setText("Alarm Name");
         nameSelect.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -255,21 +258,26 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
         writeAlarm(hourSelect.getSelectedIndex() + 1, minuteSelect.getSelectedIndex(), periodSelect.getSelectedIndex(), nameSelect.getText());
 
         nameSelect.setText("Alarm Name");
+        nameSelect.setForeground(Color.LIGHT_GRAY);
     }//GEN-LAST:event_addButtonActionPerformed
 
     //Called when focus is gained by the name text box. Deletes the default text.
     private void nameSelectFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_nameSelectFocusGained
-        if (nameSelect.getText().equals("Alarm Name")) {
+        if (nameSelect.getText().equals("Alarm Name") && nameSelect.getForeground() == Color.LIGHT_GRAY) {
             nameSelect.setText("");
+            nameSelect.setForeground(Color.BLACK);
         }
     }//GEN-LAST:event_nameSelectFocusGained
 
     //Called when focus is lost by the name text box. Replaces the name text box with the default text if it is blank.
     private void nameSelectFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_nameSelectFocusLost
-        if (nameSelect.getText().trim().equals("")) {
+        if (nameSelect.getText().trim().equals("") && nameSelect.getForeground() == Color.BLACK) {
+            nameSelect.setForeground(Color.LIGHT_GRAY);
             nameSelect.setText("Alarm Name");
-
-            JTabbedPane parent = (JTabbedPane) getParent();
+                        
+            if(evt.isTemporary()){
+                hourSelect.requestFocusInWindow();
+            }
         }
     }//GEN-LAST:event_nameSelectFocusLost
 
@@ -309,7 +317,7 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
         private int findComp(Component cmpnt) {
 
             for (int i = 0; i < compList.length; i++) {
-                if (compList[i] == cmpnt) {
+                if (compList[i].equals(cmpnt)) {
                     return i;
                 }
             }
