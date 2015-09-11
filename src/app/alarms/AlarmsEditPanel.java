@@ -263,7 +263,7 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
 
     //Called when focus is gained by the name text box. Deletes the default text.
     private void nameSelectFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_nameSelectFocusGained
-        if (nameSelect.getText().equals("Alarm Name") && nameSelect.getForeground() == Color.LIGHT_GRAY) {
+        if (nameSelect.getText().equals("Alarm Name") && nameSelect.getForeground().equals(Color.LIGHT_GRAY)) {
             nameSelect.setText("");
             nameSelect.setForeground(Color.BLACK);
         }
@@ -271,11 +271,11 @@ public class AlarmsEditPanel extends javax.swing.JPanel {
 
     //Called when focus is lost by the name text box. Replaces the name text box with the default text if it is blank.
     private void nameSelectFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_nameSelectFocusLost
-        if (nameSelect.getText().trim().equals("") && nameSelect.getForeground() == Color.BLACK) {
+        if (nameSelect.getText().trim().equals("") && nameSelect.getForeground().equals(Color.BLACK)) {
             nameSelect.setForeground(Color.LIGHT_GRAY);
             nameSelect.setText("Alarm Name");
-                        
-            if(evt.isTemporary()){
+
+            if (evt.isTemporary()) {
                 hourSelect.requestFocusInWindow();
             }
         }
