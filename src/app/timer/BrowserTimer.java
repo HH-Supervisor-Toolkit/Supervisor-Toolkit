@@ -76,9 +76,10 @@ public class BrowserTimer {
 
             } else {
                 timerDialog = new TimerWarningDialog(main.frame, false, timerDuration, timeDifference, webBrowser);
-                timerDialog.pack();
                 timerDialog.setLocationRelativeTo(main.frame);
                 timerDialog.setVisible(true);
+                
+                timerDialog.pack();
                 timerDialog.setAlwaysOnTop(true);
                 timerDialog.setAlwaysOnTop(false);
             }

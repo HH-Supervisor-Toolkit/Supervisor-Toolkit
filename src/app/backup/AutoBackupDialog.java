@@ -139,12 +139,8 @@ public class AutoBackupDialog extends javax.swing.JDialog {
                     loadBackup(backupFile);
                 } else {
                     System.out.println("Loading old backup: " + longTermBackupList[fileSelectBox.getSelectedIndex() - 1].getName());
-                    System.out.println("Will store latest backup");
-                            
-                    AutoBackupThread.storeLatestBackup();
                     loadBackup(longTermBackupList[fileSelectBox.getSelectedIndex() - 1]);
-                }
-                
+                } 
             } else {
                 System.out.println("Loading old backup: " + longTermBackupList[fileSelectBox.getSelectedIndex()].getName());
                 loadBackup(longTermBackupList[fileSelectBox.getSelectedIndex()]);
