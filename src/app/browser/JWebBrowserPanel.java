@@ -71,6 +71,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         backButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/img/backIcon.png"))); // NOI18N
         backButton.setBorder(null);
         backButton.setContentAreaFilled(false);
+        backButton.setFocusPainted(false);
         backButton.setMaximumSize(new java.awt.Dimension(20, 20));
         backButton.setMinimumSize(new java.awt.Dimension(20, 20));
         backButton.setPreferredSize(new java.awt.Dimension(20, 20));
@@ -83,6 +84,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         forwardButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/img/forwardIcon.png"))); // NOI18N
         forwardButton.setBorder(null);
         forwardButton.setContentAreaFilled(false);
+        forwardButton.setFocusPainted(false);
         forwardButton.setMaximumSize(new java.awt.Dimension(20, 20));
         forwardButton.setMinimumSize(new java.awt.Dimension(20, 20));
         forwardButton.setPreferredSize(new java.awt.Dimension(20, 20));
@@ -96,6 +98,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         refreshButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/img/refreshIcon.png"))); // NOI18N
         refreshButton.setBorder(null);
         refreshButton.setContentAreaFilled(false);
+        refreshButton.setFocusPainted(false);
         refreshButton.setMaximumSize(new java.awt.Dimension(20, 20));
         refreshButton.setMinimumSize(new java.awt.Dimension(20, 20));
         refreshButton.setPreferredSize(new java.awt.Dimension(20, 20));
@@ -111,6 +114,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         printButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/img/printIcon.png"))); // NOI18N
         printButton.setBorder(null);
         printButton.setContentAreaFilled(false);
+        printButton.setFocusPainted(false);
         printButton.setMaximumSize(new java.awt.Dimension(20, 20));
         printButton.setMinimumSize(new java.awt.Dimension(20, 20));
         printButton.setPreferredSize(new java.awt.Dimension(20, 20));
