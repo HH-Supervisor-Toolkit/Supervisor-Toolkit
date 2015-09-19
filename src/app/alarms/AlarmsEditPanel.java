@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FocusTraversalPolicy;
-import java.awt.KeyboardFocusManager;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,7 +16,6 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.FocusManager;
 
 //This class is the panel that displays all active alarms and allows for new alarms to be created.
 public class AlarmsEditPanel extends javax.swing.JPanel {

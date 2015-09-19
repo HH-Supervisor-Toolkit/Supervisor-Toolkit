@@ -162,7 +162,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
     //Called when the refresh icon is clicked. Reloads the page.
     private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
         Platform.runLater(() -> {
-            engine.reload();
+            engine.load(engine.getLocation());
         });
     }//GEN-LAST:event_refreshButtonActionPerformed
 
@@ -195,7 +195,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
 
     //This is used to create all of the JavaFX components because that all must be done in the JavaFX thread. This means most of this code is preformed asynchronously.
     private void createScene(CountDownLatch latch) {
-        
+
         Platform.runLater(() -> {
             WebView view = new WebView();
             engine = view.getEngine();
@@ -208,7 +208,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
 
                 //This is how we handle obeservations and download differently. We close the popup window if they are a special type.
                 popupView.getEngine().locationProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-                    
+
                     if (newValue.startsWith("conf:sip")) {
                         stage.close();
 
@@ -233,25 +233,22 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         });
     }
 
-    //Used to load a webpage, but with some more intelligent URL handling.
+    //Used to load a webpage, first constructs a URL then attempts to read in each line of the url.
     public void loadURL(final String url) {
         Platform.runLater(() -> {
-            String tmp = toURL(url);
-
-            if (tmp == null) {
-                tmp = toURL("http://" + url);
+            try {
+                engine.load(toURL(url));
+            } catch (Exception ex) {
+                Logger.getLogger(JWebBrowserPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
-
-            engine.load(tmp);
         });
     }
 
-    //Used to make sure the provided URL is in the correct format.
-    private static String toURL(String str) {
+    private String toURL(String url) {
         try {
-            return new URL(str).toExternalForm();
-        } catch (MalformedURLException exception) {
-            return null;
+            return new URL(url).toExternalForm();
+        } catch (MalformedURLException ex) {
+            return url.contains("http://") ? null : toURL("http://" + url);
         }
     }
 

@@ -87,7 +87,6 @@ public class main {
         //Both SSLv3 and TLSv1 must be allowed because Rose's sites are out of date.
         //Setting the cookie handler to null fixes an issue (com.sun.webkit.network.URLLoader doRun Unexpected error).
         System.setProperty("https.protocols", "SSLv3,TLSv1");
-        java.net.CookieHandler.setDefault(null);
 
         //This is how we add special handeling to urls prefixed with conf. Conf is what Skype for business uses to initiate group calls e.g. observations.
         URL.setURLStreamHandlerFactory((String protocol) -> {
