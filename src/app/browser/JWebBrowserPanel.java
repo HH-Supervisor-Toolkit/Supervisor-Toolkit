@@ -30,7 +30,7 @@ import javafx.stage.Stage;
 public class JWebBrowserPanel extends javax.swing.JPanel {
 
     //A list of all file types that should be downloadable.
-    private final String[] fileSuffixes = {"doc", "docx", "rft", "txt", "pps",
+    private final String[] fileSuffixes = {"doc", "docx", "rft", "txt", "pdf", "pps",
         "ppt", "pptx", "png", "bmp", "tif", "jpg", "xls", "xlsx", "7z", "rar", "zip"};
 
     //We use a JFXPanel so we can display a JavaFX element in a Swing element. The toolkit started as Swing before using JavaFX's web browser, so this is a cop-out to rewriting everthing.
@@ -244,6 +244,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         });
     }
 
+    //This function can be used to confirm in the URL requested to be loaded is correctly formatted. If the URL fails the first time a second guess with http:// prefixing it will occur.
     private String toURL(String url) {
         try {
             return new URL(url).toExternalForm();
