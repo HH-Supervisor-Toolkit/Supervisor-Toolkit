@@ -42,6 +42,8 @@ public class main {
         "[JotForms]", "http://www.jotform.com/login"
     };
 
+    public static boolean debug = false;
+
     static ExtendedWebBrowser[] webBrowsers;
     public static JFrame frame;
     static public BufferedImage icon;
@@ -83,9 +85,8 @@ public class main {
     }
 
     public static void main(final String[] args) {
-        
+
         //Both SSLv3 and TLSv1 must be allowed because Rose's sites are out of date.
-        //Setting the cookie handler to null fixes an issue (com.sun.webkit.network.URLLoader doRun Unexpected error).
         System.setProperty("https.protocols", "SSLv3,TLSv1");
 
         //This is how we add special handeling to urls prefixed with conf. Conf is what Skype for business uses to initiate group calls e.g. observations.
@@ -100,14 +101,13 @@ public class main {
         //How we detect if the user wants bears.
         String iconPath = "img/icon.png";
         for (String arg : args) {
-            if (arg.equals("don'tfeedthebears")
-                    || arg.equals("don'tfeedthebear")
-                    || arg.equals("bear")
-                    || arg.equals("bears")
-                    || arg.equals("dontfeedthebears")
-                    || arg.equals("dontfeedthebear")) {
-                iconPath = "img/bear.png";
-                break;
+            switch (arg) {
+                case "bears":
+                    iconPath = "img/bear.png";
+                    break;
+                case "debug":
+                    debug = true;
+                    break;
             }
         }
 

@@ -7,6 +7,7 @@ import java.util.TimerTask;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker.State;
 
 //This class is used to add a refresh timer to a web browser. This class creates a TimerTask and Timer to manage when to alert the user. 
 //This class also adds a listener to the ExtendedWebBrowser that will reset the TimerTask if the page is reloaded or navigated to a different page.
@@ -18,7 +19,7 @@ public class BrowserTimer {
     private final ExtendedWebBrowser webBrowser;
 
     private TimerWarningDialog timerDialog = null;
-    private ChangeListener<Number> refreshListener = null;
+    private ChangeListener<State> refreshListener = null;
 
     private final Timer alertTimer = new Timer();
     private TimerAlertTask timerAlertTask = new TimerAlertTask();
@@ -34,7 +35,7 @@ public class BrowserTimer {
         alertTimer.cancel();
 
         Platform.runLater(() -> {
-            webBrowser.getEngine().getLoadWorker().workDoneProperty().removeListener(refreshListener);
+            webBrowser.getEngine().getLoadWorker().stateProperty().removeListener(refreshListener);
         });
     }
 
@@ -42,9 +43,9 @@ public class BrowserTimer {
     //This function starts the TimerTask and adds the refresh listener.
     public void start() {
 
-        refreshListener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+        refreshListener = (ObservableValue<? extends State> observable, State oldValue, State newValue) -> {
 
-            if (newValue.intValue() == 100) {
+            if (newValue.equals(State.SUCCEEDED)) {
                 System.out.println("A timer has seen a change of page");
                 lastRefreshTime = System.currentTimeMillis();
 
@@ -57,7 +58,7 @@ public class BrowserTimer {
         alertTimer.scheduleAtFixedRate(timerAlertTask, timerDuration * 40000, timerDuration * 10000);
 
         Platform.runLater(() -> {
-            webBrowser.getEngine().getLoadWorker().workDoneProperty().addListener(refreshListener);
+            webBrowser.getEngine().getLoadWorker().stateProperty().addListener(refreshListener);
         });
     }
 

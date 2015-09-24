@@ -15,16 +15,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.print.PrinterJob;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.scene.web.PopupFeatures;
 import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebErrorEvent;
+import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import netscape.javascript.JSObject;
 
 //This class is the base web browser. It contains all the code needed to create a basic web browser not specific to the supervisor toolkit.
 public class JWebBrowserPanel extends javax.swing.JPanel {
@@ -72,9 +77,6 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         backButton.setBorder(null);
         backButton.setContentAreaFilled(false);
         backButton.setFocusPainted(false);
-        backButton.setMaximumSize(new java.awt.Dimension(20, 20));
-        backButton.setMinimumSize(new java.awt.Dimension(20, 20));
-        backButton.setPreferredSize(new java.awt.Dimension(20, 20));
         backButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 backButtonActionPerformed(evt);
@@ -85,9 +87,6 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         forwardButton.setBorder(null);
         forwardButton.setContentAreaFilled(false);
         forwardButton.setFocusPainted(false);
-        forwardButton.setMaximumSize(new java.awt.Dimension(20, 20));
-        forwardButton.setMinimumSize(new java.awt.Dimension(20, 20));
-        forwardButton.setPreferredSize(new java.awt.Dimension(20, 20));
         forwardButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 forwardButtonActionPerformed(evt);
@@ -115,9 +114,6 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         printButton.setBorder(null);
         printButton.setContentAreaFilled(false);
         printButton.setFocusPainted(false);
-        printButton.setMaximumSize(new java.awt.Dimension(20, 20));
-        printButton.setMinimumSize(new java.awt.Dimension(20, 20));
-        printButton.setPreferredSize(new java.awt.Dimension(20, 20));
         printButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 printButtonActionPerformed(evt);
@@ -155,21 +151,29 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
     //Called when the forward arrow is clicked. Navigates to the next page in the browsing history.
     private void forwardButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_forwardButtonActionPerformed
         Platform.runLater(() -> {
-            engine.executeScript("history.forward()");
+            try {
+                engine.getHistory().go(1);
+            } catch (IndexOutOfBoundsException e) {
+
+            }
         });
     }//GEN-LAST:event_forwardButtonActionPerformed
 
     //Called when the refresh icon is clicked. Reloads the page.
     private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
         Platform.runLater(() -> {
-            engine.load(engine.getLocation());
+            engine.reload();
         });
     }//GEN-LAST:event_refreshButtonActionPerformed
 
     //Called when the back arrow is clicked. Navigates to the previous page. 
     private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
         Platform.runLater(() -> {
-            engine.executeScript("history.back()");
+            try {
+                engine.getHistory().go(-1);
+            } catch (IndexOutOfBoundsException e) {
+
+            }
         });
     }//GEN-LAST:event_backButtonActionPerformed
 
@@ -227,6 +231,46 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
 
                 return popupView.getEngine();
             });
+            
+            if (main.debug) {
+
+                engine.setOnAlert((WebEvent<String> event) -> {
+                    System.out.println("Web browser at location: " + engine.getLocation() + " has given the following alert: " + event.getData());
+                });
+
+                engine.setOnError((WebErrorEvent event) -> {
+                    System.err.println("Web browser at location: " + engine.getLocation() + " has given the following error: " + event.getMessage());
+                });
+
+                engine.setOnStatusChanged((WebEvent<String> event) -> {
+                    if (event.getData() != null) {
+                        System.out.println("The browser at location: " + engine.getLocation() + " has given the following status change: " + event.getData());
+                    }
+                });
+
+                engine.getLoadWorker().exceptionProperty().addListener((ObservableValue<? extends Throwable> observable, Throwable newValue, Throwable oldValue) -> {
+                    System.err.println("Web browser at location: " + engine.getLocation() + " has given the following exception: " + oldValue.getMessage());
+                });
+
+                engine.getLoadWorker().stateProperty().addListener((ObservableValue<? extends Worker.State> observable, Worker.State newValue, Worker.State oldValue) -> {
+
+                    JSObject window = (JSObject) engine.executeScript("window");
+                    ConsoleBridge bridge = new ConsoleBridge();
+                    window.setMember("java", bridge);
+
+                    engine.executeScript("window.onerror = function(msg, url, line){java.error(msg, url, line);}");
+                });
+                
+                engine.getLoadWorker().stateProperty().addListener((ObservableValue<? extends Worker.State> observable, Worker.State newValue, Worker.State oldValue)->{
+                    System.out.println("The site at location: " + engine.getLocation() + " has changed to state: " + newValue.name());
+                });
+
+                view.setOnKeyPressed((javafx.scene.input.KeyEvent event) -> {
+                    if (event.isControlDown() && event.getCode() == KeyCode.D) {
+                        engine.executeScript("if (!document.getElementById('FirebugLite')){E = document['createElement' + 'NS'] && document.documentElement.namespaceURI;E = E ? document['createElement' + 'NS'](E, 'script') : document['createElement']('script');E['setAttribute']('id', 'FirebugLite');E['setAttribute']('src', 'https://getfirebug.com/' + 'firebug-lite.js' + '#startOpened');E['setAttribute']('FirebugLite', '4');(document['getElementsByTagName']('head')[0] || document['getElementsByTagName']('body')[0]).appendChild(E);E = new Image;E['setAttribute']('src', 'https://getfirebug.com/' + '#startOpened');}");
+                    }
+                });
+            }
 
             fxWebViewPanel.setScene(new Scene(view));
             latch.countDown();
@@ -313,6 +357,17 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
     //Allows other classes to access the WebEngine of the web browser.
     public WebEngine getEngine() {
         return engine;
+    }
+
+    public class ConsoleBridge {
+
+        public void error(String message, String url, String line) {
+            System.err.println("Error from site: " + url + " with message: " + message + " at line: " + line);
+        }
+
+        public void log(String message) {
+            System.out.println("Message from site: " + engine.getLocation() + " with message: " + message);
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
