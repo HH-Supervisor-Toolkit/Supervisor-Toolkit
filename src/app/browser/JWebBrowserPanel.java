@@ -233,16 +233,20 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
             //Also redirects javascript errors.
             if (main.debug) {
 
+                //These listeners are in place to give alerts should an aspect of the WebEngine fail.
                 engine.setOnAlert((WebEvent<String> event) -> {
-                    System.out.println("Web browser at location: " + getName() + " has given the following alert: " + event.getData());
+                    System.out.println("Web browser at location: " + getName()
+                            + "\n     Has given the following alert: " + event.getData());
                 });
 
                 engine.setOnError((WebErrorEvent event) -> {
-                    System.err.println("Web browser at location: " + getName() + " has given the following error: " + event.getMessage());
+                    System.err.println("Web browser at location: " + getName()
+                            + "\n     Has given the following error: " + event.getMessage());
                 });
 
                 engine.getLoadWorker().exceptionProperty().addListener((ObservableValue<? extends Throwable> observable, Throwable newValue, Throwable oldValue) -> {
-                    System.err.println("Web browser at location: " + engine.getLocation() + " has given the following exception: " + oldValue.getMessage());
+                    System.err.println("Web browser at location: " + engine.getLocation()
+                            + "\n     Has given the following exception: " + oldValue.getMessage());
                 });
 
                 engine.getLoadWorker().workDoneProperty().addListener((ObservableValue<? extends Number> observable, Number newValue, Number oldValue) -> {
@@ -250,6 +254,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
                     JSObject window = (JSObject) engine.executeScript("window");
                     window.setMember("java", bridge);
 
+                    //This script redirects JavaScript errors to System.err via ConsoleBridge
                     engine.executeScript("window.onerror = function (msg, url, line) {\n"
                             + "    java.error(msg, url, line);\n"
                             + "}");
@@ -302,14 +307,13 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         return engine;
     }
 
+    //This class allows us to forward JavaScript errors to System.err
     public class ConsoleBridge {
 
         public void error(String message, String url, String line) {
-            System.err.println("Error from site: " + url + " with message: " + message + " at line: " + line);
-        }
-
-        public void log(String message) {
-            System.out.println("Message from site: " + engine.getLocation() + " with message: " + message);
+            System.err.println("Error from site: " + url
+                    + "\n     With message: " + message
+                    + "\n     At line: " + line);
         }
     }
 
