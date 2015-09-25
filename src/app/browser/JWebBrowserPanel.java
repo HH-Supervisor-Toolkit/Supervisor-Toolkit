@@ -1,21 +1,16 @@
 package app.browser;
 
 import app.main;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.awt.Desktop;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.print.PrinterJob;
@@ -26,8 +21,6 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebErrorEvent;
 import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import netscape.javascript.JSObject;
 
@@ -216,11 +209,15 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
                     if (newValue.startsWith("conf:sip")) {
                         stage.close();
 
-                    } else if (contains(fileSuffixes, newValue.substring(newValue.lastIndexOf(".") + 1)) && popupView.getEngine().getLoadWorker().getProgress() != -1) {
-                        System.out.println("The browser has detected a file to download");
-
+                    } else if (contains(fileSuffixes, newValue.substring(newValue.lastIndexOf(".") + 1))) {
+                        System.out.println("The browser has detected a file to redirect to the native browser");
                         stage.close();
-                        downloadFile(newValue);
+
+                        try {
+                            Desktop.getDesktop().browse(URI.create(newValue));
+                        } catch (IOException ex) {
+                            Logger.getLogger(JWebBrowserPanel.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
                 });
 
@@ -231,40 +228,34 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
 
                 return popupView.getEngine();
             });
-            
+
+            //If the user has choosen to debug this will attatch several listeners to give alerts to the user.
+            //Also redirects javascript errors.
             if (main.debug) {
 
                 engine.setOnAlert((WebEvent<String> event) -> {
-                    System.out.println("Web browser at location: " + engine.getLocation() + " has given the following alert: " + event.getData());
+                    System.out.println("Web browser at location: " + getName() + " has given the following alert: " + event.getData());
                 });
 
                 engine.setOnError((WebErrorEvent event) -> {
-                    System.err.println("Web browser at location: " + engine.getLocation() + " has given the following error: " + event.getMessage());
-                });
-
-                engine.setOnStatusChanged((WebEvent<String> event) -> {
-                    if (event.getData() != null) {
-                        System.out.println("The browser at location: " + engine.getLocation() + " has given the following status change: " + event.getData());
-                    }
+                    System.err.println("Web browser at location: " + getName() + " has given the following error: " + event.getMessage());
                 });
 
                 engine.getLoadWorker().exceptionProperty().addListener((ObservableValue<? extends Throwable> observable, Throwable newValue, Throwable oldValue) -> {
                     System.err.println("Web browser at location: " + engine.getLocation() + " has given the following exception: " + oldValue.getMessage());
                 });
 
-                engine.getLoadWorker().stateProperty().addListener((ObservableValue<? extends Worker.State> observable, Worker.State newValue, Worker.State oldValue) -> {
-
-                    JSObject window = (JSObject) engine.executeScript("window");
+                engine.getLoadWorker().workDoneProperty().addListener((ObservableValue<? extends Number> observable, Number newValue, Number oldValue) -> {
                     ConsoleBridge bridge = new ConsoleBridge();
+                    JSObject window = (JSObject) engine.executeScript("window");
                     window.setMember("java", bridge);
 
-                    engine.executeScript("window.onerror = function(msg, url, line){java.error(msg, url, line);}");
-                });
-                
-                engine.getLoadWorker().stateProperty().addListener((ObservableValue<? extends Worker.State> observable, Worker.State newValue, Worker.State oldValue)->{
-                    System.out.println("The site at location: " + engine.getLocation() + " has changed to state: " + newValue.name());
+                    engine.executeScript("window.onerror = function (msg, url, line) {\n"
+                            + "    java.error(msg, url, line);\n"
+                            + "}");
                 });
 
+                //This command will allow a debug console to be brought up if Ctrl-D is pressed.
                 view.setOnKeyPressed((javafx.scene.input.KeyEvent event) -> {
                     if (event.isControlDown() && event.getCode() == KeyCode.D) {
                         engine.executeScript("if (!document.getElementById('FirebugLite')){E = document['createElement' + 'NS'] && document.documentElement.namespaceURI;E = E ? document['createElement' + 'NS'](E, 'script') : document['createElement']('script');E['setAttribute']('id', 'FirebugLite');E['setAttribute']('src', 'https://getfirebug.com/' + 'firebug-lite.js' + '#startOpened');E['setAttribute']('FirebugLite', '4');(document['getElementsByTagName']('head')[0] || document['getElementsByTagName']('body')[0]).appendChild(E);E = new Image;E['setAttribute']('src', 'https://getfirebug.com/' + '#startOpened');}");
@@ -274,17 +265,14 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
 
             fxWebViewPanel.setScene(new Scene(view));
             latch.countDown();
-        });
+        }
+        );
     }
 
     //Used to load a webpage, first constructs a URL then attempts to read in each line of the url.
     public void loadURL(final String url) {
         Platform.runLater(() -> {
-            try {
-                engine.load(toURL(url));
-            } catch (Exception ex) {
-                Logger.getLogger(JWebBrowserPanel.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            engine.load(toURL(url));
         });
     }
 
@@ -294,51 +282,6 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
             return new URL(url).toExternalForm();
         } catch (MalformedURLException ex) {
             return url.contains("http://") ? null : toURL("http://" + url);
-        }
-    }
-
-    //If the web browser navigated to a downloadable file this is how we download that file.
-    private void downloadFile(String url) {
-
-        try {
-            //This makes sure that the original file name from the URL is the default suggestion. We have to take into account how URLs are encoded.
-            String fileName = URLDecoder.decode(url, "UTF-8").substring(url.lastIndexOf("/") + 1);
-
-            String fileType = url.substring(url.lastIndexOf(".") + 1);
-
-            FileChooser chooser = new FileChooser();
-            ExtensionFilter fileTypeFilter = new ExtensionFilter(fileType.toUpperCase(), "*." + fileType);
-
-            chooser.setTitle("Choose Save Location");
-            chooser.setInitialFileName(fileName);
-            chooser.getExtensionFilters().add(fileTypeFilter);
-
-            File saveResult = chooser.showSaveDialog(null);
-
-            //If the user chose a save location and didn't cancel. We'll now download the file and save it to there.
-            if (saveResult != null) {
-
-                try (BufferedInputStream inStream = new BufferedInputStream(new URL(url).openStream());
-                        FileOutputStream outStream = new FileOutputStream(saveResult)) {
-
-                    byte data[] = new byte[1024];
-                    int count;
-
-                    while ((count = inStream.read(data, 0, 1024)) != -1) {
-                        outStream.write(data, 0, count);
-                    }
-
-                } catch (FileNotFoundException ex) {
-                    Logger.getLogger(JWebBrowserPanel.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (MalformedURLException ex) {
-                    Logger.getLogger(JWebBrowserPanel.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(JWebBrowserPanel.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(JWebBrowserPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
