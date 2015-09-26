@@ -209,7 +209,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
                     if (newValue.startsWith("conf:sip")) {
                         stage.close();
 
-                    } else if (contains(fileSuffixes, newValue.substring(newValue.lastIndexOf(".") + 1))) {
+                    } else if (contains(fileSuffixes, newValue.substring(newValue.lastIndexOf(".") + 1)) && stage.isShowing()) {
                         System.out.println("The browser has detected a file to redirect to the native browser");
                         stage.close();
 
