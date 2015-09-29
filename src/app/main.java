@@ -72,7 +72,6 @@ public class main {
 
             RepairOptions();
             return createContent(ReadOptions());
-
         }
 
         //optionsEdit is a class variable because it will be reference again when options switches are changed. These changes come from any tab and not just the OptionsEditPanel itself.

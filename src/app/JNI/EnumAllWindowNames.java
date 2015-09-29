@@ -58,7 +58,7 @@ public class EnumAllWindowNames {
         File fileOut = new File(System.getProperty("user.home") + "\\AppData\\Local\\Temp\\SuperToolkit\\cLib.dll");
         fileOut.getParentFile().mkdirs();
 
-        try (InputStream in = main.class.getResourceAsStream("/app/JNI/clib.dll");
+        try (InputStream in = main.class.getResourceAsStream("/app/JNI/cLib.dll");
                 FileOutputStream out = new FileOutputStream(fileOut)) {
 
             int i;
