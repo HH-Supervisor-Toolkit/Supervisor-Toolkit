@@ -146,8 +146,8 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         Platform.runLater(() -> {
             try {
                 engine.getHistory().go(1);
-            } catch (IndexOutOfBoundsException e) {
-
+            } catch (Exception e) {
+                Logger.getLogger(JWebBrowserPanel.class.getName()).log(Level.SEVERE, null, e);
             }
         });
     }//GEN-LAST:event_forwardButtonActionPerformed
@@ -155,7 +155,11 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
     //Called when the refresh icon is clicked. Reloads the page.
     private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
         Platform.runLater(() -> {
-            engine.reload();
+            try {
+                engine.reload();
+            } catch (Exception e) {
+                Logger.getLogger(JWebBrowserPanel.class.getName()).log(Level.SEVERE, null, e);
+            }
         });
     }//GEN-LAST:event_refreshButtonActionPerformed
 
@@ -164,8 +168,8 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
         Platform.runLater(() -> {
             try {
                 engine.getHistory().go(-1);
-            } catch (IndexOutOfBoundsException e) {
-
+            } catch (Exception e) {
+                Logger.getLogger(JWebBrowserPanel.class.getName()).log(Level.SEVERE, null, e);
             }
         });
     }//GEN-LAST:event_backButtonActionPerformed
@@ -277,7 +281,11 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
     //Used to load a webpage, first constructs a URL then attempts to read in each line of the url.
     public void loadURL(final String url) {
         Platform.runLater(() -> {
-            engine.load(toURL(url));
+            try {
+                engine.load(toURL(url));
+            } catch (Exception e) {
+                Logger.getLogger(JWebBrowserPanel.class.getName()).log(Level.SEVERE, null, e);
+            }
         });
     }
 

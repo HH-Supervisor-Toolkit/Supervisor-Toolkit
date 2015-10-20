@@ -1,17 +1,19 @@
 package app.timer;
 
 import app.browser.ExtendedWebBrowser;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Platform;
 
 //This class is the dialog that is displayed when an alert from the refresh timer should be given.
 public class TimerWarningDialog extends javax.swing.JDialog {
 
     private final ExtendedWebBrowser webBrowser;
-    
+
     public TimerWarningDialog(java.awt.Frame parent, boolean modal, int timerDuration, long timeDifference, ExtendedWebBrowser ewb) {
-        super(parent, modal);       
+        super(parent, modal);
         webBrowser = ewb;
-        
+
         initComponents();
         updateMessage(timerDuration, timeDifference);
     }
@@ -90,17 +92,21 @@ public class TimerWarningDialog extends javax.swing.JDialog {
     private void reloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadButtonActionPerformed
 
         Platform.runLater(() -> {
-            webBrowser.getEngine().reload();
+            try {
+                webBrowser.getEngine().reload();
+            } catch (Exception e) {
+                Logger.getLogger(TimerWarningDialog.class.getName()).log(Level.SEVERE, null, e);
+            }
         });
 
         setVisible(false);
     }//GEN-LAST:event_reloadButtonActionPerformed
 
     //This function allow for the alert message to be updated outside of the class.
-    public final void updateMessage(int timerDuration, long timeDifference){
+    public final void updateMessage(int timerDuration, long timeDifference) {
         messageLabel.setText("Your timer for " + webBrowser.getName() + " is at " + String.format("%.2f", (double) timeDifference / (60000)) + " of " + timerDuration + " minutes");
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel messageLabel;
     private javax.swing.JButton okayButton;
