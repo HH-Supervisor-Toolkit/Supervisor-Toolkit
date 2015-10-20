@@ -29,7 +29,7 @@ public class JWebBrowserPanel extends javax.swing.JPanel {
 
     //A list of all file types that should be downloadable.
     private final String[] fileSuffixes = {"doc", "docx", "rft", "txt", "pdf", "pps",
-        "ppt", "pptx", "png", "bmp", "tif", "jpg", "xls", "xlsx", "7z", "rar", "zip"};
+        "ppt", "pptx", "png", "bmp", "tif", "jpg", "jpeg", "xls", "xlsx", "7z", "rar", "zip"};
 
     //We use a JFXPanel so we can display a JavaFX element in a Swing element. The toolkit started as Swing before using JavaFX's web browser, so this is a cop-out to rewriting everthing.
     private final JFXPanel fxWebViewPanel = new JFXPanel();
