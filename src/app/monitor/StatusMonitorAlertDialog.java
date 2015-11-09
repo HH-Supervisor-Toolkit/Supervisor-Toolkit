@@ -20,7 +20,7 @@ public class StatusMonitorAlertDialog extends javax.swing.JDialog {
         
         this.webBrowser = webBrowser;
         this.name = name;
-        labelText = "User " + name + " has been on " + mode + " too long.";
+        labelText = name + " has been on " + mode + " too long.";
         
         initComponents();
     }
